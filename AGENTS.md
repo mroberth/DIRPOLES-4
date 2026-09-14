@@ -35,18 +35,29 @@ antes de proponer código nuevo.
   **contador real** vía `data-stat`/`api/dashboard/stats`) y un resumen
   operativo; cada empleado ve las **estadísticas de su módulo**. Todos tienen
   **calendario personal** con CRUD por API.
-- **NO hay módulos de negocio todavía** (beneficiarios, citas, inventario,
-  reportes IA, etc.). Esos son los que el dueño del proyecto construye.
+- **Módulos ya construidos sobre el esqueleto** (con rutas, controladores,
+  modelos, vistas y JS siguiendo la GUIA-MODULOS.md):
+  - **Empleados** (id_modulo 1): CRUD completo, stats, validaciones asíncronas.
+  - **Beneficiarios** (id_modulo 2): CRUD completo, stats, validaciones asíncronas.
+  - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
+  - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
+  - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
+  - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
+- **Faltan los módulos de negocio pesados**: citas, psicología, medicina,
+  orientación, trabajo social, discapacidad, inventario, referencias, jornadas,
+  mobiliario, transporte, horarios (ver `app/Config/dashboard_cards.php`, las
+  cards con `'disponible' => false` son los pendientes).
 
-### Relación con el sistema completo
+### Repositorio y relación con el sistema completo
 
-El sistema completo anterior (con todos sus módulos) está en el directorio
-hermano `../DIRPOLES_4` (fuera de este repo). **Este repositorio NO es un
-repositorio git** (no existe `.git`), así que no hay tags ni `HEAD~1`; para
-consultar código viejo, lee directamente `../DIRPOLES_4`.
-
-Puedes CONSULTAR el sistema viejo como referencia, pero el código nuevo debe
-seguir las convenciones nuevas de este esqueleto (no copiar-pegar estilo viejo).
+- Este repositorio **SÍ es git ahora** y está publicado en GitHub:
+  `https://github.com/mroberth/DIRPOLES-4` (rama `main`). Sí existen `git log`
+  y el historial; sigue SIN existir tags. Las llaves RSA (`app/Config/Keys/`),
+  `.env` y `vendor/` NO se versionan (`.gitignore`).
+- El sistema completo anterior (con todos sus módulos) sigue estando en el
+  directorio hermano `../DIRPOLES_4` (fuera de este repo, sin git).
+- Puedes CONSULTAR el sistema viejo como referencia, pero el código nuevo debe
+  seguir las convenciones nuevas de este esqueleto (no copiar-pegar estilo viejo).
 
 ---
 
@@ -206,7 +217,10 @@ Páginas: `modulo/accion` (GET). API: `api/modulo/accion` (GET leer / POST escri
 
 **Sidebar**: entrada en `app/Config/modulos_sidebar.php` con clave = `id_modulo`
 real de la BD. El módulo debe existir en la tabla `modulo` y tener filas en
-`rol_modulo_permiso` para verse. Hoy el archivo está **vacío** a propósito.
+`rol_modulo_permiso` para verse. Hoy ya tiene entradas para Empleados (1),
+Beneficiarios (2) y Configuración (14, con subitems de Bitácora/Permisos/Respaldo
+que usan `id_modulo` explícito porque validan contra otro módulo); AGREGA AHÍ tu
+módulo nuevo al crearlo.
 
 ---
 
@@ -228,8 +242,9 @@ real de la BD. El módulo debe existir en la tabla `modulo` y tener filas en
   `SessionAuthMiddleware` (id_empleado sesión vs payload JWT). Refresh tokens
   en BD (`refresh_tokens`) con **rotación one-time use**: `renovar_jwt` revoca
   el token usado y emite uno nuevo en la misma transacción; revocados en logout.
-  - **Deuda pendiente**: el refresh token se guarda en texto plano; lo ideal es
-    hashearlo (SHA-256) como una contraseña.
+  - **Deuda vigente (verificada 2026-09-14)**: el refresh token se guarda en
+    texto plano en `refresh_tokens`; lo ideal es hashearlo (SHA-256) como una
+    contraseña. No ha sido resuelta aún.
 - `session.gc_maxlifetime` se fija en `index.php` al máximo entre
   `JWT_EXPIRATION` y `REFRESH_EXPIRATION`, para que la sesión no muera antes
   que el JWT (el refresh depende de la sesión).
@@ -279,21 +294,26 @@ app/Config/             modulos_sidebar.php, dashboard_cards.php, roles_sistema.
 app/routes/             notificaciones.php, dashboard.php, empleados.php,
                         beneficiarios.php, permisos.php, configuracion.php,
                         bitacora.php, backup.php (los demás módulos los creas tú)
-docs/                   Manual de contexto, guía de arquitectura, guías backend,
-                        plan de mejoras, SQL (bd/), PDF (fpdf)
+docs/                   docs/MANUAL_DIRPOLES_CONTEXTO.md (manual de contexto),
+                        docs/guia_arquitectura_dirpoles.md (arquitectura),
+                        docs/GUIA-BACKEND.MD (guía backend),
+                        docs/IMPROVEMENT_PLAN.md (plan de mejoras), SQL (bd/),
+                        PDF (fpdf)
 dist/                   CSS/JS/IMG propios:
                         js/core/ (apiFetch, AlertManager, logout, modalManager),
                         js/login/login.js, js/jwt-refresh.js,
                         js/modulos/notificaciones/control.js,
                         js/modulos/dashboard/dashboard_stats.js,
                         js/modulos/calendario/calendario_personal.js,
+                        js/modulos/{empleado,beneficiario,configuracion,bitacora,permisos}/,
                         css/dashboard/dashboard.css
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)
 GUIA-MODULOS.md         ← GUÍA PRINCIPAL para crear módulos nuevos
 GUIA-BACKEND-FRONTEND.md  Guía explicativa backend+frontend (conceptos y
                         diferencias con el sistema viejo) — para defensa
-README.md               Instalación y estructura (revisar: tiene datos desactualizados)
+README.md               Instalación y estructura
+uploads/                Archivos subidos por los módulos (hoy: trabajo_social/)
 setup_linux.sh          Instalación automática (Apache, llaves, BD)
 logs/                   php_errors.log
 ```
