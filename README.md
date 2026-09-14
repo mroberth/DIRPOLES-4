@@ -8,9 +8,7 @@
 [![Composer](https://img.shields.io/badge/Composer-2.x-885630?logo=composer&logoColor=white)](https://getcomposer.org/)
 [![License](https://img.shields.io/badge/Licencia-Académica-lightgrey)](#-licencia)
 
-**DIRPOLES-4** es el sistema de gestión de estudiantes beneficiarios de la
-**Universidad Politécnica Territorial de los Altos Llanos Occidentales
-"José Antonio Anzoátegui" (UPTAEB)**. Es un **monolito híbrido en PHP 8** con
+**DIRPOLES-4** es el sistema de gestión Administrativa para la dirección de políticas estudiantiles de la Universidad Politécnica Territorial del Estado Lara Andrés Eloy Blanco (UPTAEB)**. Es un **monolito híbrido en PHP 8** con
 **MVC propio** (sin framework) que sirve **páginas HTML renderizadas en el
 servidor** y una **API JSON** con contrato único.
 
