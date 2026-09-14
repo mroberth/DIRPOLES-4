@@ -1,0 +1,45 @@
+/* dist/css/dashboard/dashboard.css
+   Estilos del panel de Inicio (stats, cards de módulos y calendario). */
+
+/* Aparición suave del valor de una estadística al cargar por API */
+.fade-in {
+    animation: dashboardFadeIn .35s ease;
+}
+
+@keyframes dashboardFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Card de módulo: el badge "Próximamente" ocupa el ancho del footer */
+.card .card-footer .badge {
+    font-size: .75rem;
+}
+
+/* FullCalendar: celdas y eventos más cómodos */
+.fc-daygrid-day {
+    min-height: 100px;
+}
+
+.fc-event {
+    font-size: .85rem;
+    padding: 2px 4px;
+    border-radius: .25rem;
+}
+
+.fc-event:hover {
+    opacity: .85;
+    cursor: pointer;
+}
+
+.fc-toolbar-title {
+    font-size: 1.1rem !important;
+    font-weight: 600;
+}

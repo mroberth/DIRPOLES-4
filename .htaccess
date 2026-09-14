@@ -1,0 +1,22 @@
+# DIRPOLES-4 — API REST
+RewriteEngine On
+
+# Enviar todo a index.php (excepto archivos existentes, por si algún día sirves estáticos)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+
+# Nunca mostrar directory listings
+Options -Indexes
+
+# Cabeceras de seguridad para una API
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "DENY"
+    Header always set Referrer-Policy "no-referrer"
+</IfModule>
+
+# Sin caché para respuestas de la API (el cliente decide su propia política)
+<IfModule mod_expires.c>
+    ExpiresActive Off
+</IfModule>

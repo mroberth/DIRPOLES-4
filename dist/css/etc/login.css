@@ -1,0 +1,172 @@
+/* Variables */
+:root {
+    --dirpoles-blue: #0044FF;
+    /* tu azul rey pedido */
+    --dirpoles-blue-dark: #0033CC;
+    --muted: #6c757d;
+}
+
+/* Asegurar full height */
+html,
+body {
+    height: 100%;
+}
+
+/* Scope solo para esta pantalla (si pegas global, quita .login-page) */
+.login-page .login-left {
+    background: #ffffff;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem;
+}
+
+/* Card contenedor */
+.login-page .login-card {
+    max-width: 420px;
+    width: 100%;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+    padding: 2rem;
+}
+
+/* Logo */
+.login-logo {
+    width: 84px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Titles */
+.login-page .text-dirpoles {
+    color: var(--dirpoles-blue);
+    margin-bottom: 0;
+}
+
+/* Iconos de input */
+.login-page .input-icon {
+    background: var(--dirpoles-blue);
+    color: #fff;
+    border: none;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    padding: 0.75rem 0.9rem;
+    font-size: 1.05rem;
+}
+
+/* Inputs */
+.login-page .form-control {
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    box-shadow: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    height: calc(2.6rem + 0.6rem);
+}
+
+.login-page .form-control:focus {
+    border-color: var(--dirpoles-blue);
+    box-shadow: 0 0 0 0.15rem rgba(0, 68, 255, 0.12);
+    outline: none;
+}
+
+/* Button */
+.btn-dirpoles {
+    background: linear-gradient(180deg, var(--dirpoles-blue) 0%, var(--dirpoles-blue-dark) 100%);
+    border: none;
+    color: #fff;
+    padding: 0.65rem 1rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    transition: transform .08s ease, box-shadow .08s ease;
+}
+
+.btn-dirpoles:hover,
+.btn-dirpoles:focus {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0, 68, 255, 0.18);
+}
+
+/* Error small tiene siempre espacio */
+.login-page small.text-danger {
+    min-height: 1.05rem;
+    display: block;
+}
+
+/* Right panel: imagen full cover + overlay azul */
+.login-page .login-right {
+    position: relative;
+    min-height: 100vh;
+}
+
+.login-page .login-right .bg-image {
+    position: absolute;
+    inset: 0;
+    background-image: url('../../img/fondo.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: none;
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+}
+
+/* Overlay azul con degradado */
+.login-page .login-right::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0, 68, 255, 0.55) 0%, rgba(0, 68, 255, 0.25) 60%, rgba(255, 255, 255, 0.05) 100%);
+    z-index: 1;
+}
+
+/* optional: colocar un texto, logo o frase encima de la imagen */
+.login-page .login-right .hero-text {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    padding: 3rem;
+}
+
+/* Responsiveness tweaks */
+@media (max-width: 991.98px) {
+    .login-page .login-card {
+        padding: 1.3rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .login-page .login-left {
+        padding: 1.5rem;
+    }
+}
+
+/* Estética adicional */
+.login-page .input-group.shadow-sm {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Botón mostrar/ocultar contraseña (ojo) */
+.login-page .toggle-password-btn {
+    cursor: pointer;
+    color: var(--dirpoles-blue);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-left: none;
+    border-radius: 0 8px 8px 0 !important;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+}
+
+.login-page .toggle-password-btn:hover {
+    color: var(--dirpoles-blue-dark);
+}
+
+.login-page #password {
+    border-radius: 0 !important;
+}

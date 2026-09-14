@@ -1,0 +1,75 @@
+ .mi-popover {
+        background-color: #CAE8FC !important;
+    }
+    
+.mi-popover .driver-popover-title {
+        border-bottom: none !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 10px !important;
+        text-align: center !important;
+    }
+
+.mi-popover .driver-popover-title::after {
+    content: '' !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 2px !important;
+    background: linear-gradient(to right, transparent, #333333, transparent) !important;
+}
+
+.driver-popover.mi-popover button {
+  flex: 1;
+  text-align: center;
+  background-color: #000;
+  color: #ffffff;
+  border: 2px solid #000;
+  text-shadow: none;
+  font-size: 14px;
+  padding: 5px 8px;
+  border-radius: 6px;
+}
+
+.driver-popover.mi-popover button:hover {
+  background-color: #3E617A;
+  color: #ffffff;
+}
+
+.driver-popover.mi-popover .driver-popover-navigation-btns {
+  justify-content: space-between;
+  gap: 3px;
+}
+
+.mi-popover .driver-popover-close-btn {
+  display: none !important;
+}
+
+.mi-popover .driver-popover-progress-text {
+    display: none !important;
+}
+
+.mi-popover .driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: #CAE8FC !important;
+}
+
+.mi-popover .driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: #CAE8FC !important;
+}
+
+.mi-popover .driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: #CAE8FC !important;
+}
+
+.mi-popover .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: #CAE8FC !important;
+}
+
+/* Z-index para que Driver.js se muestre por encima de los modales de Bootstrap */
+.driver-active .driver-overlay {
+  z-index: 100000 !important;
+}
+
+.driver-active .driver-popover {
+  z-index: 100001 !important;
+}

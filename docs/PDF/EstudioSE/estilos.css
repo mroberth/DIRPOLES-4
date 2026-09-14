@@ -1,0 +1,49 @@
+body{
+    padding: 10px;
+}
+
+.grupoF th,
+td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+.grupoF2 th,
+td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+.grupoF input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.grupoF2 input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+
+.idenS td {
+    text-align: left;
+}
+
+.idenS .tituloIdenS {
+    text-align: center;
+}
+
+.DatosE td {
+    text-align: left;
+}
+
+.DatosE .TituloDatosE {
+    text-align: center;
+}

@@ -1,0 +1,17 @@
+{
+    "name": "uptaeb/dirpoles",
+    "description": "DIRPOLES-4 — Esqueleto MVC (monolito híbrido)",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "require": {
+        "firebase/php-jwt": "^7.0",
+        "vlucas/phpdotenv": "^5.6"
+    }
+}

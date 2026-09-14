@@ -1,0 +1,322 @@
+:root {
+    --dirpoles-blue: #0044FF;
+    /* azul rey pedido */
+    --dirpoles-blue-600: #0033CC;
+}
+
+/* --- Fondo Personalizado del Sidebar (Mezcla de blancos y azules) --- */
+.bg-sidebar-custom {
+    background: linear-gradient(180deg, #ffffff 10%, #f0f4ff 100%);
+    border-right: 1px solid #e3e6f0;
+}
+
+/* --- Brand Section (Logo area) --- */
+/* Hacer que coincida con el header blanco */
+.sidebar-brand-custom {
+    background-color: #ffffff;
+    color: var(--dirpoles-blue) !important;
+    border-bottom: 1px solid #e3e6f0; /* Separador sutil */
+    height: 4.375rem; /* Altura estándar de SB Admin 2 topbar */
+    text-decoration: none !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar-brand-custom .sidebar-brand-icon i {
+    color: var(--dirpoles-blue);
+}
+
+.sidebar-brand-custom .sidebar-brand-text {
+    color: var(--dirpoles-blue);
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: 0.05rem;
+}
+
+/* --- Ajustes para modo Light del Sidebar --- */
+/* Textos principales */
+.sidebar-light .nav-item .nav-link {
+    color: #5a5c69;
+}
+.sidebar-light .nav-item .nav-link i {
+    color: #d1d3e2;
+}
+.sidebar-light .nav-item .nav-link:hover {
+    color: var(--dirpoles-blue);
+}
+.sidebar-light .nav-item .nav-link:hover i {
+    color: var(--dirpoles-blue);
+}
+.sidebar-light .nav-item.active .nav-link {
+    color: var(--dirpoles-blue);
+    font-weight: 700;
+}
+.sidebar-light .nav-item.active .nav-link i {
+    color: var(--dirpoles-blue);
+}
+
+/* Submenús */
+.sidebar-light .collapse-inner .collapse-item {
+    color: #3a3b45;
+}
+.sidebar-light .collapse-inner .collapse-item:hover {
+    background-color: #eaecf4;
+    color: var(--dirpoles-blue);
+}
+.sidebar-light .collapse-inner .collapse-item.active {
+    color: var(--dirpoles-blue);
+    background-color: #eaecf4;
+    font-weight: 700;
+}
+
+/* Divider */
+.sidebar-light hr.sidebar-divider {
+    border-top: 1px solid #eaecf4;
+}
+
+/* Toggler */
+.sidebar-light #sidebarToggle {
+    background-color: #eaecf4;
+}
+.sidebar-light #sidebarToggle::after {
+    color: #b7b9cc;
+}
+.sidebar-light #sidebarToggle:hover {
+    background-color: #d1d3e2;
+}
+
+/* --- Forzar que la "collapse-inner bg-white" no sea blanca --- */
+#accordionSidebar .collapse-inner.bg-white {
+    background: rgba(255,255,255,0.7) !important;
+    box-shadow: none !important;
+    padding: 0.25rem 0.25rem !important;
+}
+
+/* --- Estilos heredados y adaptados --- */
+/* Ajuste general nav-link */
+#accordionSidebar .nav-link {
+    transition: background .12s ease, color .12s ease;
+}
+
+#accordionSidebar .nav-link:hover,
+#accordionSidebar .nav-item:hover>.nav-link {
+    background: rgba(0, 68, 255, 0.05); /* leve azul */
+}
+
+/* Estilo para los items dentro del collapse (las "fichas") */
+#accordionSidebar .collapse-inner .collapse-item {
+    display: block;
+    text-decoration: none;
+    padding: 0.45rem 1rem;
+    margin: 0.18rem 0.5rem;
+    border-radius: 8px;
+    background: transparent;
+    transition: background .14s ease, transform .08s ease, box-shadow .12s ease;
+    font-size: .95rem;
+    border-left: 3px solid transparent;
+    box-shadow: none;
+}
+
+/* Hover suave para cada sub-item */
+#accordionSidebar .collapse-inner .collapse-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 68, 255, 0.1);
+}
+
+/* Estado activo del sub-item */
+#accordionSidebar .collapse-inner .collapse-item.active,
+#accordionSidebar .collapse-inner .collapse-item:focus {
+    background: rgba(0, 68, 255, 0.1);
+    color: var(--dirpoles-blue);
+    border-left-color: var(--dirpoles-blue);
+    padding-left: calc(1rem - 3px);
+    box-shadow: 0 8px 24px rgba(0, 68, 255, 0.15);
+}
+
+/* Caret / chevron */
+#accordionSidebar .nav-link .fa-chevron-down,
+#accordionSidebar .nav-link .submenu-caret {
+    transition: transform .18s ease;
+}
+
+#accordionSidebar .nav-link[aria-expanded="true"] .fa-chevron-down,
+#accordionSidebar .nav-link[aria-expanded="true"] .submenu-caret {
+    transform: rotate(180deg);
+}
+
+/* --- Scroll responsivo para el sidebar --- */
+/* Contenedor principal del sidebar */
+body #wrapper #content-wrapper {
+    min-height: 100vh;
+}
+
+/* Sidebar con scroll para pantallas pequeñas */
+.sidebar {
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+/* Para pantallas grandes (desktop) - comportamiento normal */
+@media (min-width: 768px) {
+    .sidebar {
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    
+    /* Cuando el sidebar está colapsado en desktop */
+    .sidebar.toggled {
+        overflow-y: visible;
+    }
+}
+
+/* Para pantallas pequeñas (mobile) */
+@media (max-width: 767.98px) {
+    .sidebar {
+        height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Asegurar que el sidebar no cubra todo el contenido en mobile */
+    body:not(.sidebar-toggled) .sidebar {
+        transform: translateX(0);
+    }
+    
+    body.sidebar-toggled .sidebar {
+        transform: translateX(-100%);
+    }
+}
+
+/* Scrollbar personalizado para el sidebar */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: rgba(0, 68, 255, 0.05);
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(0, 68, 255, 0.2);
+    border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 68, 255, 0.3);
+}
+
+/* Ajustar el content wrapper cuando hay scroll en sidebar */
+@media (min-width: 768px) {
+    #content-wrapper {
+        /* El sidebar es position:fixed, así que el contenido se separa con
+           margin-left. Debe coincidir con el ancho REAL del sidebar:
+           6.5rem colapsado (solo iconos) / 14rem expandido. */
+        margin-left: 6.5rem;
+        transition: margin-left 0.3s ease;
+    }
+    
+    /* Cuando el sidebar está expandido */
+    body:not(.sidebar-toggled) #content-wrapper {
+        margin-left: 14rem;
+    }
+}
+
+/* Asegurar que el botón de cerrar sesión quede visible al final */
+.sidebar .nav-item:last-child {
+    margin-bottom: 1rem;
+}
+
+/* Clase para cuando se necesita scroll */
+.sidebar-scroll-needed {
+    padding-bottom: 2rem;
+}
+
+/* Mejoras para el scroll en móviles */
+@media (max-width: 767.98px) {
+    .sidebar-scroll-needed {
+        padding-bottom: 3rem;
+    }
+    
+    /* Asegurar que el brand no se pierda al hacer scroll */
+    .sidebar-brand-custom {
+        backdrop-filter: blur(8px);
+        background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+}
+
+/* Animación suave para el scroll */
+.sidebar {
+    scroll-behavior: smooth;
+}
+
+/* Sombra sutil cuando hay scroll para indicar que hay más contenido */
+.sidebar-scroll-needed::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2rem;
+    background: linear-gradient(to bottom, transparent, rgba(240, 244, 255, 0.8));
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Ocultar la sombra cuando está al final del scroll */
+.sidebar:not(:hover)::-webkit-scrollbar-thumb {
+    background: rgba(0, 68, 255, 0.1);
+}
+
+.sidebar:hover::-webkit-scrollbar-thumb {
+    background: rgba(0, 68, 255, 0.3);
+}
+
+/* Para Firefox */
+.sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 68, 255, 0.2) rgba(0, 68, 255, 0.05);
+}
+
+/* Asegurar que los submenús sean visibles al hacer scroll */
+.sidebar .collapse {
+    position: relative;
+    z-index: 6;
+}
+
+/* Mejorar accesibilidad del botón de cerrar sesión */
+.sidebar .nav-item:last-child .nav-link {
+    font-weight: 600;
+    border-top: 1px solid rgba(227, 230, 240, 0.5);
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+}
+
+/* Indicador visual cuando hay scroll disponible */
+@media (min-width: 768px) {
+    body:not(.sidebar-toggled) .sidebar-scroll-needed::before {
+        content: '⟳';
+        position: absolute;
+        top: 5rem;
+        right: 0.5rem;
+        color: rgba(0, 68, 255, 0.3);
+        font-size: 0.75rem;
+        animation: pulse 2s infinite;
+        z-index: 10;
+        pointer-events: none;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+}

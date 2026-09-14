@@ -1,0 +1,17 @@
+# Seguridad
+.env
+
+# Llaves RSA y JWT
+app/Config/Keys/*.pem
+app/Config/Keys/*.key
+app/Config/Keys/*.pub
+
+# Dependencias
+/vendor/
+
+# Logs
+/logs/*.log
+
+# IDE
+/.vscode/
+/.idea/
