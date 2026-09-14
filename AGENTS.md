@@ -291,7 +291,8 @@ dist/                   CSS/JS/IMG propios:
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)
 GUIA-MODULOS.md         ← GUÍA PRINCIPAL para crear módulos nuevos
-GUIA_ARQUITECTURA_API.md  Guía de arquitectura de la API
+GUIA-BACKEND-FRONTEND.md  Guía explicativa backend+frontend (conceptos y
+                        diferencias con el sistema viejo) — para defensa
 README.md               Instalación y estructura (revisar: tiene datos desactualizados)
 setup_linux.sh          Instalación automática (Apache, llaves, BD)
 logs/                   php_errors.log
