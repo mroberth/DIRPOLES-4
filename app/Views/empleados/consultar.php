@@ -1,6 +1,7 @@
 <?php
 // app/Views/empleados/consultar.php
 $titulo = "Consultar Empleados";
+$esAdmin = in_array($_SESSION['tipo_empleado'] ?? '', ['Administrador', 'Superusuario'], true);
 include 'app/Views/template/head.php';
 ?>
 
@@ -22,6 +23,11 @@ include 'app/Views/template/head.php';
                             <a href="<?= BASE_URL ?>empleados/crear" class="btn btn-sm btn-primary shadow-sm">
                                 <i class="fas fa-plus me-1"></i> Nuevo empleado
                             </a>
+                            <?php if ($esAdmin): ?>
+                                <a href="<?= BASE_URL ?>horarios/consultar" class="btn btn-sm btn-info shadow-sm ms-2">
+                                    <i class="fas fa-clock me-1"></i> Horarios de Psicología
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
 
