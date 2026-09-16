@@ -45,8 +45,10 @@ class RateLimitMiddleware
         }
 
         // NIVEL 1: Excepciones de Seguridad (Máxima Estricción)
-        // Autenticación exacta ('iniciar_sesion') o actualización del perfil del empleado ('perfil_actualizar')
-        $nivel1Endpoints = ['iniciar_sesion', 'perfil_actualizar'];
+        // Autenticación exacta ('iniciar_sesion') o actualización del perfil
+        // del empleado ('api/perfil/actualizar'; 'perfil_actualizar' se
+        // conserva por compatibilidad histórica).
+        $nivel1Endpoints = ['iniciar_sesion', 'perfil_actualizar', 'api/perfil/actualizar'];
         if (in_array($endpoint, $nivel1Endpoints)) {
             return [
                 'capacity' => 5.0,

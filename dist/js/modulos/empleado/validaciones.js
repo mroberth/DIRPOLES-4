@@ -67,6 +67,8 @@ window.EmpleadoValidaciones = (function () {
 
     function configurar(form, opciones = {}) {
         const validarRemoto = opciones.validarRemoto !== false;
+        const urlValidarCorreo = opciones.urlValidarCorreo || 'api/empleados/validar_correo';
+        const urlValidarTelefono = opciones.urlValidarTelefono || 'api/empleados/validar_telefono';
 
         // Se leen en cada validación (no se capturan): así editar.js puede
         // fijar `opciones.idExcluir` al abrir el modal con un empleado distinto.
@@ -189,7 +191,7 @@ window.EmpleadoValidaciones = (function () {
 
             if (validarRemoto) {
                 try {
-                    const r = await consultar('api/empleados/validar_correo', { correo, id_excluir: idExcluirActual() });
+                    const r = await consultar(urlValidarCorreo, { correo, id_excluir: idExcluirActual() });
                     if (r.existe) {
                         mostrarError(c.correo, 'El correo ya está registrado');
                         return false;
@@ -220,7 +222,7 @@ window.EmpleadoValidaciones = (function () {
 
             if (validarRemoto) {
                 try {
-                    const r = await consultar('api/empleados/validar_telefono', { telefono, id_excluir: idExcluirActual() });
+                    const r = await consultar(urlValidarTelefono, { telefono, id_excluir: idExcluirActual() });
                     if (r.existe) {
                         mostrarError(c.telefono, 'El teléfono ya está registrado');
                         return false;

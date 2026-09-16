@@ -60,5 +60,14 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         initSelect2(document);
+
+        document.addEventListener('reset', function (evento) {
+            const formulario = evento.target;
+            window.setTimeout(function () {
+                $(formulario).find('.select2').each(function () {
+                    $(this).trigger('change');
+                });
+            }, 0);
+        }, true);
     });
 })();

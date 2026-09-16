@@ -56,6 +56,10 @@
             <!-- Dropdown - User Information -->
             <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
                 aria-labelledby="userDropdown" style="min-width: 240px;">
+                <a class="dropdown-item py-2" href="<?= BASE_URL ?>perfil/ver">
+                    <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i>
+                    Mi Perfil
+                </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item py-2 js-logout" href="<?= BASE_URL ?>logout" data-logout>
                     <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i>

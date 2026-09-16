@@ -23,7 +23,7 @@
 return [
     1  => ['icon' => 'fa-users',              'color' => 'primary',   'titulo' => 'Empleados',        'url' => 'consultar_empleados',        'disponible' => false, 'stat' => 'admin_empleados_total'],
     2  => ['icon' => 'fa-person',             'color' => 'success',   'titulo' => 'Beneficiarios',    'url' => 'beneficiarios/consultar',    'disponible' => true,  'stat' => 'admin_beneficiarios_total'],
-    3  => ['icon' => 'fa-calendar-check',     'color' => 'info',      'titulo' => 'Citas',            'url' => 'consultar_citas',            'disponible' => false, 'stat' => 'admin_citas_total'],
+    3  => ['icon' => 'fa-calendar-check',     'color' => 'info',      'titulo' => 'Citas',            'url' => 'citas/consultar',            'disponible' => true,  'stat' => 'admin_citas_total'],
     4  => ['icon' => 'fa-brain',              'color' => 'secondary', 'titulo' => 'Psicología',       'url' => 'diagnostico_psicologia',     'disponible' => false, 'stat' => 'admin_psicologia_total'],
     5  => ['icon' => 'fa-stethoscope',        'color' => 'danger',    'titulo' => 'Medicina',         'url' => 'diagnostico_medicina',       'disponible' => false, 'stat' => 'admin_medicina_total'],
     6  => ['icon' => 'fa-comments',           'color' => 'warning',   'titulo' => 'Orientación',      'url' => 'diagnostico_orientacion',    'disponible' => false, 'stat' => 'admin_orientacion_total'],
@@ -37,5 +37,5 @@ return [
     14 => ['icon' => 'fa-gear',               'color' => 'secondary', 'titulo' => 'Configuración',    'url' => 'configuracion/crear',        'disponible' => true],
     16 => ['icon' => 'fa-clipboard-list',     'color' => 'dark',      'titulo' => 'Bitácora',         'url' => 'bitacora/consultar',         'disponible' => true,  'stat' => 'admin_bitacora_total'],
     17 => ['icon' => 'fa-user-shield',        'color' => 'danger',    'titulo' => 'Permisos',         'url' => 'permisos/gestionar',         'disponible' => true,  'stat' => 'admin_permisos_total'],
-    18 => ['icon' => 'fa-clock',              'color' => 'info',      'titulo' => 'Horarios',         'url' => 'horarios',                   'disponible' => false, 'stat' => 'admin_horarios_total'],
+    18 => ['icon' => 'fa-clock',              'color' => 'info',      'titulo' => 'Horarios',         'url' => 'horarios/consultar',          'disponible' => true,  'stat' => 'admin_horarios_total'],
 ];

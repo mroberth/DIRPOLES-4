@@ -45,6 +45,24 @@ return [
             ['url' => 'beneficiarios/consultar', 'texto' => 'Consultar', 'permiso' => 2],
         ],
     ],
+    3 => [ // id_modulo real = 3 (Citas)
+        'key'    => 'citas',
+        'icon'   => 'fa-calendar-check',
+        'titulo' => 'Gestionar Citas',
+        'subitems' => [
+            ['url' => 'citas/crear',     'texto' => 'Crear',     'permiso' => 1],
+            ['url' => 'citas/consultar', 'texto' => 'Consultar', 'permiso' => 2],
+        ],
+    ],
+    18 => [ // id_modulo real = 18 (Horarios)
+        'key'    => 'horarios',
+        'icon'   => 'fa-clock',
+        'titulo' => 'Horarios de Psicología',
+        'subitems' => [
+            ['url' => 'horarios/crear',     'texto' => 'Crear',     'permiso' => 1, 'solo_admin' => true],
+            ['url' => 'horarios/consultar', 'texto' => 'Consultar', 'permiso' => 2, 'solo_admin' => true],
+        ],
+    ],
     14 => [ // id_modulo real = 14 (Configuración)
         'key'    => 'configuracion',
         'icon'   => 'fa-gear',
