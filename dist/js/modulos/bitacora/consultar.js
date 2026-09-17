@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const tbody = tablaEl.querySelector('tbody');
     let tabla = null;
+    let numeroSolicitud = 0;
 
     const btnAyuda = document.getElementById('btn-ayuda');
     if (btnAyuda && window.BitacoraTour) {
@@ -62,9 +63,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function cargar() {
+        const solicitudActual = ++numeroSolicitud;
         try {
             const qs = leerFiltros();
             const filas = await apiFetch(BASE_URL + 'api/bitacora/listar' + (qs ? '?' + qs : ''));
+
+            if (solicitudActual !== numeroSolicitud) return;
+
+            if (tabla) {
+                tabla.destroy();
+                tabla = null;
+            }
 
             tbody.innerHTML = filas.map((r) => `
                 <tr>
@@ -76,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 </tr>`).join('');
 
             if (window.jQuery && $.fn && $.fn.DataTable) {
-                if (tabla) tabla.destroy();
                 tabla = $('#tabla_bitacora').DataTable({
                     language: { url: BASE_URL + 'plugins/DataTables/js/languaje.json' },
                     order: [[4, 'desc']],
@@ -140,9 +148,11 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btn-limpiar')?.addEventListener('click', function () {
         ['f-modulo', 'f-accion', 'f-empleado', 'f-buscar', 'f-desde', 'f-hasta'].forEach((id) => {
             const el = document.getElementById(id);
-            if (el) el.value = '';
+            if (el) {
+                el.value = '';
+                if (el.tagName === 'SELECT') el.dispatchEvent(new Event('change', { bubbles: true }));
+            }
         });
-        if (window.initSelect2) window.initSelect2(document);
         cargar();
     });
     document.getElementById('f-buscar')?.addEventListener('keydown', (ev) => {

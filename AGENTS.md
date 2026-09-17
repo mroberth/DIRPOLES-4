@@ -39,13 +39,17 @@ antes de proponer código nuevo.
   modelos, vistas y JS siguiendo la GUIA-MODULOS.md):
   - **Empleados** (id_modulo 1): CRUD completo, stats, validaciones asíncronas.
   - **Beneficiarios** (id_modulo 2): CRUD completo, stats, validaciones asíncronas.
+  - **Citas** (id_modulo 3): agenda de Psicología, disponibilidad contra horarios,
+    permisos por rol, CRUD, estados, stats y DataTables.
   - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
   - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
   - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
+  - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
+    Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-- **Faltan los módulos de negocio pesados**: citas, psicología, medicina,
-  orientación, trabajo social, discapacidad, inventario, referencias, jornadas,
-  mobiliario, transporte, horarios (ver `app/Config/dashboard_cards.php`, las
+  - **Faltan los módulos de negocio pesados**: psicología, medicina, orientación,
+    trabajo social, discapacidad, inventario, referencias, jornadas,
+    mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
   cards con `'disponible' => false` son los pendientes).
 
 ### Repositorio y relación con el sistema completo
@@ -81,6 +85,23 @@ antes de proponer código nuevo.
    `manejador()`; este esqueleto ya lo migró a `manejarAccion()`.)
 7. No agregar dependencias composer/npm sin justificar; el sistema es
    deliberadamente autocontenido (plugins locales en `/plugins`).
+8. Antes de crear código, leer `AGENTS.md`, `GUIA-MODULOS.md`, el esquema SQL
+  relacionado y al menos un módulo nuevo equivalente (normalmente Empleados,
+  Beneficiarios, Citas u Horarios). La implementación vieja en `../DIRPOLES_4`
+  sirve únicamente para descubrir reglas funcionales; no se copia su contrato,
+  sus rutas ni sus respuestas de error.
+9. Un módulo no está terminado si solo funciona el camino feliz. Debe incluir
+  permisos, validación frontend y backend, estados visuales, tour, estadísticas,
+  tabla/consulta cuando corresponda, auditoría, responsive básico y una lista
+  de comandos de verificación manual para el usuario.
+10. **PROHIBIDO EJECUTAR COMANDOS EN LA TERMINAL (OPTIMIZACIÓN DE TOKENS):**
+  La IA **NUNCA** debe invocar o ejecutar herramientas de terminal (ej. `bash`,
+  `php -l`, `node --check`, `git`, etc.) directamente. Toda ejecución automática
+  gasta excesivos tokens de la API por reenvío de contexto. En su lugar, la IA
+  debe limitarse a leer, buscar, analizar y editar archivos, e **indicar
+  explícitamente en su mensaje final los comandos que el usuario debe ejecutar
+  manualmente en su terminal**. Esto incluye no usar `run_in_terminal`, ni
+  ejecutar comandos mediante tareas, scripts, shells o herramientas indirectas.
 
 ---
 
@@ -201,6 +222,36 @@ Notificador::enviar($idReceptor, 'Título', 'productos/consultar', 'info');
   El estado de validación (rojo/verde) se pinta con
   `dist/css/etc/select2-validacion.css` (cubre `.is-valid`/`.is-invalid`
   tanto en el `<select>` como en `.select2-selection`).
+- **Reset de Select2**: `form.reset()` no actualiza por sí solo la representación
+  visible. El helper global `select-2-init.js` escucha `reset` y dispara `change`.
+  No implementar soluciones incompatibles por módulo; si se agregan selects
+  dinámicos, llamar `window.initSelect2(form)` después de insertar las opciones.
+- **Driver.js obligatorio en formularios**: toda pantalla de creación o edición
+  que tenga flujo no trivial debe incluir `tour.js`, un botón `#btn-ayuda`,
+  cargar el tour antes de la lógica de pantalla y conectar el botón a
+  `ModuloTour.iniciar()`. Para un `<select class="select2">`, Driver.js debe
+  apuntar a `select.nextElementSibling` (`.select2-container`), no al `<select>`
+  original oculto. El tour debe describir reglas reales, no texto genérico.
+- **DataTables obligatorio en consultas tabulares**: una vista de consulta con
+  tabla debe cargar su `consultar.js`, inicializar `$('#tabla').DataTable()`
+  después de pintar los datos y destruir la instancia antes de recargar. Debe
+  incluir idioma local, ordenamiento, paginación y, cuando el módulo lo permita,
+  botones `excelHtml5` y `pdfHtml5` excluyendo la columna Acciones. Nunca insertar
+  una fila manual con un único `<td colspan>` en una tabla que DataTables va a
+  inicializar: usar `tbody` vacío y dejar que DataTables muestre el estado vacío.
+- **Carga dinámica**: si un `<select>` o tabla se llena por API, la secuencia es
+  `apiFetch` → insertar opciones/filas → `initSelect2(scope)` o DataTables. No
+  inicializar Select2 antes de insertar las opciones.
+- **Eventos en tiempo real**: los inputs usan `input`/`change`; los Select2 usan
+  `change select2:select select2:clear`. Las validaciones remotas deben llevar
+  debounce y no marcar verde si la API de unicidad o disponibilidad falló.
+- **Validación visual**: cada campo validable debe tener `<div id="campoError"
+  class="form-text text-danger"></div>`, alternar `is-valid`/`is-invalid` y
+  limpiar mensaje y estado al resetear. Validar siempre en submit aunque ya se
+  haya validado en vivo.
+- **Estadísticas**: si el módulo tiene tarjetas, usar `data-stat="clave"`, un
+  `stats.js` separado y una sola llamada a `api/<modulo>/stats`. No hardcodear
+  cifras ni duplicar consultas desde cada tarjeta.
 - **Composición por rol (ejemplo: `/inicio`)**: una sola vista shell decide el
   contenido por permisos/rol. Las piezas reutilizables viven en
   `app/Views/inicio/components/` (`stat_card.php`, `card_modulo.php`, un
@@ -217,10 +268,23 @@ Páginas: `modulo/accion` (GET). API: `api/modulo/accion` (GET leer / POST escri
 
 **Sidebar**: entrada en `app/Config/modulos_sidebar.php` con clave = `id_modulo`
 real de la BD. El módulo debe existir en la tabla `modulo` y tener filas en
-`rol_modulo_permiso` para verse. Hoy ya tiene entradas para Empleados (1),
-Beneficiarios (2) y Configuración (14, con subitems de Bitácora/Permisos/Respaldo
-que usan `id_modulo` explícito porque validan contra otro módulo); AGREGA AHÍ tu
-módulo nuevo al crearlo.
+`rol_modulo_permiso` para verse. Hoy tiene entradas para Empleados (1),
+Beneficiarios (2), Citas (3), Horarios (18) y Configuración (14, con subitems
+de Bitácora/Permisos/Respaldo que usan `id_modulo` explícito porque validan
+contra otro módulo); AGREGA AHÍ tu módulo nuevo al crearlo.
+
+### Convenciones de nombres frontend
+
+- Carpeta: `dist/js/modulos/<modulo>/` en singular cuando así esté establecido
+  por el módulo existente (`empleado`, `beneficiario`, `cita`, `horario`).
+- Archivos recomendados: `validaciones.js`, `tour.js`, `stats.js`, `crear.js`,
+  `editar.js`, `consultar.js`. No concentrar todo en un único archivo si la
+  pantalla tiene tabla, modal y formulario.
+- La vista incluye los scripts con `defer` en orden de dependencia:
+  `stats.js`, `validaciones.js`, `tour.js`, `editar.js` y/o `crear.js`,
+  `consultar.js`. El helper global ya se carga desde `script.php`.
+- Todos los textos de usuario y nombres de variables nuevos deben seguir la
+  convención en español del repositorio.
 
 ---
 
@@ -274,17 +338,21 @@ app/Middlewares/        RateLimitMiddleware, SessionAuthMiddleware
 app/Controllers/        loginController.php, notificacionesController.php,
                         sseController.php, dashboardController.php,
                         empleadoController.php, beneficiarioController.php,
+                        citaController.php, horarioController.php,
                         permisosController.php, configuracionController.php,
                         bitacoraController.php, backupController.php (solo funciones)
 app/Models/             loginModel, PermisosModel, NotificacionesModel,
                         DashboardModel, CalendarioModel, SecurityModel, BusinessModel,
-                        EmpleadoModel, BeneficiarioModel, ConfiguracionModel, BitacoraModel,
+                        EmpleadoModel, BeneficiarioModel, CitaModel, HorarioModel,
+                        ConfiguracionModel, BitacoraModel,
                         BackupModel
 app/Views/              template/ (head, header, sidebar, footer, script),
                         inicio/dashboard.php (shell compuesto por rol), login.php,
                         errors/ (404, error, rate_limit, access_denied),
                         inicio/components/ (stat_card, card_modulo, stats_*),
                         empleados/, beneficiarios/ (crear + consultar con modal),
+                        citas/ (crear + consultar con edición),
+                        horarios/ (crear + consultar con edición),
                         permisos/ (matriz de permisos rol × módulo),
                         configuracion/ (crear + consultar catálogos, respaldo BD),
                         bitacora/ (consulta de auditoría)
@@ -292,8 +360,9 @@ app/Config/             modulos_sidebar.php, dashboard_cards.php, roles_sistema.
                         configuracion_catalogos.php, Keys/ (RSA, no versionadas)
                         (NO existe config.php: la config va por .env)
 app/routes/             notificaciones.php, dashboard.php, empleados.php,
-                        beneficiarios.php, permisos.php, configuracion.php,
-                        bitacora.php, backup.php (los demás módulos los creas tú)
+                        beneficiarios.php, citas.php, horarios.php,
+                        permisos.php, configuracion.php, bitacora.php,
+                        backup.php (los demás módulos los creas tú)
 docs/                   docs/MANUAL_DIRPOLES_CONTEXTO.md (manual de contexto),
                         docs/guia_arquitectura_dirpoles.md (arquitectura),
                         docs/GUIA-BACKEND.MD (guía backend),
@@ -305,7 +374,7 @@ dist/                   CSS/JS/IMG propios:
                         js/modulos/notificaciones/control.js,
                         js/modulos/dashboard/dashboard_stats.js,
                         js/modulos/calendario/calendario_personal.js,
-                        js/modulos/{empleado,beneficiario,configuracion,bitacora,permisos}/,
+                        js/modulos/{empleado,beneficiario,cita,horario,configuracion,bitacora,permisos}/,
                         css/dashboard/dashboard.css
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)
@@ -340,4 +409,250 @@ HTTP → index.php (CORS, sesión, handler global)
 - [ ] ¿Toda salida JSON pasa por `Respuesta`?
 - [ ] ¿Las rutas nuevas respetan la regla de las dos puertas?
 - [ ] ¿Operaciones de escritura registran en Bitácora?
-- [ ] `php -l` sobre cada archivo PHP modificado.
+
+La IA no ejecuta estas comprobaciones. Debe revisar estáticamente los archivos
+modificados y entregar al usuario los comandos equivalentes para ejecutarlos
+manualmente en su terminal local.
+
+
+---
+
+## 11. Protocolo obligatorio para crear un módulo
+
+Cuando el usuario pida "crear", "elaborar", "terminar" o "ajustar" un
+módulo, la IA debe ejecutar este flujo completo. No debe detenerse después de
+crear solo el modelo o la vista.
+
+### 11.1 Descubrimiento mínimo antes de editar
+
+Antes del primer cambio, la IA debe identificar y documentar mentalmente:
+
+1. La tabla o tablas del módulo en `docs/bd/dirpoles_business.sql` o
+   `docs/bd/dirpoles_security.sql`.
+2. El `id_modulo` y los permisos reales en la tabla `modulo`/
+   `rol_modulo_permiso`.
+3. El rol que puede crear, consultar, editar y eliminar.
+4. Un módulo nuevo equivalente para copiar estructura, no código ciego:
+   - CRUD y DataTables: `empleado` o `beneficiario`.
+   - Autoservicio: `perfil`.
+   - Agenda y disponibilidad: `cita` y `horario`.
+5. Las reglas del sistema viejo en `../DIRPOLES_4`, si existen; solo para
+   descubrir reglas funcionales que el SQL no explica.
+6. Las rutas, nombres de campos y restricciones de base de datos que deben
+   permanecer compatibles.
+   
+
+La IA debe formar una hipótesis local sobre el comportamiento y realizar una
+edición pequeña seguida de una validación ejecutable antes de ampliar el
+alcance.
+
+### 11.2 Entregables mínimos de un módulo CRUD
+
+Salvo que el usuario limite explícitamente el alcance, un módulo CRUD debe
+incluir:
+
+```text
+app/Models/<Modulo>Model.php
+app/Controllers/<modulo>Controller.php
+app/routes/<modulo>.php
+app/Views/<modulo>/crear.php                 si existe creación
+app/Views/<modulo>/consultar.php             si existe consulta
+app/Views/<modulo>/components/              si hay stats o piezas repetidas
+dist/js/modulos/<modulo>/validaciones.js
+dist/js/modulos/<modulo>/tour.js             si hay formulario
+dist/js/modulos/<modulo>/stats.js            si hay tarjetas
+dist/js/modulos/<modulo>/crear.js            si existe creación
+dist/js/modulos/<modulo>/editar.js           si existe edición/modal
+dist/js/modulos/<modulo>/consultar.js        si existe tabla
+```
+
+También debe actualizar, cuando corresponda:
+
+- `app/Config/modulos_sidebar.php`.
+- `app/Config/dashboard_cards.php`.
+- `docs/bd/` con un script idempotente si hacen falta datos RBAC o cambios de
+  esquema.
+- `AGENTS.md` si se incorpora una regla permanente o una deuda técnica nueva.
+
+### 11.3 Secuencia backend obligatoria
+
+1. **Modelo**
+   - Extender `BusinessModel` o `SecurityModel` según la tabla propietaria.
+   - Declarar atributos y validar cada asignación en `__set()`.
+   - Implementar `__get()` y `manejarAccion()`.
+   - Mantener métodos SQL privados.
+   - Lanzar `ExcepcionApi` en toda validación, duplicado, ausencia, conflicto
+     o error técnico.
+   - Validar relaciones, estado activo, permisos de alcance, fechas, horas,
+     solapamientos, unicidad y reglas de negocio en backend aunque ya exista
+     validación frontend.
+   - Si consulta ambas bases de datos, inicializar explícitamente la conexión
+     adicional con el patrón de `Database`.
+
+2. **Controlador**
+   - Crear solo funciones.
+   - Poner `Autorizacion::verificar()` como primera instrucción de cada función
+     pública, salvo una comprobación adicional de rol que venga inmediatamente
+     después.
+   - Tomar JSON o `$_POST`, nunca leer parámetros de negocio desde la sesión
+     excepto el usuario autenticado y su rol.
+   - Para operaciones propias, ignorar IDs de propietario enviados por el
+     cliente y derivarlos de `$_SESSION`.
+   - Auditar cada escritura con `Bitacora::registrar()`.
+   - Notificar solo cuando exista un receptor real y el efecto lo requiera.
+   - Responder exclusivamente mediante `Respuesta`.
+
+3. **Rutas**
+   - Páginas bajo `<modulo>/...` y solo `GET`.
+   - APIs bajo `api/<modulo>/...`.
+   - Lecturas por `GET`, escrituras por `POST`.
+   - Usar `{id}` cuando sea un parámetro de URL; leerlo desde `$_GET['id']`.
+   - No conservar rutas antiguas sin prefijo `api/` salvo compatibilidad
+     explícitamente solicitada.
+
+### 11.4 Secuencia frontend obligatoria
+
+#### Formularios
+
+- Incluir `novalidate` y errores junto a cada campo.
+- Validar en tiempo real y nuevamente al enviar.
+- Pintar `is-invalid` con mensaje y `is-valid` solo después de una validación
+  exitosa real.
+- Para validaciones remotas usar `apiFetch`, debounce y manejar errores por
+  `error.codigo`; una API caída no equivale a "válido".
+- Para `select2`:
+  1. clase `select2` en el `<select>`;
+  2. `data-placeholder` coherente;
+  3. `window.initSelect2(form)` después de opciones AJAX;
+  4. eventos `change select2:select select2:clear`;
+  5. clases en el `<select>` y en `.select2-selection`;
+  6. reset probado visualmente.
+- Para contraseñas, fechas, horas, rangos y confirmaciones, validar también
+  dependencias entre campos, no solo cada campo aislado.
+- Tras guardar, mostrar éxito, limpiar/rellenar controles y actualizar stats o
+  tabla sin recarga completa cuando el módulo ya usa ese patrón.
+
+#### Tours
+
+- Toda pantalla de creación/edición con varios controles debe tener `tour.js`
+  y `#btn-ayuda`.
+- El tour debe omitir o resolver con gracia elementos ausentes.
+- En Select2, enfocar el hermano `.select2-container` visible:
+
+```js
+function objetivo(selector) {
+    const elemento = document.querySelector(selector);
+    if (!elemento) return selector;
+    if (elemento.tagName === 'SELECT' && elemento.classList.contains('select2')
+        && elemento.nextElementSibling?.classList.contains('select2-container')) {
+        return elemento.nextElementSibling;
+    }
+    return elemento;
+}
+```
+
+#### Consultas
+
+- Usar DataTables para tablas de consulta.
+- Cargar datos con `apiFetch`, escapar texto antes de insertar HTML y destruir la
+  instancia antes de pintar una recarga.
+- Incluir idioma local, búsqueda, paginación y ordenamiento.
+- Incluir Excel/PDF si el módulo consulta datos operativos, excluyendo Acciones.
+- Nunca usar IDs repetidos dentro de filas generadas; usar clases y delegación.
+- El estado vacío se representa con `tbody` vacío, no con una fila `colspan`
+  incompatible con el número de columnas.
+
+### 11.5 Roles y alcance
+
+La IA debe distinguir entre permiso RBAC y alcance de datos:
+
+| Usuario | Citas | Horarios | Regla de alcance |
+|---|---|---|---|
+| Administrador | Crear/leer/editar/eliminar | Crear/leer/editar/eliminar | Puede asignar citas a cualquier psicólogo activo |
+| Superusuario | Según permisos concedidos | Según permisos concedidos | La UI y backend lo tratan como administrativo para Horarios |
+| Psicólogo | Sus citas | Sin acceso | Solo puede crear y gestionar citas con su propio ID |
+| Otros empleados | Sin acceso salvo permiso explícito | Sin acceso | No asumir permisos por tipo de empleado |
+
+Esta tabla es específica de los módulos actuales; cada módulo nuevo debe
+definir su propia matriz antes de escribir controladores. El backend debe
+repetir la restricción aunque el sidebar o el formulario oculten controles.
+
+### 11.6 Criterio de módulo terminado
+
+Antes de afirmar que un módulo está listo, comprobar todos los puntos:
+
+- [ ] SQL y relaciones entendidos.
+- [ ] Modelo con `__set`, `__get`, `manejarAccion` y excepciones correctas.
+- [ ] Controlador sin clases y con autorización primera.
+- [ ] Rutas separadas por puerta HTML/JSON.
+- [ ] RBAC, sidebar y dashboard configurados.
+- [ ] Crear/consultar/editar/eliminar implementados según alcance solicitado.
+- [ ] Validación backend duplicada en frontend.
+- [ ] Validación en vivo, mensajes y clases visuales.
+- [ ] Select2 probado después de carga AJAX y después de reset.
+- [ ] Driver.js y botón de ayuda funcionando en cada formulario aplicable.
+- [ ] DataTables y exportaciones funcionando en cada consulta aplicable.
+- [ ] Stats con `data-stat` y una sola llamada.
+- [ ] Bitácora en cada escritura y notificación cuando corresponda.
+- [ ] Fechas, horas, rangos, conflictos y estados probados con datos inválidos.
+- [ ] No se rompieron cambios ajenos en archivos modificados por el usuario.
+
+La IA debe entregar, sin ejecutarlos, los comandos de sintaxis correspondientes
+a cada archivo modificado. Como mínimo, incluir `php -l` para cada PHP y
+`node --check` para cada JavaScript del módulo.
+
+### 11.7 Pruebas mínimas por módulo
+
+La IA debe enumerar estos escenarios y dejar al usuario los pasos para probarlos
+manualmente cuando sean aplicables. La IA no ejecuta comandos ni pruebas de
+terminal por la regla de optimización de tokens:
+
+1. Página accesible con rol permitido.
+2. Página rechazada con rol no permitido.
+3. API sin sesión responde 401 con el contrato.
+4. API con permiso insuficiente responde 403 con el contrato.
+5. Campo vacío, formato inválido y longitud inválida.
+6. Duplicado o conflicto de negocio.
+7. Fecha/hora fuera de rango y solapamiento.
+8. Creación exitosa y auditoría.
+9. Edición exitosa y exclusión del propio registro en validaciones únicas.
+10. Eliminación exitosa y registro inexistente.
+11. Recarga de tabla y estado vacío sin warnings de DataTables.
+12. Select2: seleccionar, limpiar y resetear.
+13. Driver.js: botón, objetivo visible y avance de pasos.
+
+Si no hay entorno de navegador, la IA debe informar que la validación visual
+queda pendiente. No debe afirmar que la interfaz fue probada porque haya
+inspeccionado el código o porque el usuario aún no haya ejecutado los comandos.
+
+### 11.8 Regla de comunicación con el usuario
+
+Al terminar un módulo, el resumen debe mencionar:
+
+- Archivos creados y modificados.
+- Roles y permisos aplicados.
+- Reglas funcionales implementadas.
+- Validaciones frontend/backend.
+- Revisión estática realizada y cualquier prueba manual pendiente.
+- Datos SQL/RBAC que el usuario todavía debe ejecutar o verificar.
+
+**Comandos para ejecutar manualmente**
+
+La respuesta final debe incluir una sección explícita con los comandos que el
+usuario debe ejecutar en su terminal local. Debe adaptar los nombres al módulo
+real, por ejemplo:
+
+```text
+He terminado con los cambios. Por favor, ejecuta los siguientes comandos en tu terminal para verificar que la sintaxis de todos los archivos sea correcta:
+
+php -l app/Models/<Modulo>Model.php
+php -l app/Controllers/<modulo>Controller.php
+node --check dist/js/modulos/<modulo>/crear.js
+```
+
+Si existen más archivos PHP o JavaScript modificados, debe añadir un comando
+para cada uno. Si la tarea requiere pruebas de navegador, debe indicar también
+los escenarios que el usuario debe probar manualmente y no afirmar que fueron
+ejecutados por la IA.
+
+No decir "módulo completo" si falta una parte del checklist anterior.
