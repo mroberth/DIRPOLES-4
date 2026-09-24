@@ -7,7 +7,7 @@
 //   const validador = ConfiguracionValidaciones.configurar(form, {
 //       idExcluir: () => 0,   // en edición: id de la fila actual
 //   });
-//   validador.validarTodo();
+//   if (!(await validador.validarTodo())) { ... };
 // ------------------------------------------------------------------
 window.ConfiguracionValidaciones = (function () {
     'use strict';
@@ -81,23 +81,35 @@ window.ConfiguracionValidaciones = (function () {
             const datos = Object.fromEntries(new FormData(form).entries());
             datos.catalogo = form.dataset.tipo;
             if (idExcluir() > 0) datos.id_excluir = idExcluir();
+
+            const camposUnicos = () => unicos
+                .map((name) => form.querySelector(`[name="${name}"]`))
+                .filter(Boolean);
+
             try {
                 const r = await apiFetch(BASE_URL + 'api/configuracion/validar', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify(datos),
                 });
-                unicos.forEach((name) => {
-                    const campo = form.querySelector(`[name="${name}"]`);
-                    if (!campo) return;
+                let todoOk = true;
+                camposUnicos().forEach((campo) => {
                     if (r.existe) {
                         mostrarError(campo, (campo.dataset.label || 'El campo') + ': ya existe un registro con esos datos.');
-                    } else {
-                        validarCampo(campo);
+                        todoOk = false;
+                    } else if (!validarCampo(campo)) {
+                        todoOk = false;
                     }
                 });
+                return todoOk;
             } catch (e) {
-                /* silencioso: no bloquear por un fallo de la validación remota */
+                // API caída → NO se verificó nada: jamás dejar verde (aunque
+                // antes hubiera quedado en verde por una verificación previa).
+                console.error('validar unicidad:', e);
+                camposUnicos().forEach((campo) => {
+                    mostrarError(campo, 'No se pudo verificar con el servidor. Intenta de nuevo.');
+                });
+                return false;
             }
         }
 
@@ -115,7 +127,12 @@ window.ConfiguracionValidaciones = (function () {
         }
 
         return {
-            validarTodo: () => campos.every((c) => validarCampo(c)),
+            // Asíncrono: la unicidad remota también decide si el envío pasa
+            // (los llamadores deben usar `await validador.validarTodo()`).
+            validarTodo: async () => {
+                if (!campos.every((c) => validarCampo(c))) return false;
+                return unicos.length ? await validarUnico() : true;
+            },
             limpiar: () => {
                 form.querySelectorAll('.is-valid, .is-invalid').forEach((c) => c.classList.remove('is-valid', 'is-invalid'));
                 form.querySelectorAll('.form-text.text-danger').forEach((e) => (e.textContent = ''));

@@ -6,41 +6,47 @@ document.addEventListener('DOMContentLoaded', function () {
         let bestMatch = null;
         let maxLength = 0;
 
-        items.forEach(a => {
+        // Normaliza una ruta: deja solo el path, sin query string, hash ni slash final.
+        const normalizar = (ruta) => {
+            let linkPath = ruta;
+            if (linkPath.startsWith('http')) {
+                try {
+                    linkPath = new URL(linkPath).pathname;
+                } catch (e) {
+                    return '';
+                }
+            }
+            return linkPath.split('?')[0].split('#')[0].replace(/\/$/, '');
+        };
+
+        const normalizedCurrent = currentPath.replace(/\/$/, '');
+
+        items.forEach((a) => {
             const href = a.getAttribute('href');
             if (!href) return;
 
-            // Extraer solo el path del href (sin dominio, query string ni hash)
-            let linkPath = href;
+            // Rutas candidatas: el href más los alias declarados en data-activo.
+            // Esto permite que, por ejemplo, "psicologia/consultar" mantenga
+            // activo el item de "psicologia/crear".
+            const candidatas = [href].concat(
+                (a.dataset.activo || '').split(/\s+/).filter(Boolean)
+            );
 
-            // Si el href es una URL completa, extraer solo el path
-            if (href.startsWith('http')) {
-                try {
-                    const url = new URL(href);
-                    linkPath = url.pathname;
-                } catch (e) {
-                    console.error('Error parsing URL:', href);
-                    return;
-                }
-            }
+            candidatas.forEach((candidata) => {
+                const normalizedLink = normalizar(candidata);
 
-            // Eliminar query string y hash si existen
-            linkPath = linkPath.split('?')[0].split('#')[0];
-
-            // Normalizar ambas rutas (eliminar trailing slashes)
-            const normalizedCurrent = currentPath.replace(/\/$/, '');
-            const normalizedLink = linkPath.replace(/\/$/, '');
-
-            // Comparación: el path actual debe contener el path del link
-            // Esto permite que "diagnostico_trabajo_social_consultar" active "diagnostico_trabajo_social"
-            if (normalizedCurrent.includes(normalizedLink) && normalizedLink !== '/' && normalizedLink.length > 1) {
-                // Almacenar el match más largo para evitar colisiones 
-                // entre "consultar_inventario" y "consultar_inventario_mob"
-                if (normalizedLink.length > maxLength) {
+                // El path actual debe contener el path del link. Se guarda el
+                // match más largo para evitar colisiones entre rutas parecidas.
+                if (
+                    normalizedLink !== '/' &&
+                    normalizedLink.length > 1 &&
+                    normalizedCurrent.includes(normalizedLink) &&
+                    normalizedLink.length > maxLength
+                ) {
                     maxLength = normalizedLink.length;
                     bestMatch = a;
                 }
-            }
+            });
         });
 
         if (bestMatch) {

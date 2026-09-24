@@ -17,7 +17,9 @@ use App\Core\ExcepcionApi;
  * de la petición). CRUD de terceros vive en EmpleadoModel.
  *
  * Extiende SecurityModel: la tabla `empleado` vive en
- * dirpoles_security. Conexión: $this->conn_security.
+ * dirpoles_security. Conexión: $this->conn_security (tablas propias)
+ * y $this->conn (business) para la unicidad GLOBAL de correo/teléfono
+ * contra beneficiario y proveedores.
  *
  * Patrón del esqueleto: __set valida → manejarAccion() despacha →
  * métodos privados hacen el SQL y lanzan ExcepcionApi.
@@ -178,13 +180,12 @@ class PerfilModel extends SecurityModel
                 throw ExcepcionApi::validacion('La contraseña actual no es correcta.');
             }
 
-            // 2. Unicidad de correo (excluyéndose a sí mismo).
-            $stmt = $this->conn_security->prepare(
-                "SELECT COUNT(*) FROM empleado WHERE correo = :correo AND id_empleado <> :id"
-            );
-            $stmt->execute([':correo' => $this->__get('correo'), ':id' => $id]);
-            if ((int) $stmt->fetchColumn() > 0) {
-                throw ExcepcionApi::yaExiste('Ya existe otro empleado con ese correo.');
+            // 2. Unicidad GLOBAL de correo y teléfono (excluyéndose a sí mismo).
+            if ($this->validarCorreo()['existe']) {
+                throw ExcepcionApi::yaExiste('Ese correo ya está registrado en el sistema.');
+            }
+            if ($this->validarTelefono()['existe']) {
+                throw ExcepcionApi::yaExiste('Ese teléfono ya está registrado en el sistema.');
             }
 
             // 3. Si cambia la contraseña: confirmación y no repetir la actual.
@@ -227,7 +228,7 @@ class PerfilModel extends SecurityModel
             throw $e; // regla de negocio: no la disfrazo de error técnico
         } catch (PDOException $e) {
             if ($e->getCode() === '23000') {
-                throw ExcepcionApi::yaExiste('Ese correo ya está registrado por otro empleado.');
+                throw ExcepcionApi::yaExiste('Ese correo ya está registrado en el sistema.');
             }
             error_log('PerfilModel::actualizar - ' . $e->getMessage());
             throw ExcepcionApi::errorInterno('No se pudo actualizar el perfil.');
@@ -239,24 +240,61 @@ class PerfilModel extends SecurityModel
 
     private function validarCorreo(): array
     {
-        $stmt = $this->conn_security->prepare(
-            'SELECT COUNT(*) FROM empleado WHERE correo = :correo AND id_empleado <> :id'
-        );
-        $stmt->bindValue(':correo', $this->__get('correo'));
-        $stmt->bindValue(':id', (int) $this->__get('id_empleado'), PDO::PARAM_INT);
-        $stmt->execute();
+        $this->Business(); // conexión a BD de negocio para consultar beneficiarios y proveedores
+
+        // Unicidad GLOBAL de correo: empleado (excluyendo el propio) +
+        // beneficiario + proveedores.
+        $sql = 'SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE correo = :c1 AND id_empleado <> :x1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE correo = :c2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE correo = :c3
+                ) t';
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            ':c1' => $this->__get('correo'),
+            ':x1' => (int) $this->__get('id_empleado'),
+            ':c2' => $this->__get('correo'),
+            ':c3' => $this->__get('correo'),
+        ]);
 
         return ['existe' => (int) $stmt->fetchColumn() > 0];
     }
 
     private function validarTelefono(): array
     {
-        $stmt = $this->conn_security->prepare(
-            'SELECT COUNT(*) FROM empleado WHERE telefono = :telefono AND id_empleado <> :id'
-        );
-        $stmt->bindValue(':telefono', $this->__get('telefono'));
-        $stmt->bindValue(':id', (int) $this->__get('id_empleado'), PDO::PARAM_INT);
-        $stmt->execute();
+        // Vacío no se valida (la columna es opcional).
+        if (trim((string) $this->__get('telefono')) === '') {
+            return ['existe' => false];
+        }
+
+        $this->Business(); // conexión a BD de negocio para consultar beneficiarios y proveedores
+
+        // Unicidad GLOBAL de teléfono: empleado (excluyendo el propio) +
+        // beneficiario + proveedores.
+        $sql = 'SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE telefono = :t1 AND id_empleado <> :x1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE telefono = :t2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE telefono = :t3
+                ) t';
+
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            ':t1' => $this->__get('telefono'),
+            ':x1' => (int) $this->__get('id_empleado'),
+            ':t2' => $this->__get('telefono'),
+            ':t3' => $this->__get('telefono'),
+        ]);
 
         return ['existe' => (int) $stmt->fetchColumn() > 0];
     }

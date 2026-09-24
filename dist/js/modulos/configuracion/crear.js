@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
         form.addEventListener('submit', async (ev) => {
             ev.preventDefault();
 
-            if (!validador.validarTodo()) {
+            if (!(await validador.validarTodo())) {
                 AlertManager.error('Formulario incompleto', 'Corrige los campos resaltados antes de continuar.');
                 return;
             }

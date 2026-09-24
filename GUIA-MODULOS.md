@@ -38,33 +38,45 @@ Respuesta::exito($datos)   →  { "exito": true, "datos": ... }
 
 ---
 
-## 1. Registrar el módulo en la base de datos
+## 1. Identificar el módulo en la base de datos
 
-El RBAC necesita el módulo en la tabla `modulo` (BD `dirpoles_security`):
+**Ya NO hace falta insertar módulos**: los 20 módulos del sistema ya existen
+en la tabla `modulo` (BD `dirpoles_security`). Tu trabajo es identificar el
+`id_modulo` real de TU módulo y usarlo en el sidebar, en `Autorizacion` y en
+los mensajes de bitácora:
+
+| id | Módulo | id | Módulo |
+|---|---|---|---|
+| 1 | Empleados | 11 | Jornadas |
+| 2 | Beneficiarios | 12 | Mobiliario |
+| 3 | Citas | 13 | Transporte |
+| 4 | Psicologia | 14 | Configuracion |
+| 5 | Medicina | 15 | Reportes |
+| 6 | Orientacion | 16 | Bitacora |
+| 7 | Trabajador Social | 17 | Permisos |
+| 8 | Discapacidad | 18 | Horarios |
+| 9 | Inventario Medico | 19 | Notificaciones |
+| 10 | Referencias | 20 | Perfil |
 
 ```sql
--- 1. Crear el módulo
-INSERT INTO modulo (nombre, descripcion) VALUES ('Productos', 'Gestionar Productos');
-
--- 2. Averiguar el ID que le asignó (lo necesitas para el sidebar)
-SELECT id_modulo FROM modulo WHERE nombre = 'Productos';
-
--- 3. Darle TODOS los permisos al rol 1 (Administrador; ajusta según tus roles)
-INSERT INTO rol_modulo_permiso (id_tipo_emp, id_modulo, id_permiso)
-VALUES (1, <ID_MODULO>, 1),   -- Crear
-       (1, <ID_MODULO>, 2),   -- Leer
-       (1, <ID_MODULO>, 3),   -- Editar
-       (1, <ID_MODULO>, 4);   -- Eliminar
-
--- 4. (Opcional) Dar solo lectura a otro rol, ej. rol 3
-INSERT INTO rol_modulo_permiso (id_tipo_emp, id_modulo, id_permiso)
-VALUES (3, <ID_MODULO>, 2);
+-- Verificar el id del módulo con el que vas a trabajar (ya existe)
+SELECT id_modulo FROM modulo WHERE nombre = 'Inventario Medico';
 ```
 
-Permisos existentes: **1=Crear, 2=Leer, 3=Editar, 4=Eliminar**.
+> En esta guía **"Productos" es solo un ejemplo ilustrativo** de nombres y
+> campos; en la práctica trabaja sobre uno de los módulos existentes de la
+> tabla anterior. No crear módulos nuevos por el momento.
 
-> La tabla `rol_modulo_permiso` se gestiona desde la pantalla de permisos de
-> administrador si prefieres no usar SQL.
+**Permisos** (tabla `rol_modulo_permiso`; permisos: **1=Crear, 2=Leer,
+3=Editar, 4=Eliminar**): el módulo debe tener filas para tu rol o no se verá
+en el sidebar. Si falta algún permiso, asígnalo desde la pantalla de
+**Permisos** del administrador o con un SQL puntual:
+
+```sql
+-- Ejemplo: dar todos los permisos al rol Administrador (1) sobre Inventario (9)
+INSERT INTO rol_modulo_permiso (id_tipo_emp, id_modulo, id_permiso)
+VALUES (1, 9, 1), (1, 9, 2), (1, 9, 3), (1, 9, 4);
+```
 
 ---
 
@@ -104,7 +116,8 @@ Router::post('api/productos/crear', function () {
 Convenciones de rutas:
 - Páginas: `productos/accion` → GET → devuelven HTML (renderizan vista).
 - API: `api/productos/accion` → GET para leer, POST para escribir → devuelven JSON.
-- Parámetros en URL: `'productos/ver/{id}'` (el Router los soporta con regex).
+- Parámetros en URL: `'productos/ver/{id}'` — el Router inyecta el valor en
+  `$_GET['id']`; el controlador lo lee desde ahí (no como argumento del closure).
 
 ---
 
@@ -201,6 +214,14 @@ Puntos clave:
 Aquí van las clases. Extiende `BusinessModel` (datos transaccionales) o
 `SecurityModel` (usuarios/permisos/bitácora). Patrón obligatorio:
 `__set` valida → `manejarAccion()` despacha → métodos privados hacen el SQL.
+
+> **Unicidad global de identidad**: cédula (tipo+documento), correo y
+> teléfono son únicos entre `empleado`, `beneficiario` y `proveedores`.
+> Si tu módulo guarda alguno de esos datos, valida contra las tres tablas
+> con el patrón `UNION ALL` cross-schema de `EmpleadoModel::existeX()` /
+> `BeneficiarioModel::existeX()` (regla completa en `AGENTS.md` §7). El
+> mensaje de duplicado es genérico: "ya está registrado en el sistema"
+> (no digas en qué módulo).
 
 ```php
 <?php
@@ -393,8 +414,12 @@ include 'app/Views/template/head.php';
 
     <?php include 'app/Views/template/script.php'; ?>
 
-    <!-- JS del módulo al final -->
-    <script src="<?= BASE_URL ?>dist/js/modulos/productos.js"></script>
+    <!-- JS del módulo al final, con defer, en orden de dependencia -->
+    <script src="<?= BASE_URL ?>dist/js/modulos/productos/stats.js" defer></script>
+    <script src="<?= BASE_URL ?>dist/js/modulos/productos/validaciones.js" defer></script>
+    <script src="<?= BASE_URL ?>dist/js/modulos/productos/tour.js" defer></script>
+    <script src="<?= BASE_URL ?>dist/js/modulos/productos/crear.js" defer></script>
+    <script src="<?= BASE_URL ?>dist/js/modulos/productos/consultar.js" defer></script>
 </body>
 </html>
 ```
@@ -403,59 +428,41 @@ Reglas de vistas:
 - `$titulo` se define antes de `head.php` (lo usa `script.php` para no cargar
   FullCalendar/DataTables en el login).
 - Todo dato dinámico impreso va con `htmlspecialchars()` o `<?= ... ?>` de datos ya confiables.
-- El JS del módulo vive en `dist/js/modulos/<modulo>.js` y se incluye al final.
+- El JS del módulo vive en `dist/js/modulos/<modulo>/` (**carpeta en singular**)
+  dividido por pantalla: `validaciones.js`, `tour.js`, `stats.js`, `crear.js`,
+  `editar.js`, `consultar.js` — incluidos con `defer` al final, en ese orden.
+- Si el módulo tiene formulario: `novalidate`, errores junto a cada campo
+  (`<div class="form-text text-danger">`), clases `is-valid`/`is-invalid`,
+  Select2 (`.select2` + `data-placeholder`) y botón `#btn-ayuda` conectado al tour.
+- Si el módulo tiene tabla: `<table id="tabla">` vacía (tbody vacío) para DataTables.
 
 ---
 
-## 6. El JS del módulo — `dist/js/modulos/productos.js`
+## 6. El JS del módulo — `dist/js/modulos/<modulo>/`
 
-Todo el JS consume la API con el mismo contrato. Función helper recomendada
-(cópiala a `dist/js/core/apiFetch.js` para reutilizarla en todos los módulos):
+Carpeta en singular (como `empleado/`, `cita/`, `horario/`) con un archivo por
+pantalla, incluidos con `defer` en la vista en este orden: `stats.js`,
+`validaciones.js`, `tour.js`, `editar.js`/`crear.js`, `consultar.js`.
 
-```javascript
-// dist/js/core/apiFetch.js
-async function apiFetch(url, opciones = {}) {
-    const resp = await fetch(url, {
-        headers: { 'Accept': 'application/json' },
-        credentials: 'same-origin',          // envía sesión + cookies JWT
-        ...opciones,
-    });
+- `validaciones.js` — validaciones reutilizables crear/editar
+  (`ModuloValidaciones.configurar(form, {idExcluir})`), en vivo con `input`/`change`,
+  remotas con `apiFetch` + debounce; si la API falla → rojo "No se pudo
+  verificar…" + `return false` (nunca verde).
+- `tour.js` — Driver.js con `ModuloTour.iniciar()`, botón `#btn-ayuda`; para
+  `<select class="select2">` apuntar a `select.nextElementSibling`.
+- `stats.js` — tarjetas `[data-stat]` con UNA sola llamada a `api/<modulo>/stats`.
+- `crear.js` / `editar.js` — solo la lógica de esa pantalla; tras guardar,
+  éxito con AlertManager/SweetAlert2 y refresco de stats/tabla sin recarga.
+- `consultar.js` — pinta filas con `apiFetch` (texto escapado), destruye la
+  instancia anterior y reinicia `$('#tabla').DataTable()` con idioma local y
+  botones `excelHtml5`/`pdfHtml5` excluyendo la columna Acciones.
 
-    // Sesión expirada → el middleware responde 401 con datos.redireccion
-    if (resp.status === 401 && resp.headers.get('Content-Type')?.includes('json')) {
-        const cuerpo = await resp.json();
-        window.location.href = cuerpo.datos?.redireccion ?? BASE_URL + 'login';
-        return;
-    }
-
-    const cuerpo = await resp.json();
-
-    if (!resp.ok || !cuerpo.exito) {
-        // CONTRATO DE ERROR: { exito:false, error:{ codigo, estado, mensaje } }
-        throw cuerpo.error ?? { codigo: 'INTERNAL_SERVER_ERROR', estado: resp.status, mensaje: 'Error inesperado' };
-    }
-    return cuerpo.datos;
-}
-```
-
-Uso en el módulo:
+El helper `apiFetch` **ya existe** en `dist/js/core/apiFetch.js` (lo carga
+`template/script.php`): no lo copies ni lo redefinas, solo úsalo. Devuelve
+`cuerpo.datos` en éxito y lanza `error.codigo` en fallo:
 
 ```javascript
-// dist/js/modulos/productos.js
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        const productos = await apiFetch(BASE_URL + 'api/productos/listar');
-        // ... poblar la tabla ...
-    } catch (error) {
-        // Programa contra error.codigo (estable), nunca contra mensaje
-        if (error.codigo === 'ACCESS_DENIED') {
-            Swal.fire('Sin permiso', error.mensaje, 'warning');
-        } else {
-            Swal.fire('Error', error.mensaje, 'error');
-        }
-    }
-});
-
+// dist/js/modulos/productos/crear.js
 async function crearProducto(datos) {
     try {
         await apiFetch(BASE_URL + 'api/productos/crear', {
@@ -465,6 +472,7 @@ async function crearProducto(datos) {
         });
         Swal.fire('¡Listo!', 'Producto creado', 'success');
     } catch (error) {
+        // Programa contra error.codigo (estable), nunca contra mensaje
         if (error.codigo === 'ALREADY_EXISTS') {
             Swal.fire('Duplicado', error.mensaje, 'info');
         } else {
@@ -480,8 +488,9 @@ async function crearProducto(datos) {
 
 ```php
 return [
-    // ⬇️ Este número es el id_modulo de la BD (paso 1 de esta guía)
-    19 => [
+    // ⬇️ Clave = id_modulo REAL de tu módulo (tabla del paso 1; los ids 1–20
+    // ya están ocupados). Reemplaza 9 por el id que te devolvió tu SELECT.
+    9 => [
         'key'    => 'productos',
         'icon'   => 'fa-box',
         'titulo' => 'Productos',
@@ -502,15 +511,16 @@ El sidebar muestra el grupo solo si el rol tiene permiso "Leer" sobre ese
 
 ## 8. Checklist final del módulo
 
-- [ ] `INSERT INTO modulo ...` ejecutado y permisos asignados por rol
-- [ ] `app/routes/productos.php` con páginas (HTML) y API (`api/…`, JSON)
+- [ ] `id_modulo` real identificado en la tabla `modulo` (ya existen; sin INSERT) y permisos del rol en `rol_modulo_permiso`
+- [ ] `app/routes/productos.php` con páginas (HTML, GET) y API (`api/…`, GET leer / POST escribir)
 - [ ] `app/Controllers/productosController.php`: solo funciones; `Autorizacion::verificar()` primera línea de cada función
 - [ ] `app/Models/ProductoModel.php`: `__set` valida, `manejarAccion()` despacha, `throw ExcepcionApi` para errores
 - [ ] Bitácora con `Bitacora::registrar()` en toda operación de escritura
-- [ ] Vista(s) copiando `app/Views/inicio/dashboard.php`, `$titulo` antes de `head.php`
-- [ ] JS en `dist/js/modulos/` usando `apiFetch` y programando contra `error.codigo`
+- [ ] Vista(s) copiando un módulo existente, `$titulo` antes de `head.php`, validación visual, Select2 y `#btn-ayuda`
+- [ ] JS en `dist/js/modulos/<modulo>/` dividido por pantalla, usando `apiFetch`, `data-stat`, DataTables y programando contra `error.codigo`
 - [ ] Entrada en `app/Config/modulos_sidebar.php` con el `id_modulo` real
-- [ ] `php -l` sobre los archivos PHP nuevos
+- [ ] Card en `app/Config/dashboard_cards.php` (marcar `'disponible' => true`)
+- [ ] `php -l` sobre cada PHP nuevo y `node --check` sobre cada JS nuevo (entregar los comandos al usuario, sin ejecutarlos)
 
 ---
 

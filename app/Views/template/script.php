@@ -33,6 +33,10 @@
     <script src="<?= BASE_URL ?>dist/js/dashboard/sidebar-scroll-enhancement.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/core/select-2-init.js" defer></script>
 
+    <!-- Helpers de formato y de tablas (DataTables) compartidos por los módulos -->
+    <script src="<?= BASE_URL ?>dist/js/core/formato.js" defer></script>
+    <script src="<?= BASE_URL ?>dist/js/core/datatable.js" defer></script>
+
     <!-- Driver.js -->
     <script src="<?= BASE_URL ?>plugins/driver.js/driver.js.iife.js" defer></script>
 

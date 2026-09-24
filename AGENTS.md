@@ -188,6 +188,12 @@ Notificador::enviar($idReceptor, 'Título', 'productos/consultar', 'info');
 
 ## 6. Convenciones por capa
 
+> **Frontend**: antes de crear o editar CUALQUIER vista o JS de módulo, lee
+> `GUIA-FRONTEND.md`. Es el contrato de frontend (helpers globales, contrato de
+> campos, patrón de `validaciones/tour/stats/crear/editar/consultar`,
+> prohibiciones). El módulo canónico es Empleados: copia su patrón real y
+> adapta nombres; no inventes código genérico.
+
 **Controller** (`app/Controllers/`, solo funciones, carga perezosa con
 `load_controller('xController.php')`):
 1. `Autorizacion::verificar()` primera línea.
@@ -244,7 +250,10 @@ Notificador::enviar($idReceptor, 'Título', 'productos/consultar', 'info');
   inicializar Select2 antes de insertar las opciones.
 - **Eventos en tiempo real**: los inputs usan `input`/`change`; los Select2 usan
   `change select2:select select2:clear`. Las validaciones remotas deben llevar
-  debounce y no marcar verde si la API de unicidad o disponibilidad falló.
+  debounce y, si la API de unicidad o disponibilidad **falla** (caída, 500, 429),
+  marcar el campo en ROJO con "No se pudo verificar…" y devolver `false`;
+  jamás dejarlo en verde ni asumir que es válido. Los errores de negocio del
+  backend (400/404/409) muestran `error.mensaje` tal cual.
 - **Validación visual**: cada campo validable debe tener `<div id="campoError"
   class="form-text text-danger"></div>`, alternar `is-valid`/`is-invalid` y
   limpiar mensaje y estado al resetear. Validar siempre en submit aunque ya se
@@ -297,6 +306,19 @@ contra otro módulo); AGREGA AHÍ tu módulo nuevo al crearlo.
   `rol_modulo_permiso` (rol × módulo × permiso). El sidebar se filtra por
   permiso id 2 (Leer) vía `PermisosModel::obtenerPermisosSidebar`.
 - Módulo real de Notificaciones = `id_modulo` 19 (nombre `Notificaciones`).
+- **Unicidad global de identidad**: cédula (tipo+documento), correo y
+  teléfono son únicos entre `empleado` (security), `beneficiario` y
+  `proveedores` (business). Los `existeX()`/`validarX()` de `EmpleadoModel`,
+  `BeneficiarioModel` y `PerfilModel` lo resuelven con un `UNION ALL`
+  cross-schema ejecutado desde la conexión **business**
+  (`dirpoles_security.empleado` calificado; patrón ya usado por `CitaModel`
+  y `HorarioModel`). Se compite por igual tipo de documento (V↔V, J↔J): un
+  RIF J/G nunca bloquea una cédula V/E ni al revés; el `id_excluir` de
+  edición solo se aplica en la rama de la tabla propia. En producción con
+  usuarios de BD separados hace falta `GRANT SELECT` de cada esquema sobre
+  la tabla ajena. **Deuda técnica**: ninguna de las tres tablas tiene
+  `UNIQUE KEY` en estos campos; la única barrera hoy es el código (una
+  carrera puede duplicar).
 - Login: contraseña cifrada RSA en el cliente → descifrada con
   `app/Config/Keys/login_private.pem` → bcrypt. Bloqueo tras 3 intentos
   fallidos **persistidos en `login_intentos`** (tabla de `dirpoles_security`),
@@ -379,6 +401,7 @@ dist/                   CSS/JS/IMG propios:
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)
 GUIA-MODULOS.md         ← GUÍA PRINCIPAL para crear módulos nuevos
+GUIA-FRONTEND.md        ← GUÍA del frontend (helpers, patrón de vistas/JS, checks)
 GUIA-BACKEND-FRONTEND.md  Guía explicativa backend+frontend (conceptos y
                         diferencias con el sistema viejo) — para defensa
 README.md               Instalación y estructura
@@ -512,6 +535,9 @@ También debe actualizar, cuando corresponda:
 
 ### 11.4 Secuencia frontend obligatoria
 
+> Lee primero `GUIA-FRONTEND.md` (patrón canónico: `app/Views/empleados/` +
+> `dist/js/modulos/empleado/`) y copia ese patrón antes de escribir.
+
 #### Formularios
 
 - Incluir `novalidate` y errores junto a cada campo.
@@ -519,7 +545,8 @@ También debe actualizar, cuando corresponda:
 - Pintar `is-invalid` con mensaje y `is-valid` solo después de una validación
   exitosa real.
 - Para validaciones remotas usar `apiFetch`, debounce y manejar errores por
-  `error.codigo`; una API caída no equivale a "válido".
+  `error.codigo`; una API caída no equivale a "válido": marcar en ROJO
+  "No se pudo verificar…" y bloquear el envío (nunca verde).
 - Para `select2`:
   1. clase `select2` en el `<select>`;
   2. `data-placeholder` coherente;
@@ -620,6 +647,9 @@ terminal por la regla de optimización de tokens:
 11. Recarga de tabla y estado vacío sin warnings de DataTables.
 12. Select2: seleccionar, limpiar y resetear.
 13. Driver.js: botón, objetivo visible y avance de pasos.
+14. Validación remota fallida (API caída o 500, p. ej. validación de unicidad o
+    de disponibilidad): campo en ROJO con "No se pudo verificar…" y envío
+    bloqueado hasta reintentar; en ningún caso queda en verde.
 
 Si no hay entorno de navegador, la IA debe informar que la validación visual
 queda pendiente. No debe afirmar que la interfaz fue probada porque haya

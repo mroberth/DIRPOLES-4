@@ -8,16 +8,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function fila(horario) {
         return `<tr><td>${escapar(horario.psicologo)}</td><td>${escapar(horario.cedula)}</td><td>${escapar(horario.dia_semana)}</td><td>${escapar(horario.hora_inicio)}</td><td>${escapar(horario.hora_fin)}</td><td class="text-center text-nowrap"><button type="button" class="btn btn-sm btn-outline-secondary btn-editar-horario" data-id="${horario.id_horario}" title="Editar"><i class="fas fa-pen"></i></button> <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-horario" data-id="${horario.id_horario}" title="Eliminar"><i class="fas fa-trash"></i></button></td></tr>`;
     }
-    function exportOptions() { return { columns: [0, 1, 2, 3, 4], format: { body: (data) => String(data).replace(/<[^>]*>/g, '') } }; }
     function construirTabla() {
-        if (!window.jQuery || !$.fn?.DataTable) return;
-        tabla = $('#tablaHorarios').DataTable({
-            language: { url: BASE_URL + 'plugins/DataTables/js/languaje.json' }, order: [[0, 'asc'], [2, 'asc']], pageLength: 10, autoWidth: false,
+        if (!window.DataTableHelper) return;
+        tabla = DataTableHelper.inicializar('#tablaHorarios', {
+            titulo: 'Horarios de Psicología',
+            orden: [[0, 'asc'], [2, 'asc']],
+            pageLength: 10,
+            columnasExport: [0, 1, 2, 3, 4],
             columnDefs: [{ targets: 5, orderable: false, searchable: false, className: 'text-center text-nowrap' }],
-            layout: { topStart: { buttons: [
-                { extend: 'excelHtml5', text: '<i class="fas fa-file-excel me-1"></i> Excel', className: 'btn btn-success btn-sm me-1', title: 'Horarios de Psicología', exportOptions: exportOptions() },
-                { extend: 'pdfHtml5', text: '<i class="fas fa-file-pdf me-1"></i> PDF', className: 'btn btn-danger btn-sm', title: 'Horarios de Psicología', orientation: 'landscape', pageSize: 'A4', exportOptions: exportOptions() },
-            ] } },
         });
     }
     async function cargar() {

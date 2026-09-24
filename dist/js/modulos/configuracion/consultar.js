@@ -38,16 +38,19 @@ document.addEventListener('DOMContentLoaded', function () {
         return apiFetch(BASE_URL + 'api/configuracion/listar?tipo=' + encodeURIComponent(tipo))
             .then((filas) => {
                 const cfg = catalogos[tipo];
+
+                // Destruir antes de repintar (destroy() restaura el DOM viejo).
+                if (tablas[tipo]) {
+                    tablas[tipo].destroy();
+                    tablas[tipo] = null;
+                }
+
                 tbody.innerHTML = filas.map((r) => filaHTML(tipo, cfg, r)).join('');
 
-                if (window.jQuery && $.fn && $.fn.DataTable) {
-                    if (tablas[tipo]) tablas[tipo].destroy();
-                    tablas[tipo] = $('#tabla-' + tipo).DataTable({
-                        language: { url: BASE_URL + 'plugins/DataTables/js/languaje.json' },
-                        autoWidth: false,
-                        columnDefs: [{ targets: -1, orderable: false, className: 'text-center text-nowrap', width: '80px' }],
-                    });
-                }
+                tablas[tipo] = DataTableHelper.inicializar('#tabla-' + tipo, {
+                    exportar: false,
+                    columnDefs: [{ targets: -1, orderable: false, className: 'text-center text-nowrap', width: '80px' }],
+                });
             })
             .catch((error) => {
                 console.error('Configuración ' + tipo + ':', error);
@@ -120,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
         form.addEventListener('submit', async function (ev) {
             ev.preventDefault();
 
-            if (!form._validador.validarTodo()) {
+            if (!(await form._validador.validarTodo())) {
                 AlertManager.error('Formulario incompleto', 'Corrige los campos resaltados antes de continuar.');
                 return;
             }

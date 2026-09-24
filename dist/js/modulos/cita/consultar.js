@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${escapar(cita.fecha_formateada)}</td>
                 <td>${escapar(cita.hora_formateada)}</td>
                 <td>${escapar(`${cita.beneficiario_nombres} ${cita.beneficiario_apellidos}`)}<br><small class="text-muted">${escapar(cita.cedula_beneficiario)}</small></td>
-                <td>${escapar(cita.psicologo)}</td>
+                <td>${escapar(cita.psicologo)}<br><small class="text-muted">${escapar(cita.cedula_psicologo || '')}</small></td>
                 <td><span class="badge bg-${estado[1]}">${estado[0]}</span></td>
                 <td class="text-center text-nowrap">
                     <button class="btn btn-sm btn-outline-primary js-editar-cita" data-id="${cita.id_cita}" title="Editar"><i class="fas fa-pen"></i></button>
@@ -39,42 +39,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function inicializarDataTable() {
-        if (!window.jQuery || !$.fn || !$.fn.DataTable) return;
+        if (!window.DataTableHelper) return;
 
-        tablaDataTable = $('#tabla-citas').DataTable({
-            language: { url: BASE_URL + 'plugins/DataTables/js/languaje.json' },
-            order: [[0, 'desc'], [1, 'desc']],
+        tablaDataTable = DataTableHelper.inicializar('#tabla-citas', {
+            titulo: 'Citas',
+            orden: [[0, 'desc'], [1, 'desc']],
             pageLength: 10,
-            autoWidth: false,
             responsive: true,
+            columnasExport: [0, 1, 2, 3, 4],
             columnDefs: [
                 { targets: 0, width: '110px' },
                 { targets: 1, width: '80px' },
                 { targets: 4, width: '110px', className: 'text-center' },
                 { targets: 5, width: '130px', orderable: false, searchable: false, className: 'text-center text-nowrap' },
             ],
-            layout: {
-                topStart: {
-                    buttons: [
-                        {
-                            extend: 'excelHtml5',
-                            text: '<i class="fas fa-file-excel me-1"></i> Excel',
-                            className: 'btn btn-success btn-sm me-1',
-                            title: 'Citas',
-                            exportOptions: { columns: [0, 1, 2, 3, 4] },
-                        },
-                        {
-                            extend: 'pdfHtml5',
-                            text: '<i class="fas fa-file-pdf me-1"></i> PDF',
-                            className: 'btn btn-danger btn-sm',
-                            title: 'Citas',
-                            orientation: 'landscape',
-                            pageSize: 'A4',
-                            exportOptions: { columns: [0, 1, 2, 3, 4] },
-                        },
-                    ],
-                },
-            },
         });
     }
 

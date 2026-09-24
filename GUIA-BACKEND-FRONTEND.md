@@ -486,7 +486,7 @@ Problemas:
 **a) `ExcepcionApi`**: una sola excepción de negocio con metadatos:
 
 ```php
-throw ExcepcionApi::yaExiste('Ya existe un empleado con ese correo.');
+throw ExcepcionApi::yaExiste('Ese correo ya está registrado en el sistema.');
 // Lleva: codigo=ALREADY_EXISTS, estado=409, mensaje=...
 ```
 
@@ -867,6 +867,10 @@ Provee validaciones **locales** (formato, longitud, requerido) y **remotas**
 - **No cortar la validación con `return` temprano**: si el "tipo de cédula" está
   vacío y retornábamos de inmediato, la "cédula" nunca se marcaba. Ahora se
   validan por separado para marcar **ambos**.
+- **Si la API remota falla** (caída de red, 500, 429): el campo se marca en
+  **rojo** con "No se pudo verificar…" y se bloquea el envío; **jamás se deja
+  en verde**, porque no se verificó nada. Los errores de negocio del backend
+  (400/404/409, p. ej. "ya existe") muestran `error.mensaje` tal cual.
 
 **Validación en dos capas**: el cliente da retroalimentación inmediata; el
 servidor es la **autoridad** (no se puede confiar en el cliente). Por eso las

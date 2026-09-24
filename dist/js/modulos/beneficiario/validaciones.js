@@ -128,6 +128,9 @@ window.BeneficiarioValidaciones = (function () {
                     }
                 } catch (e) {
                     console.error('validar cédula:', e);
+                    // API caída → NO se verificó nada: jamás dejar verde.
+                    mostrarError(c.cedula, 'No se pudo verificar la cédula con el servidor. Intenta de nuevo.');
+                    return false;
                 }
             }
             limpiarError(c.cedula);
@@ -188,6 +191,9 @@ window.BeneficiarioValidaciones = (function () {
                     }
                 } catch (e) {
                     console.error('validar correo:', e);
+                    // API caída → NO se verificó nada: jamás dejar verde.
+                    mostrarError(c.correo, 'No se pudo verificar el correo con el servidor. Intenta de nuevo.');
+                    return false;
                 }
             }
             limpiarError(c.correo);
@@ -222,6 +228,9 @@ window.BeneficiarioValidaciones = (function () {
                     }
                 } catch (e) {
                     console.error('validar teléfono:', e);
+                    // API caída → NO se verificó nada: jamás dejar verde.
+                    mostrarError(c.telefono, 'No se pudo verificar el teléfono con el servidor. Intenta de nuevo.');
+                    return false;
                 }
             }
             limpiarError(c.telefono);

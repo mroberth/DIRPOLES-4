@@ -21,14 +21,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return d.innerHTML;
     };
 
-    const fechaBonita = (f) => {
-        if (!f) return '';
-        const d = new Date(String(f).replace(' ', 'T'));
-        if (isNaN(d.getTime())) return f;
-        const p = (n) => String(n).padStart(2, '0');
-        return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
-    };
-
     const COLORES = {
         'Registro': 'bg-success',
         'Lectura': 'bg-info',
@@ -55,13 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return params.toString();
     }
 
-    function opcionesExport() {
-        return {
-            columns: [0, 1, 2, 3, 4],
-            format: { body: (data) => String(data).replace(/<[^>]*>/g, '') },
-        };
-    }
-
     async function cargar() {
         const solicitudActual = ++numeroSolicitud;
         try {
@@ -78,36 +63,19 @@ document.addEventListener('DOMContentLoaded', function () {
             tbody.innerHTML = filas.map((r) => `
                 <tr>
                     <td>${escapar(r.modulo)}</td>
-                    <td>${escapar(r.empleado)}</td>
+                    <td>${escapar(r.empleado)}<br><small class="text-muted">${escapar(r.cedula_empleado || '')}</small></td>
                     <td>${accionBadge(r.accion)}</td>
                     <td>${escapar(r.descripcion)}</td>
-                    <td data-order="${escapar(r.fecha)}">${fechaBonita(r.fecha)}</td>
+                    <td data-order="${escapar(r.fecha)}">${escapar(Formato.fechaHora(r.fecha))}</td>
                 </tr>`).join('');
 
-            if (window.jQuery && $.fn && $.fn.DataTable) {
-                tabla = $('#tabla_bitacora').DataTable({
-                    language: { url: BASE_URL + 'plugins/DataTables/js/languaje.json' },
-                    order: [[4, 'desc']],
-                    pageLength: 20,
-                    lengthMenu: [[10, 20, 50, -1], [10, 20, 50, 'Todos']],
-                    autoWidth: false,
-                    layout: {
-                        topStart: {
-                            buttons: [
-                                {
-                                    extend: 'excelHtml5', text: '<i class="fas fa-file-excel me-1"></i> Excel',
-                                    className: 'btn btn-success btn-sm me-1', title: 'Bitacora', exportOptions: opcionesExport(),
-                                },
-                                {
-                                    extend: 'pdfHtml5', text: '<i class="fas fa-file-pdf me-1"></i> PDF',
-                                    className: 'btn btn-danger btn-sm', title: 'Bitacora',
-                                    orientation: 'landscape', pageSize: 'A4', exportOptions: opcionesExport(),
-                                },
-                            ],
-                        },
-                    },
-                });
-            }
+            tabla = DataTableHelper.inicializar('#tabla_bitacora', {
+                titulo: 'Bitacora',
+                orden: [[4, 'desc']],
+                pageLength: 20,
+                lengthMenu: [[10, 20, 50, -1], [10, 20, 50, 'Todos']],
+                columnasExport: [0, 1, 2, 3, 4],
+            });
         } catch (error) {
             console.error('Bitácora:', error);
             if (error.codigo === 'ACCESS_DENIED') {

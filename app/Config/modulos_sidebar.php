@@ -54,6 +54,20 @@ return [
             ['url' => 'citas/consultar', 'texto' => 'Consultar', 'permiso' => 2],
         ],
     ],
+    4 => [ // id_modulo real = 4 (Psicología)
+        'key'    => 'psicologia',
+        'icon'   => 'fa-brain',
+        'titulo' => 'Gestionar Diagnósticos',
+        'subitems' => [
+            // 'activo' => rutas extra que deben mantener este item marcado y su
+            // dropdown abierto (NO son entradas visibles, solo coincidencias).
+            ['url' => 'psicologia/crear',     'texto' => 'Psicología',     'permiso' => 2, 'activo' => ['psicologia/consultar']],
+            ['url' => 'medicina/crear',       'texto' => 'Medicina',       'permiso' => 2],
+            ['url' => 'orientacion/crear',    'texto' => 'Orientación',    'permiso' => 2],
+            ['url' => 'discapacidad/crear',   'texto' => 'Discapacidad',   'permiso' => 2],
+            ['url' => 'trabajo-social/crear', 'texto' => 'Trabajo Social', 'permiso' => 2],
+        ],
+    ],
     18 => [ // id_modulo real = 18 (Horarios)
         'key'    => 'horarios',
         'icon'   => 'fa-clock',

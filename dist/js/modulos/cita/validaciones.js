@@ -122,7 +122,15 @@ window.CitaValidaciones = (function () {
                 disponibilidadValida = true;
                 return true;
             } catch (error) {
-                mostrarError(campoHora, error.mensaje || 'La hora no está disponible.');
+                // Error de NEGOCIO (400/404/409): el backend explicó por qué no
+                // hay disponibilidad → mostramos su mensaje.
+                // Caída de red / 500 / otro: NO se verificó nada → jamás verde,
+                // y no decimos "hora no disponible" (sería mentira).
+                const esErrorDeNegocio = error && error.codigo
+                    && ['VALIDATION_ERROR', 'NOT_FOUND', 'ALREADY_EXISTS', 'IN_USE'].includes(error.codigo);
+                mostrarError(campoHora, esErrorDeNegocio
+                    ? error.mensaje
+                    : 'No se pudo verificar la disponibilidad con el servidor. Intenta de nuevo.');
                 disponibilidadValida = false;
                 return false;
             }

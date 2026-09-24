@@ -165,10 +165,13 @@ Class EmpleadoModel extends SecurityModel{
     {
         try {
             if ($this->existeCorreo($this->__get('correo'))) {
-                throw ExcepcionApi::yaExiste('Ya existe un empleado con ese correo.');
+                throw ExcepcionApi::yaExiste('Ese correo ya está registrado en el sistema.');
             }
             if ($this->existeCedula($this->__get('tipo_cedula'), $this->__get('cedula'))) {
-                throw ExcepcionApi::yaExiste('Ya existe un empleado con esa cédula.');
+                throw ExcepcionApi::yaExiste('Esa cédula ya está registrada en el sistema.');
+            }
+            if ($this->existeTelefono($this->__get('telefono'))) {
+                throw ExcepcionApi::yaExiste('Ese teléfono ya está registrado en el sistema.');
             }
 
             $stmt = $this->conn_security->prepare(
@@ -302,7 +305,8 @@ Class EmpleadoModel extends SecurityModel{
 
     /**
      * Actualiza un empleado. La clave es opcional: si no viene, no se toca.
-     * Las validaciones de unicidad excluyen al propio empleado.
+     * Las validaciones de unicidad son globales (empleado + beneficiario +
+     * proveedores) y excluyen solo al propio empleado en su tabla.
      */
     private function actualizar(): array
     {
@@ -312,13 +316,13 @@ Class EmpleadoModel extends SecurityModel{
                 throw ExcepcionApi::noEncontrado('El empleado no existe.');
             }
             if ($this->existeCorreo($this->__get('correo'), $id)) {
-                throw ExcepcionApi::yaExiste('Ya existe otro empleado con ese correo.');
+                throw ExcepcionApi::yaExiste('Ese correo ya está registrado en el sistema.');
             }
             if ($this->existeCedula($this->__get('tipo_cedula'), $this->__get('cedula'), $id)) {
-                throw ExcepcionApi::yaExiste('Ya existe otro empleado con esa cédula.');
+                throw ExcepcionApi::yaExiste('Esa cédula ya está registrada en el sistema.');
             }
             if ($this->existeTelefono($this->__get('telefono'), $id)) {
-                throw ExcepcionApi::yaExiste('Ya existe otro empleado con ese teléfono.');
+                throw ExcepcionApi::yaExiste('Ese teléfono ya está registrado en el sistema.');
             }
 
             $campos = "nombre = :nombre, apellido = :apellido, tipo_cedula = :tipo_cedula,
@@ -438,31 +442,47 @@ Class EmpleadoModel extends SecurityModel{
 
     private function existeCorreo(string $correo, int $excluir = 0): bool
     {
-        $sql = "SELECT COUNT(*) FROM empleado WHERE correo = :correo";
-        $params = [':correo' => $correo];
+        $this->Business(); // conexión a BD de negocio para consultar beneficiarios y proveedores
+        // Unicidad GLOBAL de correo: empleado + beneficiario + proveedores.
+        // La exclusión (edición) solo aplica a la tabla propia (empleado).
+        $sql = "SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE correo = :c1 AND id_empleado <> :x1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE correo = :c2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE correo = :c3
+                ) t";
 
-        if ($excluir > 0) {
-            $sql .= " AND id_empleado <> :excluir";
-            $params[':excluir'] = $excluir;
-        }
-
-        $stmt = $this->conn_security->prepare($sql);
-        $stmt->execute($params);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':c1' => $correo, ':x1' => $excluir, ':c2' => $correo, ':c3' => $correo]);
         return (int) $stmt->fetchColumn() > 0;
     }
 
     private function existeCedula(string $tipo, string $cedula, int $excluir = 0): bool
     {
-        $sql = "SELECT COUNT(*) FROM empleado WHERE tipo_cedula = :tipo AND cedula = :cedula";
-        $params = [':tipo' => $tipo, ':cedula' => $cedula];
+        $this->Business(); // conexión a BD de negocio para consultar beneficiarios y proveedores
+        // Unicidad GLOBAL de cédula/documento: se compite por TIPO igual
+        // (V↔V, J↔J): un RIF J/G nunca bloquea una cédula V/E ni al revés.
+        $sql = "SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE tipo_cedula = :t1 AND cedula = :c1 AND id_empleado <> :x1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE tipo_cedula = :t2 AND cedula = :c2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE tipo_documento = :t3 AND num_documento = :c3
+                ) t";
 
-        if ($excluir > 0) {
-            $sql .= " AND id_empleado <> :excluir";
-            $params[':excluir'] = $excluir;
-        }
-
-        $stmt = $this->conn_security->prepare($sql);
-        $stmt->execute($params);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            ':t1' => $tipo, ':c1' => $cedula, ':x1' => $excluir,
+            ':t2' => $tipo, ':c2' => $cedula,
+            ':t3' => $tipo, ':c3' => $cedula,
+        ]);
         return (int) $stmt->fetchColumn() > 0;
     }
 
@@ -473,16 +493,22 @@ Class EmpleadoModel extends SecurityModel{
             return false;
         }
 
-        $sql = "SELECT COUNT(*) FROM empleado WHERE telefono = :telefono";
-        $params = [':telefono' => $telefono];
+        $this->Business(); // conexión a BD de negocio para consultar beneficiarios y proveedores
 
-        if ($excluir > 0) {
-            $sql .= " AND id_empleado <> :excluir";
-            $params[':excluir'] = $excluir;
-        }
+        // Unicidad GLOBAL de teléfono: empleado + beneficiario + proveedores.
+        $sql = "SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE telefono = :t1 AND id_empleado <> :x1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE telefono = :t2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE telefono = :t3
+                ) t";
 
-        $stmt = $this->conn_security->prepare($sql);
-        $stmt->execute($params);
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([':t1' => $telefono, ':x1' => $excluir, ':t2' => $telefono, ':t3' => $telefono]);
         return (int) $stmt->fetchColumn() > 0;
     }
 }

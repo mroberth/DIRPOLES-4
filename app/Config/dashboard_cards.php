@@ -21,10 +21,10 @@
  * pon aquí `'disponible' => true` y ajusta `url`.
  */
 return [
-    1  => ['icon' => 'fa-users',              'color' => 'primary',   'titulo' => 'Empleados',        'url' => 'consultar_empleados',        'disponible' => false, 'stat' => 'admin_empleados_total'],
+    1  => ['icon' => 'fa-users',              'color' => 'primary',   'titulo' => 'Empleados',        'url' => 'empleados/consultar',        'disponible' => true, 'stat' => 'admin_empleados_total'],
     2  => ['icon' => 'fa-person',             'color' => 'success',   'titulo' => 'Beneficiarios',    'url' => 'beneficiarios/consultar',    'disponible' => true,  'stat' => 'admin_beneficiarios_total'],
     3  => ['icon' => 'fa-calendar-check',     'color' => 'info',      'titulo' => 'Citas',            'url' => 'citas/consultar',            'disponible' => true,  'stat' => 'admin_citas_total'],
-    4  => ['icon' => 'fa-brain',              'color' => 'secondary', 'titulo' => 'Psicología',       'url' => 'diagnostico_psicologia',     'disponible' => false, 'stat' => 'admin_psicologia_total'],
+    4  => ['icon' => 'fa-brain',              'color' => 'secondary', 'titulo' => 'Psicología',       'url' => 'psicologia/crear',             'disponible' => true,  'stat' => 'admin_psicologia_total'],
     5  => ['icon' => 'fa-stethoscope',        'color' => 'danger',    'titulo' => 'Medicina',         'url' => 'diagnostico_medicina',       'disponible' => false, 'stat' => 'admin_medicina_total'],
     6  => ['icon' => 'fa-comments',           'color' => 'warning',   'titulo' => 'Orientación',      'url' => 'diagnostico_orientacion',    'disponible' => false, 'stat' => 'admin_orientacion_total'],
     7  => ['icon' => 'fa-hand-holding-heart', 'color' => 'success',   'titulo' => 'Trabajo Social',   'url' => 'diagnostico_trabajo_social', 'disponible' => false, 'stat' => 'admin_ts_total'],

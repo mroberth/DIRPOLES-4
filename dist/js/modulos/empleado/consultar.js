@@ -48,61 +48,32 @@ document.addEventListener('DOMContentLoaded', function () {
             </tr>`;
     }
 
-    function opcionesExport() {
-        // Columnas 0..5 (sin la de Acciones).
-        return {
-            columns: [0, 1, 2, 3, 4, 5],
-            format: {
-                body: (data) => String(data).replace(/<[^>]*>/g, ''),
-            },
-        };
-    }
-
     async function cargar() {
         try {
             empleados = await apiFetch(BASE_URL + 'api/empleados/listar');
+
+            // Destruir SIEMPRE antes de repintar el tbody: destroy() restaura el
+            // DOM capturado al inicializar la tabla y borraría las filas nuevas.
+            if (tabla) {
+                tabla.destroy();
+                tabla = null;
+            }
+
             tbody.innerHTML = empleados.map(fila).join('');
 
-            if (window.jQuery && $.fn && $.fn.DataTable) {
-                if (tabla) {
-                    tabla.destroy();
-                }
-                tabla = $('#tablaEmpleados').DataTable({
-                    language: { url: BASE_URL + 'plugins/DataTables/js/languaje.json' },
-                    order: [[1, 'asc']],
-                    pageLength: 10,
-                    autoWidth: false,
-                    columnDefs: [
-                        { targets: 0, width: '150px' },                                   // Cédula
-                        { targets: 3, width: '100px' },                                   // Teléfono
-                        { targets: 4, width: '160px' },                                   // Tipo
-                        { targets: 5, width: '90px', className: 'text-center' },          // Estatus
-                        { targets: 6, width: '130px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
-                    ],
-                    layout: {
-                        topStart: {
-                            buttons: [
-                                {
-                                    extend: 'excelHtml5',
-                                    text: '<i class="fas fa-file-excel me-1"></i> Excel',
-                                    className: 'btn btn-success btn-sm me-1',
-                                    title: 'Empleados',
-                                    exportOptions: opcionesExport(),
-                                },
-                                {
-                                    extend: 'pdfHtml5',
-                                    text: '<i class="fas fa-file-pdf me-1"></i> PDF',
-                                    className: 'btn btn-danger btn-sm',
-                                    title: 'Empleados',
-                                    orientation: 'landscape',
-                                    pageSize: 'A4',
-                                    exportOptions: opcionesExport(),
-                                },
-                            ],
-                        },
-                    },
-                });
-            }
+            tabla = DataTableHelper.inicializar('#tablaEmpleados', {
+                titulo: 'Empleados',
+                orden: [[1, 'asc']],
+                pageLength: 10,
+                columnasExport: [0, 1, 2, 3, 4, 5],
+                columnDefs: [
+                    { targets: 0, width: '150px' },                                   // Cédula
+                    { targets: 3, width: '100px' },                                   // Teléfono
+                    { targets: 4, width: '160px' },                                   // Tipo
+                    { targets: 5, width: '90px', className: 'text-center' },          // Estatus
+                    { targets: 6, width: '130px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
+                ],
+            });
         } catch (error) {
             console.error('Empleados:', error);
             if (error.codigo === 'ACCESS_DENIED') {

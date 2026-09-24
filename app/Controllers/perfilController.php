@@ -68,7 +68,7 @@ function apiActualizarPerfil(): void
     Respuesta::exito($actualizado);
 }
 
-/** API: valida que el correo del perfil no pertenezca a otro empleado. */
+/** API: valida que el correo del perfil no esté registrado en el sistema (unicidad global). */
 function apiValidarCorreoPerfil(): void
 {
     $entrada = json_decode(file_get_contents('php://input'), true) ?: $_POST;
@@ -80,7 +80,7 @@ function apiValidarCorreoPerfil(): void
     Respuesta::exito($modelo->manejarAccion('validar_correo'));
 }
 
-/** API: valida que el teléfono del perfil no pertenezca a otro empleado. */
+/** API: valida que el teléfono del perfil no esté registrado en el sistema (unicidad global). */
 function apiValidarTelefonoPerfil(): void
 {
     $entrada = json_decode(file_get_contents('php://input'), true) ?: $_POST;

@@ -69,7 +69,8 @@ $modulosPermitidos ??= ($_SESSION['modulosPermitidos'] ?? []);
                 <div id="<?= $collapseId ?>" class="collapse">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <?php foreach ($visibleSubitems as $subitem): ?>
-                            <a class="collapse-item" href="<?= BASE_URL . $subitem['url'] ?>">
+                            <a class="collapse-item" href="<?= BASE_URL . $subitem['url'] ?>"
+                               <?php if (!empty($subitem['activo'])): ?>data-activo="<?= htmlspecialchars(implode(' ', array_map(fn ($u) => BASE_URL . $u, $subitem['activo'])), ENT_QUOTES) ?>"<?php endif; ?>>
                                 <?= htmlspecialchars($subitem['texto']) ?>
                             </a>
                         <?php endforeach; ?>

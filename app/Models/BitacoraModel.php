@@ -67,6 +67,7 @@ class BitacoraModel extends SecurityModel
 
             $sql = "SELECT b.id_bitacora, b.modulo,
                            CONCAT(e.nombre, ' ', e.apellido) AS empleado,
+                           CONCAT(e.tipo_cedula, '-', e.cedula) AS cedula_empleado,
                            b.accion, b.descripcion, b.fecha
                     FROM bitacora b
                     INNER JOIN empleado e ON e.id_empleado = b.id_empleado";

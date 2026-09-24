@@ -203,10 +203,13 @@ class BeneficiarioModel extends BusinessModel
     {
         try {
             if ($this->existeCedula($this->__get('tipo_cedula'), $this->__get('cedula'))) {
-                throw ExcepcionApi::yaExiste('Ya existe un beneficiario con esa cédula.');
+                throw ExcepcionApi::yaExiste('Esa cédula ya está registrada en el sistema.');
             }
             if ($this->existeCorreo($this->__get('correo'))) {
-                throw ExcepcionApi::yaExiste('Ya existe un beneficiario con ese correo.');
+                throw ExcepcionApi::yaExiste('Ese correo ya está registrado en el sistema.');
+            }
+            if ($this->existeTelefono($this->__get('telefono'))) {
+                throw ExcepcionApi::yaExiste('Ese teléfono ya está registrado en el sistema.');
             }
 
             $stmt = $this->conn->prepare(
@@ -326,13 +329,13 @@ class BeneficiarioModel extends BusinessModel
                 throw ExcepcionApi::noEncontrado('El beneficiario no existe.');
             }
             if ($this->existeCedula($this->__get('tipo_cedula'), $this->__get('cedula'), $id)) {
-                throw ExcepcionApi::yaExiste('Ya existe otro beneficiario con esa cédula.');
+                throw ExcepcionApi::yaExiste('Esa cédula ya está registrada en el sistema.');
             }
             if ($this->existeCorreo($this->__get('correo'), $id)) {
-                throw ExcepcionApi::yaExiste('Ya existe otro beneficiario con ese correo.');
+                throw ExcepcionApi::yaExiste('Ese correo ya está registrado en el sistema.');
             }
             if ($this->existeTelefono($this->__get('telefono'), $id)) {
-                throw ExcepcionApi::yaExiste('Ya existe otro beneficiario con ese teléfono.');
+                throw ExcepcionApi::yaExiste('Ese teléfono ya está registrado en el sistema.');
             }
 
             $stmt = $this->conn->prepare(
@@ -453,31 +456,45 @@ class BeneficiarioModel extends BusinessModel
 
     private function existeCedula(string $tipo, string $cedula, int $excluir = 0): bool
     {
-        $sql = "SELECT COUNT(*) FROM beneficiario WHERE tipo_cedula = :tipo AND cedula = :cedula";
-        $params = [':tipo' => $tipo, ':cedula' => $cedula];
-
-        if ($excluir > 0) {
-            $sql .= " AND id_beneficiario <> :excluir";
-            $params[':excluir'] = $excluir;
-        }
+        // Unicidad GLOBAL de cédula/documento: empleado + beneficiario + proveedores.
+        // Se compite por TIPO igual (V↔V, J↔J); la exclusión (edición) solo
+        // aplica a la tabla propia (beneficiario).
+        $sql = "SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE tipo_cedula = :t1 AND cedula = :c1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE tipo_cedula = :t2 AND cedula = :c2 AND id_beneficiario <> :x2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE tipo_documento = :t3 AND num_documento = :c3
+                ) t";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute([
+            ':t1' => $tipo, ':c1' => $cedula,
+            ':t2' => $tipo, ':c2' => $cedula, ':x2' => $excluir,
+            ':t3' => $tipo, ':c3' => $cedula,
+        ]);
         return (int) $stmt->fetchColumn() > 0;
     }
 
     private function existeCorreo(string $correo, int $excluir = 0): bool
     {
-        $sql = "SELECT COUNT(*) FROM beneficiario WHERE correo = :correo";
-        $params = [':correo' => $correo];
-
-        if ($excluir > 0) {
-            $sql .= " AND id_beneficiario <> :excluir";
-            $params[':excluir'] = $excluir;
-        }
+        // Unicidad GLOBAL de correo: empleado + beneficiario + proveedores.
+        $sql = "SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE correo = :c1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE correo = :c2 AND id_beneficiario <> :x2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE correo = :c3
+                ) t";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute([':c1' => $correo, ':c2' => $correo, ':x2' => $excluir, ':c3' => $correo]);
         return (int) $stmt->fetchColumn() > 0;
     }
 
@@ -487,16 +504,20 @@ class BeneficiarioModel extends BusinessModel
             return false;
         }
 
-        $sql = "SELECT COUNT(*) FROM beneficiario WHERE telefono = :telefono";
-        $params = [':telefono' => $telefono];
-
-        if ($excluir > 0) {
-            $sql .= " AND id_beneficiario <> :excluir";
-            $params[':excluir'] = $excluir;
-        }
+        // Unicidad GLOBAL de teléfono: empleado + beneficiario + proveedores.
+        $sql = "SELECT COUNT(*) FROM (
+                    SELECT id_empleado FROM dirpoles_security.empleado
+                     WHERE telefono = :t1
+                    UNION ALL
+                    SELECT id_beneficiario FROM dirpoles_business.beneficiario
+                     WHERE telefono = :t2 AND id_beneficiario <> :x2
+                    UNION ALL
+                    SELECT id_proveedor FROM dirpoles_business.proveedores
+                     WHERE telefono = :t3
+                ) t";
 
         $stmt = $this->conn->prepare($sql);
-        $stmt->execute($params);
+        $stmt->execute([':t1' => $telefono, ':t2' => $telefono, ':x2' => $excluir, ':t3' => $telefono]);
         return (int) $stmt->fetchColumn() > 0;
     }
 }

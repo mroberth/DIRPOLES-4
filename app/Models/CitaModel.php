@@ -139,6 +139,7 @@ class CitaModel extends BusinessModel
                        b.nombres AS beneficiario_nombres, b.apellidos AS beneficiario_apellidos,
                        CONCAT(b.tipo_cedula, '-', b.cedula) AS cedula_beneficiario,
                        CONCAT(e.nombre, ' ', e.apellido) AS psicologo,
+                       CONCAT(e.tipo_cedula, '-', e.cedula) AS cedula_psicologo,
                        ec.nombre AS nombre_estado
                 FROM cita c
                 INNER JOIN beneficiario b ON b.id_beneficiario = c.id_beneficiario
@@ -164,6 +165,7 @@ class CitaModel extends BusinessModel
                     CONCAT(b.nombres, ' ', b.apellidos) AS beneficiario,
                     CONCAT(b.tipo_cedula, '-', b.cedula) AS cedula_beneficiario,
                     CONCAT(e.nombre, ' ', e.apellido) AS psicologo,
+                    CONCAT(e.tipo_cedula, '-', e.cedula) AS cedula_psicologo,
                     ec.nombre AS nombre_estado
              FROM cita c
              INNER JOIN beneficiario b ON b.id_beneficiario = c.id_beneficiario
