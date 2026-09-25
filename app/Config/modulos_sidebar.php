@@ -62,7 +62,9 @@ return [
             // 'activo' => rutas extra que deben mantener este item marcado y su
             // dropdown abierto (NO son entradas visibles, solo coincidencias).
             ['url' => 'psicologia/crear',     'texto' => 'Psicología',     'permiso' => 2, 'activo' => ['psicologia/consultar']],
-            ['url' => 'medicina/crear',       'texto' => 'Medicina',       'permiso' => 2],
+            // Medicina valida contra su propio módulo (id 5), como Bitácora/Permisos:
+            // un Médico no necesita permiso en Psicología (módulo 4) para verlo.
+            ['url' => 'medicina/crear',       'texto' => 'Medicina',       'permiso' => 2, 'id_modulo' => 5, 'activo' => ['medicina/consultar']],
             ['url' => 'orientacion/crear',    'texto' => 'Orientación',    'permiso' => 2],
             ['url' => 'discapacidad/crear',   'texto' => 'Discapacidad',   'permiso' => 2],
             ['url' => 'trabajo-social/crear', 'texto' => 'Trabajo Social', 'permiso' => 2],

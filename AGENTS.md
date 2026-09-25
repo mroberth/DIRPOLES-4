@@ -41,13 +41,22 @@ antes de proponer código nuevo.
   - **Beneficiarios** (id_modulo 2): CRUD completo, stats, validaciones asíncronas.
   - **Citas** (id_modulo 3): agenda de Psicología, disponibilidad contra horarios,
     permisos por rol, CRUD, estados, stats y DataTables.
+  - **Medicina** (id_modulo 5): diagnósticos médicos (creación con insumos —
+    descuento de stock en transacción con `FOR UPDATE` —, consulta con
+    DataTables, edición restringida y eliminación). **Reglas permanentes**:
+    la edición SOLO permite patología, estatura, peso, tipo de sangre, motivo,
+    diagnóstico, tratamiento y observaciones (jamás beneficiario, empleado que
+    atendió ni insumos); al ELIMINAR **no se revierte el inventario** (el
+    insumo ya se usó: `insumos.cantidad` y `inventario_medico` quedan intactos
+    y la Bitácora registra los insumos usados). Pendiente: Enfermero (tipo 12)
+    sin permisos en este módulo y pruebas manuales de navegador.
   - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
   - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
   - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
   - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
     Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-  - **Faltan los módulos de negocio pesados**: psicología, medicina, orientación,
+  - **Faltan los módulos de negocio pesados**: orientación,
     trabajo social, discapacidad, inventario, referencias, jornadas,
     mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
   cards con `'disponible' => false` son los pendientes).

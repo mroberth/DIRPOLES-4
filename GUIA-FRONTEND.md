@@ -30,7 +30,7 @@ nunca escribas `fetch()`, `Swal.fire()` de utilidad, `$(...).DataTable()` ni
 | `AlertManager.success/error/warning/info/confirm/loading/close` | `dist/js/core/AlertManager.js` | Todo feedback al usuario. `confirm()` devuelve la promesa de SweetAlert2 (`isConfirmed`). Los 429 ya los intercepta él solo. |
 | `DataTableHelper.inicializar(selector, opciones)` | `dist/js/core/datatable.js` | Única forma de crear una tabla: idioma local, `autoWidth:false`, botones Excel/PDF con `columnasExport` (sin Acciones) y `limpiarHtml`. |
 | `window.initSelect2(scope)` | `dist/js/core/select-2-init.js` | Única forma de inicializar/re-inicializar `.select2` (destruye y recrea, ponle `dropdownParent` en modales y ya escucha el `reset` del formulario). |
-| `window.Formato.fecha/fechaHora/hora` | `dist/js/core/formato.js` | Formato de fechas MySQL en tablas y detalle. |
+| `window.Formato.fecha/fechaHora/hora` | `dist/js/core/formato.js` | Fechas MySQL **SIEMPRE** por aquí en tablas, detalle y modales; nunca la fecha cruda en la interfaz (ver regla 7 de §11). |
 | `window.BASE_URL` | inline en `script.php` | Prefijo de toda URL: `BASE_URL + 'api/...'`. |
 | Driver.js (IIFE) | `plugins/driver.js/` | Tour guiado; se expone como `window.driver.js.driver(...)`. |
 
@@ -377,6 +377,21 @@ Reglas duras:
 5. Todo texto de BD pasa por `escapar()` antes de entrar en un template string.
 6. El HTML rico (iconos, badges) se construye en el template; los **datos**
    siempre escapados.
+7. **Fechas SIEMPRE con el helper `Formato`**, jamás la cruda de MySQL
+   (`2026-09-20`): en la celda de la tabla, en el detalle de Swal y en el
+   subtítulo del modal. Patrón canónico (psicología → medicina):
+
+   ```js
+   const fecha = registro.fecha_creacion || '';
+   const hora  = Formato.hora((fecha.split(' ')[1]) || '');   // '' si es solo DATE
+   // celda:  <div>${Formato.fecha(fecha)}</div>  + hora en <small> si existe
+   // data-order conserva la fecha ISO/MySQL para que DataTables ordene bien
+   ```
+
+   - Campo `date` → solo `Formato.fecha(fecha)` (no pintes la línea de hora vacía).
+   - Campo `datetime` → `Formato.fecha(fecha)` + `Formato.hora(...)` en `<small>`.
+   - Unicidad de la celda de fecha: `<td data-order="...">` con el valor crudo
+     para la ordenación, y el texto visible formateado.
 
 ---
 
@@ -444,6 +459,7 @@ Reglas duras:
 
 **Tabla (consultar)**
 - [ ] thead completo, tbody vacío, sin `colspan`, sin `id` en filas.
+- [ ] Fechas formateadas con `Formato.fecha`/`Formato.hora` (nunca la cruda de MySQL); `data-order` conserva el valor ISO para ordenar.
 - [ ] `destroy()` antes de repintar; `DataTableHelper` con `columnasExport` sin Acciones.
 - [ ] Todo dato escapado; botones por delegación.
 - [ ] Eliminar con `AlertManager.confirm`; `IN_USE`/`NOT_FOUND` manejados.
