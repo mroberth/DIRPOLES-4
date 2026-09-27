@@ -65,8 +65,12 @@ return [
             // Medicina valida contra su propio módulo (id 5), como Bitácora/Permisos:
             // un Médico no necesita permiso en Psicología (módulo 4) para verlo.
             ['url' => 'medicina/crear',       'texto' => 'Medicina',       'permiso' => 2, 'id_modulo' => 5, 'activo' => ['medicina/consultar']],
-            ['url' => 'orientacion/crear',    'texto' => 'Orientación',    'permiso' => 2],
-            ['url' => 'discapacidad/crear',   'texto' => 'Discapacidad',   'permiso' => 2],
+            // Orientación valida contra su propio módulo (id 6), como Medicina:
+            // un Orientador no necesita permiso en Psicología (módulo 4).
+            ['url' => 'orientacion/crear',    'texto' => 'Orientación',    'permiso' => 2, 'id_modulo' => 6, 'activo' => ['orientacion/consultar']],
+            // Discapacidad valida contra su propio módulo (id 8): el tipo de
+            // empleado 'Discapacidad' (5) no tiene permiso en Psicología (4).
+            ['url' => 'discapacidad/crear',    'texto' => 'Discapacidad',    'permiso' => 2, 'id_modulo' => 8, 'activo' => ['discapacidad/consultar']],
             ['url' => 'trabajo-social/crear', 'texto' => 'Trabajo Social', 'permiso' => 2],
         ],
     ],

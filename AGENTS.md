@@ -50,14 +50,32 @@ antes de proponer código nuevo.
     insumo ya se usó: `insumos.cantidad` y `inventario_medico` quedan intactos
     y la Bitácora registra los insumos usados). Pendiente: Enfermero (tipo 12)
     sin permisos en este módulo y pruebas manuales de navegador.
+  - **Orientación** (id_modulo 6): diagnósticos de orientación (solicitud con
+    `id_servicios=3` + tabla `orientacion`; CRUD con DataTables, stats y tour).
+    **Reglas permanentes**: los 4 campos de texto (motivo, descripción,
+    indicaciones, observaciones) son **obligatorios** (decisión del usuario,
+    corrige la inconsistencia del sistema viejo); la edición SOLO permite esos
+    4 textos (jamás beneficiario ni empleado que atendió); al ELIMINAR se borran
+    `orientacion` + `solicitud_de_servicio` en transacción (no hay inventario
+    ni tablas hijas). Sin `detalle_patologia`.
+  - **Discapacidad** (id_modulo 8): diagnósticos de discapacidad (solicitud con
+    `id_servicios=5` + tabla `discapacidad`; CRUD con DataTables, stats y tour).
+    **Reglas permanentes**: son **obligatorios** `tipo_discapacidad`,
+    `diagnostico`, `grado`, `habilidades_funcionales` y `observaciones`
+    (formulario del sistema viejo); los campos ENUM (`tipo_discapacidad`,
+    `grado`, `requiere_asistencia`) se validan contra el esquema; la edición
+    SOLO permite los 11 campos de la tabla (jamás beneficiario ni empleado que
+    atendió); al ELIMINAR se borran `discapacidad` + `solicitud_de_servicio`
+    en transacción (sin inventario). Stats: `total`, `del_mes`, `graves`,
+    `con_carnet`. RBAC ya existente: tipos 5 (Discapacidad), 6 y 10 en módulo 8.
   - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
   - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
   - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
   - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
     Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-  - **Faltan los módulos de negocio pesados**: orientación,
-    trabajo social, discapacidad, inventario, referencias, jornadas,
+  - **Faltan los módulos de negocio pesados**: trabajo social,
+    inventario, referencias, jornadas,
     mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
   cards con `'disponible' => false` son los pendientes).
 
