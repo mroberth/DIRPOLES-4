@@ -27,7 +27,7 @@ return [
     4  => ['icon' => 'fa-brain',              'color' => 'secondary', 'titulo' => 'Psicología',       'url' => 'psicologia/crear',             'disponible' => true,  'stat' => 'admin_psicologia_total'],
     5  => ['icon' => 'fa-stethoscope',        'color' => 'danger',    'titulo' => 'Medicina',         'url' => 'medicina/crear',                'disponible' => true,  'stat' => 'admin_medicina_total'],
     6  => ['icon' => 'fa-comments',           'color' => 'warning',   'titulo' => 'Orientación',      'url' => 'orientacion/crear',           'disponible' => true,  'stat' => 'admin_orientacion_total'],
-    7  => ['icon' => 'fa-hand-holding-heart', 'color' => 'success',   'titulo' => 'Trabajo Social',   'url' => 'diagnostico_trabajo_social', 'disponible' => false, 'stat' => 'admin_ts_total'],
+    7  => ['icon' => 'fa-hand-holding-heart', 'color' => 'success',   'titulo' => 'Trabajo Social',   'url' => 'trabajo-social/crear',       'disponible' => true,  'stat' => 'admin_ts_total'],
     8  => ['icon' => 'fa-wheelchair',         'color' => 'primary',   'titulo' => 'Discapacidad',     'url' => 'discapacidad/crear',            'disponible' => true,  'stat' => 'admin_discapacidad_total'],
     9  => ['icon' => 'fa-pills',              'color' => 'info',      'titulo' => 'Inventario Médico','url' => 'consultar_inventario',       'disponible' => false, 'stat' => 'admin_insumos_total'],
     10 => ['icon' => 'fa-share-nodes',        'color' => 'secondary', 'titulo' => 'Referencias',      'url' => 'consultar_referencias',      'disponible' => false, 'stat' => 'admin_referidos_total'],

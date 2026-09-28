@@ -1,5 +1,5 @@
 <?php
-require BASE_PATH . '/PDF/fpdf/fpdf.php';
+require BASE_PATH . 'docs/PDF/fpdf/fpdf.php';
 
 class GenerarPDF
 {
@@ -62,11 +62,11 @@ class GenerarPDF
                 $ruta_temporal = $_FILES['imagen']['tmp_name'];
                 fixImageOrientation($ruta_temporal, $extension);
             } else {
-                $_SESSION['mensaje'] = "Tipo de archivo no permitido para la imagen del Estudio Socioeconomico. Solo se permiten JPG, JPEG, GIF y PNG.";
-                $_SESSION['tipo_mensaje'] = 'error';
-
-                header('location: index.php?action=vista_trabajo_social&formulario=exoneracion');
-                exit();
+                // Las dos puertas: nunca redirigir desde una API. El error
+                // lo convierte el handler global en el contrato JSON.
+                throw \App\Core\ExcepcionApi::validacion(
+                    'Tipo de archivo no permitido para la imagen del Estudio Socioeconómico. Solo se permiten JPG, JPEG, GIF y PNG.'
+                );
             }
         }
 
@@ -200,7 +200,7 @@ class GenerarPDF
 
         // Opcional: Colocar la imagen del formulario de fondo
         // Usar ruta absoluta para la imagen de fondo
-        $pdf->Image(BASE_PATH . '/PDF/EstudioSE/EstudioSocioeconomico.png', 0, 0, 210, 297); 
+        $pdf->Image(BASE_PATH . 'docs/PDF/EstudioSE/EstudioSocioeconomico.png', 0, 0, 210, 297); 
         $pdf->AddFont('arial', '', 'arial.php');
         // Añadir los datos en las posiciones correspondientes
         $pdf->SetFont('arial', '', 10);

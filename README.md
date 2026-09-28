@@ -236,6 +236,9 @@ mysql -u root -p < docs/bd/dirpoles_business.sql
 mkdir -p logs
 chmod 777 logs
 chmod 644 .env
+# El servidor web (www-data) debe poder escribir archivos subidos:
+mkdir -p uploads
+chmod -R 777 uploads
 ```
 
 #### 7. Servidor web (Apache)

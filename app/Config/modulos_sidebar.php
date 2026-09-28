@@ -71,7 +71,10 @@ return [
             // Discapacidad valida contra su propio módulo (id 8): el tipo de
             // empleado 'Discapacidad' (5) no tiene permiso en Psicología (4).
             ['url' => 'discapacidad/crear',    'texto' => 'Discapacidad',    'permiso' => 2, 'id_modulo' => 8, 'activo' => ['discapacidad/consultar']],
-            ['url' => 'trabajo-social/crear', 'texto' => 'Trabajo Social', 'permiso' => 2],
+            // Trabajo Social valida contra su propio módulo (id 7): el tipo
+            // de empleado 'Trabajador Social' (3) no tiene permiso en
+            // Psicología (4).
+            ['url' => 'trabajo-social/crear', 'texto' => 'Trabajo Social', 'permiso' => 2, 'id_modulo' => 7, 'activo' => ['trabajo-social/consultar']],
         ],
     ],
     18 => [ // id_modulo real = 18 (Horarios)

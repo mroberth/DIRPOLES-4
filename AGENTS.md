@@ -68,16 +68,38 @@ antes de proponer código nuevo.
     atendió); al ELIMINAR se borran `discapacidad` + `solicitud_de_servicio`
     en transacción (sin inventario). Stats: `total`, `del_mes`, `graves`,
     `con_carnet`. RBAC ya existente: tipos 5 (Discapacidad), 6 y 10 en módulo 8.
+  - **Trabajo Social** (id_modulo 7): hub con 4 pestañas (becas, exoneraciones,
+    FAMES, embarazadas) + consulta con DataTables, edición restringida y
+    eliminación; estudio socioeconómico (offcanvas de 5 pasos → PDF con FPDF
+    en `docs/PDF/EstudioSE/procesar.php`). **Reglas permanentes**:
+    - Cada sub-registro vive en su tabla con `id_solicitud_serv` (una solicitud
+      del servicio 4 por sub-registro; `listar*` usa LEFT JOINs que no duplican).
+    - La edición SOLO permite los campos editables de cada tipo (nunca
+      beneficiario, empleado ni archivos); el PDF de exoneración no se
+      regenera desde editar.
+    - Al ELIMINAR se borra sub-registro + `solicitud_de_servicio` en
+      transacción y se eliminan los PDFs físicos (best-effort, solo rutas
+      bajo `uploads/trabajo_social/`).
+    - Estudio socioeconómico: SOLO desde exoneraciones **pendientes**
+      (`direccion_estudiose IS NULL`); permiso `crear`; foto opcional
+      (jpg/jpeg/png/gif validado por extensión y MIME); los campos NO se
+      persisten (el PDF es el registro, la Bitácora guarda los insumos);
+      el vínculo es `UPDATE ... SET direccion_estudiose=... WHERE ... IS NULL`
+      con alcance; si el UPDATE no afecta filas se deshace (borra el PDF
+      huérfano) para no pisar un estudio ajeno.
+    - Stats: `total`, `del_mes`, `pendientes_estudio`, `estudios_generados`
+      (una sola query con LEFT JOINs; clave `admin_ts_total` en dashboard).
+    - Tour: `#btn-ayuda` (página) y `#btn-ayuda-estudio` (offcanvas, requiere
+      el offcanvas abierto).
   - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
   - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
   - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
   - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
     Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-  - **Faltan los módulos de negocio pesados**: trabajo social,
-    inventario, referencias, jornadas,
-    mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
-  cards con `'disponible' => false` son los pendientes).
+  - **Faltan los módulos de negocio pesados**: inventario, referencias,
+    jornadas, mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
+    cards con `'disponible' => false` son los pendientes).
 
 ### Repositorio y relación con el sistema completo
 
@@ -389,7 +411,8 @@ app/Controllers/        loginController.php, notificacionesController.php,
                         empleadoController.php, beneficiarioController.php,
                         citaController.php, horarioController.php,
                         permisosController.php, configuracionController.php,
-                        bitacoraController.php, backupController.php (solo funciones)
+                        bitacoraController.php, backupController.php,
+                        trabajoSocialController.php (solo funciones)
 app/Models/             loginModel, PermisosModel, NotificacionesModel,
                         DashboardModel, CalendarioModel, SecurityModel, BusinessModel,
                         EmpleadoModel, BeneficiarioModel, CitaModel, HorarioModel,
@@ -404,14 +427,17 @@ app/Views/              template/ (head, header, sidebar, footer, script),
                         horarios/ (crear + consultar con edición),
                         permisos/ (matriz de permisos rol × módulo),
                         configuracion/ (crear + consultar catálogos, respaldo BD),
-                        bitacora/ (consulta de auditoría)
+                        bitacora/ (consulta de auditoría),
+                        trabajo-social/ (hub crear con 4 pestañas + consultar con
+                        DataTables; components/ con stats y estudio-socioeconomico)
 app/Config/             modulos_sidebar.php, dashboard_cards.php, roles_sistema.php,
                         configuracion_catalogos.php, Keys/ (RSA, no versionadas)
                         (NO existe config.php: la config va por .env)
 app/routes/             notificaciones.php, dashboard.php, empleados.php,
                         beneficiarios.php, citas.php, horarios.php,
                         permisos.php, configuracion.php, bitacora.php,
-                        backup.php (los demás módulos los creas tú)
+                        backup.php, trabajo-social.php (los demás módulos los
+                        creas tú)
 docs/                   docs/MANUAL_DIRPOLES_CONTEXTO.md (manual de contexto),
                         docs/guia_arquitectura_dirpoles.md (arquitectura),
                         docs/GUIA-BACKEND.MD (guía backend),
@@ -424,6 +450,8 @@ dist/                   CSS/JS/IMG propios:
                         js/modulos/dashboard/dashboard_stats.js,
                         js/modulos/calendario/calendario_personal.js,
                         js/modulos/{empleado,beneficiario,cita,horario,configuracion,bitacora,permisos}/,
+                        js/modulos/trabajo-social/ (crear, consultar, editar,
+                        pendientes, estudio, stats, tour, validaciones*),
                         css/dashboard/dashboard.css
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)
