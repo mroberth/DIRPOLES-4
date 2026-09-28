@@ -12,6 +12,20 @@ Router::get('psicologia/consultar', function () {
     showConsultarPsicologia();
 });
 
+// ---------- Documentos (tercera puerta PDF: neither HTML nor JSON) ----------
+
+Router::get('psicologia/constancia/{id}', function () {
+    load_controller('psicologiaController.php');
+    generarConstanciaPsicologia();
+});
+
+Router::get('psicologia/referencia/{id}', function () {
+    load_controller('psicologiaController.php');
+    generarReferenciaPsicologia();
+});
+
+// ---------- APIs (puerta JSON) ----------
+
 Router::get('api/psicologia/listar', function () {
     load_controller('psicologiaController.php');
     apiListarPsicologia();

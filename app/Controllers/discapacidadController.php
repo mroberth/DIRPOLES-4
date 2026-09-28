@@ -74,6 +74,37 @@ function apiStatsDiscapacidad(): void
     Respuesta::exito($modelo->manejarAccion('stats'));
 }
 
+// ---------- Documentos (tercera puerta PDF) ----------
+
+/** Constancia de Atención (GET discapacidad/constancia/{id} + ?tramite=&hora=). */
+function generarConstanciaDiscapacidad(): void
+{
+    Autorizacion::verificar('discapacidad', 'leer');
+    $parametros = parametrosDocumento();
+    $modelo = new DiscapacidadModel();
+    contextoDiscapacidad($modelo);
+    $modelo->__set('id_discapacidad', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Discapacidad', 'Registro', 'Generó la constancia de atención de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/constancia/procesar.php';
+    GenerarConstancia::generar($datos);
+}
+
+/** Referencia a otra área (GET discapacidad/referencia/{id} + ?area= obligatoria). */
+function generarReferenciaDiscapacidad(): void
+{
+    Autorizacion::verificar('discapacidad', 'leer');
+    $parametros = parametrosDocumento(true);
+    $modelo = new DiscapacidadModel();
+    contextoDiscapacidad($modelo);
+    $modelo->__set('id_discapacidad', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Discapacidad', 'Registro',
+        'Generó la referencia al área ' . $datos['area'] . ' de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/referencia/procesar.php';
+    GenerarReferencia::generar($datos);
+}
+
 function apiCrearDiscapacidad(): void
 {
     Autorizacion::verificar('discapacidad', 'crear');

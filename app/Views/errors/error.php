@@ -60,7 +60,7 @@ $tituloError = $mensajes[$httpCode] ?? 'Error inesperado';
             <div class="debug"><?= htmlspecialchars($errorDebug) ?></div>
         <?php endif; ?>
 
-        <a class="btn-volver" href="<?= BASE_URL ?>login">Volver al inicio de sesión</a>
+        <a class="btn-volver" href="<?= BASE_URL ?>inicio">Volver al inicio</a>
     </div>
 </body>
 </html>

@@ -74,6 +74,37 @@ function apiStatsOrientacion(): void
     Respuesta::exito($modelo->manejarAccion('stats'));
 }
 
+// ---------- Documentos (tercera puerta PDF) ----------
+
+/** Constancia de Atención (GET orientacion/constancia/{id} + ?tramite=&hora=). */
+function generarConstanciaOrientacion(): void
+{
+    Autorizacion::verificar('orientacion', 'leer');
+    $parametros = parametrosDocumento();
+    $modelo = new OrientacionModel();
+    contextoOrientacion($modelo);
+    $modelo->__set('id_orientacion', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Orientacion', 'Registro', 'Generó la constancia de atención de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/constancia/procesar.php';
+    GenerarConstancia::generar($datos);
+}
+
+/** Referencia a otra área (GET orientacion/referencia/{id} + ?area= obligatoria). */
+function generarReferenciaOrientacion(): void
+{
+    Autorizacion::verificar('orientacion', 'leer');
+    $parametros = parametrosDocumento(true);
+    $modelo = new OrientacionModel();
+    contextoOrientacion($modelo);
+    $modelo->__set('id_orientacion', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Orientacion', 'Registro',
+        'Generó la referencia al área ' . $datos['area'] . ' de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/referencia/procesar.php';
+    GenerarReferencia::generar($datos);
+}
+
 function apiCrearOrientacion(): void
 {
     Autorizacion::verificar('orientacion', 'crear');

@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${escapar(resumen(registro) || 'No registrado')}</td>
             <td><small>${insumos ? escapar(insumos) : '<span class="text-muted">Sin insumos</span>'}</small></td>
             <td class="text-center text-nowrap"><button class="btn btn-sm btn-outline-primary js-detalle" data-id="${registro.id_consulta_med}" title="Detalle"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-sm btn-outline-success js-constancia" data-id="${registro.id_consulta_med}" title="Constancia"><i class="fas fa-file-contract"></i></button>
+            <button class="btn btn-sm btn-outline-info js-referencia" data-id="${registro.id_consulta_med}" title="Referencia"><i class="fas fa-file-export"></i></button>
+            <button class="btn btn-sm btn-outline-warning js-recipe" data-id="${registro.id_consulta_med}" title="Recipe médico"><i class="fas fa-prescription"></i></button>
             <button class="btn btn-sm btn-outline-secondary js-editar" data-id="${registro.id_consulta_med}" title="Editar"><i class="fas fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger js-eliminar" data-id="${registro.id_consulta_med}" title="Eliminar"><i class="fas fa-trash"></i></button></td>
         </tr>`;
@@ -40,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { targets: 3, width: '150px' },                                    // Patología
                 { targets: 4, width: '200px' },                                    // Resumen
                 { targets: 5, width: '170px' },                                    // Insumos
-                { targets: 6, width: '130px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
+                { targets: 6, width: '250px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
             ],
         });
     }
@@ -81,6 +84,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`,
                 confirmButtonText: 'Cerrar',
             });
+            return;
+        }
+
+        if (boton.classList.contains('js-constancia')) {
+            window.DocumentosPDF?.abrir({ tipo: 'constancia', ruta: `medicina/constancia/${registro.id_consulta_med}`, registro, tramite: registro.motivo_visita || '' });
+            return;
+        }
+
+        if (boton.classList.contains('js-referencia')) {
+            window.DocumentosPDF?.abrir({ tipo: 'referencia', ruta: `medicina/referencia/${registro.id_consulta_med}`, registro, tramite: registro.motivo_visita || '' });
+            return;
+        }
+
+        if (boton.classList.contains('js-recipe')) {
+            // Sin diálogo: el recipe no lleva trámite/hora/área.
+            window.open(`${BASE_URL}medicina/recipe/${registro.id_consulta_med}`, '_blank', 'noopener');
             return;
         }
 

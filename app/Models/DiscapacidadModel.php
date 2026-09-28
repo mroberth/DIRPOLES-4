@@ -124,6 +124,7 @@ class DiscapacidadModel extends BusinessModel
             'beneficiarios' => $this->beneficiarios(),
             'listar' => $this->listar(),
             'obtener' => $this->obtener(),
+            'datos_documento' => $this->datosDocumento(),
             'crear' => $this->crear(),
             'actualizar' => $this->actualizar(),
             'eliminar' => $this->eliminar(),
@@ -191,6 +192,43 @@ class DiscapacidadModel extends BusinessModel
         );
         $stmt->execute([':id' => $registro['id_discapacidad']]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: $registro;
+    }
+
+    // ---------- Documentos (constancia / referencia) ----------
+
+    /**
+     * Datos para la Constancia/Referencia (tercera puerta PDF). Reutiliza
+     * asegurarAlcance() para respetar el alcance y resuelve beneficiario,
+     * cédula, fecha de atención, empleado, cargo y teléfono.
+     */
+    private function datosDocumento(): array
+    {
+        $registro = $this->asegurarAlcance((int) $this->__get('id_discapacidad'));
+        $stmt = $this->conn->prepare(
+            "SELECT CONCAT(b.nombres, ' ', b.apellidos) AS beneficiario,
+                    CONCAT(b.tipo_cedula, '-', b.cedula) AS cedula,
+                    CONCAT(e.nombre, ' ', e.apellido) AS empleado,
+                    te.tipo AS cargo,
+                    e.telefono
+             FROM solicitud_de_servicio ss
+             INNER JOIN beneficiario b ON b.id_beneficiario = ss.id_beneficiario
+             INNER JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado
+             INNER JOIN dirpoles_security.tipo_empleado te ON te.id_tipo_emp = e.id_tipo_empleado
+             WHERE ss.id_solicitud_serv = :id"
+        );
+        $stmt->execute([':id' => (int) $registro['id_solicitud_serv']]);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$fila) {
+            throw ExcepcionApi::noEncontrado('La solicitud de discapacidad ya no existe.');
+        }
+        return [
+            'beneficiario' => (string) $fila['beneficiario'],
+            'cedula'       => (string) $fila['cedula'],
+            'empleado'     => (string) $fila['empleado'],
+            'cargo'        => (string) ($fila['cargo'] ?? ''),
+            'telefono'     => (string) ($fila['telefono'] ?? ''),
+            'fecha'        => (string) ($registro['fecha_creacion'] ?? ''),
+        ];
     }
 
     // ---------- Estadísticas ----------

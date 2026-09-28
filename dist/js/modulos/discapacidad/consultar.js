@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${escapar(registro.grado)}</td>
             <td>${escapar(registro.diagnostico)}</td>
             <td class="text-center text-nowrap"><button class="btn btn-sm btn-outline-primary js-detalle" data-id="${registro.id_discapacidad}" title="Detalle"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-sm btn-outline-success js-constancia" data-id="${registro.id_discapacidad}" title="Constancia"><i class="fas fa-file-contract"></i></button>
+            <button class="btn btn-sm btn-outline-info js-referencia" data-id="${registro.id_discapacidad}" title="Referencia"><i class="fas fa-file-export"></i></button>
             <button class="btn btn-sm btn-outline-secondary js-editar" data-id="${registro.id_discapacidad}" title="Editar"><i class="fas fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger js-eliminar" data-id="${registro.id_discapacidad}" title="Eliminar"><i class="fas fa-trash"></i></button></td>
         </tr>`;
@@ -35,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { targets: 3, width: '110px' },                                    // Tipo
                 { targets: 4, width: '100px' },                                    // Grado
                 { targets: 5, width: '220px' },                                    // Diagnóstico
-                { targets: 6, width: '130px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
+                { targets: 6, width: '210px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
             ],
         });
     }
@@ -78,6 +80,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`,
                 confirmButtonText: 'Cerrar',
             });
+            return;
+        }
+
+        if (boton.classList.contains('js-constancia')) {
+            window.DocumentosPDF?.abrir({ tipo: 'constancia', ruta: `discapacidad/constancia/${registro.id_discapacidad}`, registro, tramite: registro.tipo_discapacidad || '' });
+            return;
+        }
+
+        if (boton.classList.contains('js-referencia')) {
+            window.DocumentosPDF?.abrir({ tipo: 'referencia', ruta: `discapacidad/referencia/${registro.id_discapacidad}`, registro, tramite: registro.tipo_discapacidad || '' });
             return;
         }
 

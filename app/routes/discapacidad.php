@@ -14,6 +14,18 @@ Router::get('discapacidad/consultar', function () {
     showConsultarDiscapacidad();
 });
 
+// ---------- Documentos (tercera puerta PDF: neither HTML nor JSON) ----------
+
+Router::get('discapacidad/constancia/{id}', function () {
+    load_controller('discapacidadController.php');
+    generarConstanciaDiscapacidad();
+});
+
+Router::get('discapacidad/referencia/{id}', function () {
+    load_controller('discapacidadController.php');
+    generarReferenciaDiscapacidad();
+});
+
 // ---------- APIs (puerta JSON) ----------
 
 Router::get('api/discapacidad/catalogos', function () {

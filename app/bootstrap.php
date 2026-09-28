@@ -23,6 +23,39 @@ if (!function_exists('env')) {
 }
 
 // ---------------------------------------------------------
+// HELPER: parámetros de los PDF de tercera puerta (constancia/referencia)
+// ---------------------------------------------------------
+if (!function_exists('parametrosDocumento')) {
+    /**
+     * Lee y sanea los parámetros comunes de las rutas PDF de tercera puerta
+     * (medicina/orientacion/discapacidad/psicologia/trabajo-social +
+     * constancia/referencia):
+     *
+     *   tramite → texto libre, máx. 120 caracteres (opcional).
+     *   hora    → formato HH:MM (opcional; vacío = la plantilla queda en blanco).
+     *   area    → área destino de la referencia (obligatoria si $areaRequerida).
+     *
+     * Lanza ExcepcionApi 400 si la hora es inválida o falta el área.
+     */
+    function parametrosDocumento(bool $areaRequerida = false): array
+    {
+        $tramite = mb_substr(trim((string) ($_GET['tramite'] ?? '')), 0, 120);
+
+        $hora = trim((string) ($_GET['hora'] ?? ''));
+        if ($hora !== '' && !preg_match('/^\d{1,2}:\d{2}$/', $hora)) {
+            throw \App\Core\ExcepcionApi::validacion('La hora debe tener el formato HH:MM.');
+        }
+
+        $area = mb_substr(trim((string) ($_GET['area'] ?? '')), 0, 80);
+        if ($areaRequerida && $area === '') {
+            throw \App\Core\ExcepcionApi::validacion('El área de destino es obligatoria para la referencia.');
+        }
+
+        return ['tramite' => $tramite, 'hora' => $hora, 'area' => $area];
+    }
+}
+
+// ---------------------------------------------------------
 // CONFIGURACIÓN PARA CARGA DE CONTROLADORES
 // ---------------------------------------------------------
 

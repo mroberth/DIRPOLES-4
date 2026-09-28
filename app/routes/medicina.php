@@ -14,6 +14,23 @@ Router::get('medicina/consultar', function () {
     showConsultarMedicina();
 });
 
+// ---------- Documentos (tercera puerta PDF: neither HTML nor JSON) ----------
+
+Router::get('medicina/constancia/{id}', function () {
+    load_controller('medicinaController.php');
+    generarConstanciaMedicina();
+});
+
+Router::get('medicina/referencia/{id}', function () {
+    load_controller('medicinaController.php');
+    generarReferenciaMedicina();
+});
+
+Router::get('medicina/recipe/{id}', function () {
+    load_controller('medicinaController.php');
+    generarRecipeMedicina();
+});
+
 // ---------- APIs (puerta JSON) ----------
 
 Router::get('api/medicina/listar', function () {

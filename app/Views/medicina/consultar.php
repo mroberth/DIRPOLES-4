@@ -127,6 +127,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 </div>
 
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
+<script src="<?= BASE_URL ?>dist/js/core/documentos.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/medicina/stats.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/medicina/consultar.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/medicina/editar.js" defer></script>

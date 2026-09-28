@@ -89,6 +89,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 </div>
 
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
+<script src="<?= BASE_URL ?>dist/js/core/documentos.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/orientacion/stats.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/orientacion/consultar.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/orientacion/editar.js" defer></script>

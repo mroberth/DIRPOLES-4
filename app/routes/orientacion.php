@@ -14,6 +14,18 @@ Router::get('orientacion/consultar', function () {
     showConsultarOrientacion();
 });
 
+// ---------- Documentos (tercera puerta PDF: neither HTML nor JSON) ----------
+
+Router::get('orientacion/constancia/{id}', function () {
+    load_controller('orientacionController.php');
+    generarConstanciaOrientacion();
+});
+
+Router::get('orientacion/referencia/{id}', function () {
+    load_controller('orientacionController.php');
+    generarReferenciaOrientacion();
+});
+
 // ---------- APIs (puerta JSON) ----------
 
 Router::get('api/orientacion/listar', function () {

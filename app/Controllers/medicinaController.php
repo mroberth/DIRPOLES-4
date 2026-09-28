@@ -76,6 +76,59 @@ function apiStatsMedicina(): void
     Respuesta::exito($modelo->manejarAccion('stats'));
 }
 
+// ---------- Documentos (tercera puerta PDF) ----------
+
+/**
+ * Constancia de Atención (GET medicina/constancia/{id} + ?tramite=&hora=):
+ * valida los parámetros, aplica el alcance en el modelo, audita la
+ * generación y emite el PDF en una pestaña del navegador (no es HTML ni
+ * JSON: tercera puerta, como respaldo/descargar).
+ */
+function generarConstanciaMedicina(): void
+{
+    Autorizacion::verificar('medicina', 'leer');
+    $parametros = parametrosDocumento();
+    $modelo = new MedicinaModel();
+    contextoMedicina($modelo);
+    $modelo->__set('id_consulta_med', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Medicina', 'Registro', 'Generó la constancia de atención de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/constancia/procesar.php';
+    GenerarConstancia::generar($datos);
+}
+
+/** Referencia a otra área (GET medicina/referencia/{id} + ?area= obligatoria). */
+function generarReferenciaMedicina(): void
+{
+    Autorizacion::verificar('medicina', 'leer');
+    $parametros = parametrosDocumento(true);
+    $modelo = new MedicinaModel();
+    contextoMedicina($modelo);
+    $modelo->__set('id_consulta_med', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Medicina', 'Registro',
+        'Generó la referencia al área ' . $datos['area'] . ' de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/referencia/procesar.php';
+    GenerarReferencia::generar($datos);
+}
+
+/**
+ * Recipe médico (GET medicina/recipe/{id}): diagnóstico, tratamiento y
+ * observaciones de la consulta sobre la talonaria. No lleva query params
+ * (sin trámite/hora/área), por eso no pasa por parametrosDocumento().
+ */
+function generarRecipeMedicina(): void
+{
+    Autorizacion::verificar('medicina', 'leer');
+    $modelo = new MedicinaModel();
+    contextoMedicina($modelo);
+    $modelo->__set('id_consulta_med', (int) ($_GET['id'] ?? 0));
+    $datos = $modelo->manejarAccion('datos_documento');
+    Bitacora::registrar('Medicina', 'Registro', 'Generó el recipe médico de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/recipe/procesar.php';
+    GenerarRecipe::generar($datos);
+}
+
 function apiCrearMedicina(): void
 {
     Autorizacion::verificar('medicina', 'crear');

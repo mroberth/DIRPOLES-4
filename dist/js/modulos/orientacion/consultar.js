@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <td>${escapar(registro.empleado)}<br><small class="text-muted">${escapar(registro.cedula_empleado || '')}</small></td>
             <td>${escapar(registro.motivo_orientacion || 'No registrado')}</td>
             <td class="text-center text-nowrap"><button class="btn btn-sm btn-outline-primary js-detalle" data-id="${registro.id_orientacion}" title="Detalle"><i class="fas fa-eye"></i></button>
+            <button class="btn btn-sm btn-outline-success js-constancia" data-id="${registro.id_orientacion}" title="Constancia"><i class="fas fa-file-contract"></i></button>
+            <button class="btn btn-sm btn-outline-info js-referencia" data-id="${registro.id_orientacion}" title="Referencia"><i class="fas fa-file-export"></i></button>
             <button class="btn btn-sm btn-outline-secondary js-editar" data-id="${registro.id_orientacion}" title="Editar"><i class="fas fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger js-eliminar" data-id="${registro.id_orientacion}" title="Eliminar"><i class="fas fa-trash"></i></button></td>
         </tr>`;
@@ -31,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             columnDefs: [
                 { targets: 0, width: '105px' },                                    // Fecha
                 { targets: 3, width: '250px' },                                    // Motivo
-                { targets: 4, width: '130px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
+                { targets: 4, width: '210px', orderable: false, className: 'text-center text-nowrap' }, // Acciones
             ],
         });
     }
@@ -68,6 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>`,
                 confirmButtonText: 'Cerrar',
             });
+            return;
+        }
+
+        if (boton.classList.contains('js-constancia')) {
+            window.DocumentosPDF?.abrir({ tipo: 'constancia', ruta: `orientacion/constancia/${registro.id_orientacion}`, registro, tramite: registro.motivo_orientacion || '' });
+            return;
+        }
+
+        if (boton.classList.contains('js-referencia')) {
+            window.DocumentosPDF?.abrir({ tipo: 'referencia', ruta: `orientacion/referencia/${registro.id_orientacion}`, registro, tramite: registro.motivo_orientacion || '' });
             return;
         }
 

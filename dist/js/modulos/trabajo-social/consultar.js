@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
             columnDefs: [
                 { targets: 0, width: '105px' },
                 { targets: 2, width: '230px' },
-                { targets: 4, width: '130px', orderable: false, className: 'text-center text-nowrap' },
+                { targets: 4, width: '210px', orderable: false, className: 'text-center text-nowrap' },
             ],
         },
         exoneraciones: {
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             columnDefs: [
                 { targets: 0, width: '105px' },
                 { targets: 2, width: '230px' },
-                { targets: 4, width: '170px', orderable: false, className: 'text-center text-nowrap' },
+                { targets: 4, width: '250px', orderable: false, className: 'text-center text-nowrap' },
             ],
         },
         fames: {
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             columnDefs: [
                 { targets: 0, width: '105px' },
                 { targets: 2, width: '200px' },
-                { targets: 4, width: '130px', orderable: false, className: 'text-center text-nowrap' },
+                { targets: 4, width: '210px', orderable: false, className: 'text-center text-nowrap' },
             ],
         },
         embarazadas: {
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { targets: 2, width: '180px' },
                 { targets: 3, width: '90px' },
                 { targets: 4, width: '120px' },
-                { targets: 5, width: '130px', orderable: false, className: 'text-center text-nowrap' },
+                { targets: 5, width: '210px', orderable: false, className: 'text-center text-nowrap' },
             ],
         },
     };
@@ -68,19 +68,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function celdaAcciones(tipo, id) {
         // Solo exoneraciones tienen estudio socioeconómico: se añade el
-        // botón de ver PDF junto al detalle/edición/eliminación.
+        // botón de ver PDF junto al detalle/edición/eliminación. Los PDFs
+        // de constancia/referencia aplican a los 4 sub-registros.
         const verEstudio = tipo === 'exoneraciones'
             ? `<button class="btn btn-sm btn-outline-warning js-ver-estudio" data-tipo="${tipo}" data-id="${id}" title="Ver estudio socioeconómico"><i class="fas fa-file-pdf"></i></button> `
             : '';
         return `<td class="text-center text-nowrap">
             <button class="btn btn-sm btn-outline-primary js-detalle" data-tipo="${tipo}" data-id="${id}" title="Detalle"><i class="fas fa-eye"></i></button>
-            ${verEstudio}<button class="btn btn-sm btn-outline-secondary js-editar" data-tipo="${tipo}" data-id="${id}" title="Editar"><i class="fas fa-pen"></i></button>
+            ${verEstudio}<button class="btn btn-sm btn-outline-success js-constancia" data-tipo="${tipo}" data-id="${id}" title="Constancia"><i class="fas fa-file-contract"></i></button>
+            <button class="btn btn-sm btn-outline-info js-referencia" data-tipo="${tipo}" data-id="${id}" title="Referencia"><i class="fas fa-file-export"></i></button>
+            <button class="btn btn-sm btn-outline-secondary js-editar" data-tipo="${tipo}" data-id="${id}" title="Editar"><i class="fas fa-pen"></i></button>
             <button class="btn btn-sm btn-outline-danger js-eliminar" data-tipo="${tipo}" data-id="${id}" title="Eliminar"><i class="fas fa-trash"></i></button>
         </td>`;
     }
 
     function celdaBeneficiario(registro) {
         return `${escapar(registro.beneficiario)}<br><small class="text-muted">${escapar(registro.cedula_beneficiario)}</small>`;
+    }
+
+    /** Texto inicial del trámite del PDF según el sub-registro. */
+    function tramitePrellenado(tipo, registro) {
+        if (tipo === 'becas') return 'Solicitud de beca';
+        if (tipo === 'exoneraciones') {
+            return registro.motivo === 'Otro' && registro.otro_motivo
+                ? registro.otro_motivo : (registro.motivo || '');
+        }
+        if (tipo === 'fames') {
+            return registro.tipo_ayuda === 'Otros' && registro.otro_tipo
+                ? registro.otro_tipo : (registro.tipo_ayuda || '');
+        }
+        return 'Control de gestación';
     }
 
     function fila(tipo, registro) {
@@ -232,6 +249,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 title: titulos[tipo] || config.titulo,
                 html: `<div class="text-start">${htmlDetalle(tipo, registro)}</div>`,
                 confirmButtonText: 'Cerrar',
+            });
+            return;
+        }
+
+        if (boton.classList.contains('js-constancia')) {
+            window.DocumentosPDF?.abrir({
+                tipo: 'constancia',
+                ruta: `trabajo-social/constancia/${tipo}/${registro[config.clave]}`,
+                registro,
+                tramite: tramitePrellenado(tipo, registro),
+            });
+            return;
+        }
+
+        if (boton.classList.contains('js-referencia')) {
+            window.DocumentosPDF?.abrir({
+                tipo: 'referencia',
+                ruta: `trabajo-social/referencia/${tipo}/${registro[config.clave]}`,
+                registro,
+                tramite: tramitePrellenado(tipo, registro),
             });
             return;
         }

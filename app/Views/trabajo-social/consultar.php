@@ -435,6 +435,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 </div>
 
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
+<script src="<?= BASE_URL ?>dist/js/core/documentos.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/trabajo-social/consultar.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/trabajo-social/editar.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/trabajo-social/stats.js" defer></script>

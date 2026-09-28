@@ -65,6 +65,37 @@ function apiStatsPsicologia(): void
     Respuesta::exito($modelo->manejarAccion('stats'));
 }
 
+// ---------- Documentos (tercera puerta PDF) ----------
+
+/** Constancia de Atención (GET psicologia/constancia/{id} + ?tramite=&hora=). */
+function generarConstanciaPsicologia(): void
+{
+    Autorizacion::verificar('psicologia', 'leer');
+    $parametros = parametrosDocumento();
+    $modelo = new PsicologiaModel();
+    contextoPsicologia($modelo);
+    $modelo->__set('id_psicologia', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Psicologia', 'Registro', 'Generó la constancia de atención de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/constancia/procesar.php';
+    GenerarConstancia::generar($datos);
+}
+
+/** Referencia a otra área (GET psicologia/referencia/{id} + ?area= obligatoria). */
+function generarReferenciaPsicologia(): void
+{
+    Autorizacion::verificar('psicologia', 'leer');
+    $parametros = parametrosDocumento(true);
+    $modelo = new PsicologiaModel();
+    contextoPsicologia($modelo);
+    $modelo->__set('id_psicologia', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Psicologia', 'Registro',
+        'Generó la referencia al área ' . $datos['area'] . ' de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/referencia/procesar.php';
+    GenerarReferencia::generar($datos);
+}
+
 function apiCrearPsicologia(): void
 {
     Autorizacion::verificar('psicologia', 'crear');

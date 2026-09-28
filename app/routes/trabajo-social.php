@@ -14,6 +14,18 @@ Router::get('trabajo-social/consultar', function () {
     showConsultarTrabajoSocial();
 });
 
+// ---------- Documentos (tercera puerta PDF: neither HTML nor JSON) ----------
+
+Router::get('trabajo-social/constancia/{tipo}/{id}', function () {
+    load_controller('trabajoSocialController.php');
+    generarConstanciaTrabajoSocial();
+});
+
+Router::get('trabajo-social/referencia/{tipo}/{id}', function () {
+    load_controller('trabajoSocialController.php');
+    generarReferenciaTrabajoSocial();
+});
+
 // ---------- APIs (puerta JSON) ----------
 
 Router::get('api/trabajo-social/catalogos', function () {

@@ -119,7 +119,11 @@ antes de proponer código nuevo.
 1. **Controllers = SOLO funciones.** Jamás declarar clases, ni instanciar
    lógica de clase dentro de un controlador (razón: el diagrama de clases de
    la documentación solo documenta Modelos y Core).
-2. **Clases solo en `app/Models/` y `app/Core/`.**
+2. **Clases solo en `app/Models/` y `app/Core/`.** Excepción documentada:
+   las generadoras de PDF viven junto a su plantilla en `docs/PDF/*`
+   (`GenerarPDF` en `EstudioSE/procesar.php`, `GenerarConstancia` en
+   `constancia/procesar.php`, `GenerarReferencia` en `referencia/procesar.php`,
+   `GenerarRecipe` en `recipe/procesar.php`).
 3. **NO introducir capas Service/Repository/UseCase.** El "service" es la
    acción de `manejarAccion()`; el "repository" son los métodos privados SQL
    de la misma clase modelo. No crear carpetas `Services/`, `Repositories/`.
@@ -172,6 +176,33 @@ HTML ni JSON; vive fuera de `api/` y la maneja `sseController.php`.
 archivo `.sql` (`Content-Type: application/sql`, `Content-Disposition:
 attachment`). Tampoco es HTML ni JSON; la maneja `backupController.php` y solo
 la puede usar Administrador/Superusuario.
+
+**Tercera puerta PDF (Constancia de Atención / Referencia / Recipe)**: las 5
+rutas por módulo (`<modulo>/constancia/{id}`, `<modulo>/referencia/{id}` y
+`trabajo-social/constancia|referencia/{tipo}/{id}`) responden `application/pdf`
+en línea (`FPDF::Output('I')` + `exit`). Flujo fijo: `Autorizacion::verificar`
+(permiso `leer` del módulo) → helper global `parametrosDocumento()` (en
+`app/bootstrap.php`, sanea `tramite`/`hora`/`area` vía `$_GET`) → acción
+`datos_documento` del modelo (aplica `asegurarAlcance`) → `Bitacora::registrar`
+(`Registro`) → `require` del procesador → `GenerarConstancia::generar($datos)` /
+`GenerarReferencia::generar($datos)`. **Solo Medicina** tiene además
+`GET medicina/recipe/{id}` → `GenerarRecipe::generar($datos)`
+(`docs/PDF/recipe/procesar.php`, talonaria "TRATAMIENTO/INDICACIONES":
+izquierda diagnóstico + tratamiento, derecho observaciones; NO usa
+`parametrosDocumento()` porque no lleva query params; el botón `js-recipe`
+abre directo con `window.open`, sin diálogo). Los procesadores son **clases en
+`docs/PDF/{constancia,referencia,recipe}/procesar.php`**
+(excepción a "clases solo en `app/Models/` y `app/Core/`, igual que
+`GenerarPDF` del estudio socioeconómico): sobreponen texto a una plantilla PNG;
+las coordenadas nuevas (hora, del día, trámite, área en constancia/referencia;
+INDICACIONES en recipe) son constantes marcadas CALIBRAR — si el usuario
+reporta desalineación, ajustar SOLO esas constantes y conservar las
+coordenadas viejas. En frontend el diálogo común vive en
+`dist/js/core/documentos.js` (`window.DocumentosPDF.abrir({tipo, ruta,
+registro, tramite})` con SweetAlert2 y `datalist` de áreas del catálogo
+`servicio`); se incluye con `<script defer>` en las 5 vistas `consultar.php`
+y los botones `js-constancia`/`js-referencia` están en la columna Acciones de
+los 5 `consultar.js`.
 
 ### Contrato JSON ÚNICO (clase `App\Core\Respuesta`)
 

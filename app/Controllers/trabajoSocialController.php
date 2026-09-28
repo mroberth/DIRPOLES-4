@@ -156,6 +156,42 @@ function apiStatsTrabajoSocial(): void
     Respuesta::exito($modelo->manejarAccion('stats'));
 }
 
+// ---------- Documentos (tercera puerta PDF) ----------
+
+/** Constancia de Atención (GET trabajo-social/constancia/{tipo}/{id} + ?tramite=&hora=). */
+function generarConstanciaTrabajoSocial(): void
+{
+    Autorizacion::verificar('trabajador social', 'leer');
+    $parametros = parametrosDocumento();
+    $modelo = new TrabajoSocialModel();
+    contextoTrabajoSocial($modelo);
+    $modelo->__set('tipo', $_GET['tipo'] ?? '');
+    $modelo->__set('id_registro', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Trabajador Social', 'Registro',
+        'Generó la constancia de atención de ' . trabajoSocialEtiquetaTipo((string) ($_GET['tipo'] ?? ''))
+        . ' de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/constancia/procesar.php';
+    GenerarConstancia::generar($datos);
+}
+
+/** Referencia a otra área (GET trabajo-social/referencia/{tipo}/{id} + ?area= obligatoria). */
+function generarReferenciaTrabajoSocial(): void
+{
+    Autorizacion::verificar('trabajador social', 'leer');
+    $parametros = parametrosDocumento(true);
+    $modelo = new TrabajoSocialModel();
+    contextoTrabajoSocial($modelo);
+    $modelo->__set('tipo', $_GET['tipo'] ?? '');
+    $modelo->__set('id_registro', (int) ($_GET['id'] ?? 0));
+    $datos = array_merge($modelo->manejarAccion('datos_documento'), $parametros);
+    Bitacora::registrar('Trabajador Social', 'Registro',
+        'Generó la referencia al área ' . $datos['area'] . ' de '
+        . trabajoSocialEtiquetaTipo((string) ($_GET['tipo'] ?? '')) . ' de ' . $datos['beneficiario'] . '.');
+    require_once BASE_PATH . 'docs/PDF/referencia/procesar.php';
+    GenerarReferencia::generar($datos);
+}
+
 /** POST api/trabajo-social/fames/crear */
 function apiCrearFames(): void
 {
