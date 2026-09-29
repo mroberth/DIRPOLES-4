@@ -29,7 +29,7 @@ return [
     6  => ['icon' => 'fa-comments',           'color' => 'warning',   'titulo' => 'Orientación',      'url' => 'orientacion/crear',           'disponible' => true,  'stat' => 'admin_orientacion_total'],
     7  => ['icon' => 'fa-hand-holding-heart', 'color' => 'success',   'titulo' => 'Trabajo Social',   'url' => 'trabajo-social/crear',       'disponible' => true,  'stat' => 'admin_ts_total'],
     8  => ['icon' => 'fa-wheelchair',         'color' => 'primary',   'titulo' => 'Discapacidad',     'url' => 'discapacidad/crear',            'disponible' => true,  'stat' => 'admin_discapacidad_total'],
-    9  => ['icon' => 'fa-pills',              'color' => 'info',      'titulo' => 'Inventario Médico','url' => 'consultar_inventario',       'disponible' => false, 'stat' => 'admin_insumos_total'],
+    9  => ['icon' => 'fa-pills',              'color' => 'info',      'titulo' => 'Inventario Médico','url' => 'inventario/consultar',      'disponible' => true,  'stat' => 'admin_insumos_total'],
     10 => ['icon' => 'fa-share-nodes',        'color' => 'secondary', 'titulo' => 'Referencias',      'url' => 'consultar_referencias',      'disponible' => false, 'stat' => 'admin_referidos_total'],
     11 => ['icon' => 'fa-briefcase-medical',  'color' => 'success',   'titulo' => 'Jornadas',         'url' => 'consultar_jornadas',         'disponible' => false, 'stat' => 'admin_jornadas_total'],
     12 => ['icon' => 'fa-chair',              'color' => 'warning',   'titulo' => 'Mobiliario',       'url' => 'consultar_inventario_mob',   'disponible' => false, 'stat' => 'admin_mobiliario_total'],

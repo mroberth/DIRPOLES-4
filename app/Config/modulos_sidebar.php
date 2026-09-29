@@ -54,6 +54,15 @@ return [
             ['url' => 'citas/consultar', 'texto' => 'Consultar', 'permiso' => 2],
         ],
     ],
+    9 => [ // id_modulo real = 9 (Inventario Médico)
+        'key'    => 'inventario',
+        'icon'   => 'fa-pills',
+        'titulo' => 'Inventario Médico',
+        'subitems' => [
+            ['url' => 'inventario/crear',     'texto' => 'Crear',     'permiso' => 2],
+            ['url' => 'inventario/consultar', 'texto' => 'Consultar', 'permiso' => 2],
+        ],
+    ],
     4 => [ // id_modulo real = 4 (Psicología)
         'key'    => 'psicologia',
         'icon'   => 'fa-brain',

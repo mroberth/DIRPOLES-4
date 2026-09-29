@@ -91,14 +91,47 @@ antes de proponer código nuevo.
       (una sola query con LEFT JOINs; clave `admin_ts_total` en dashboard).
     - Tour: `#btn-ayuda` (página) y `#btn-ayuda-estudio` (offcanvas, requiere
       el offcanvas abierto).
+  - **Inventario Médico** (id_modulo 9): CRUD de insumos (`insumos`) con kardex
+    de movimientos (`inventario_medico`), Entrada/Salida de stock, historial y
+    stats; tabla con DataTables y 4 modales (editar, entrada, salida,
+    historial). **Reglas permanentes**:
+    - El nombre para RBAC es `'inventario medico'` (Autorizacion resuelve
+      `LOWER(modulo.nombre)`); permisos reales en BD: roles 2, 6 y 10.
+    - Crear NO lleva cantidad: el insumo nace con cantidad 0 y estatus
+      `'Agotado'` (y movimiento `'Registro'` en el kardex); el stock entra
+      solo con el botón Entrada (permiso `crear` del módulo 9).
+    - La fecha de vencimiento al CREAR debe ser >= hoy; al EDITAR se admite
+      cualquier fecha válida (la edición SOLO permite nombre, tipo,
+      presentación, fecha y descripción; jamás cantidad ni estatus).
+    - Entrada: solo insumos no vencidos (estatus != 'Vencido' y fecha >= hoy);
+      Salida: solo con cantidad > 0 y tiene motivo obligatorio del catálogo
+      `Vencimiento|Daño|Pérdida|Donación|Uso Interno`. Ambos usan
+      transacción + `FOR UPDATE` con stock calculado en PHP.
+    - Eliminar: bloqueado si está en `detalle_insumo`, si tiene stock o si ya
+      tiene movimientos distintos de `'Registro'`.
+    - Estatus mostrado en la tabla = efectivo: si `fecha_vencimiento < hoy`
+      se pinta `'Vencido'` sin masivos UPDATE; la Entrada se deshabilita y la
+      Salida se deshabilita con stock 0.
+    - Stats: `insumos_total`, `insumos_disponibles`, `insumos_por_vencer`
+      (≤30 días) y `insumos_criticos` (cantidad < 10 con `Disponible`);
+      el dashboard usa la clave `admin_insumos_total`.
+    - Duplicado: misma presentación + nombre + tipo + fecha de vencimiento
+      (validación remota en vivo `api/inventario/validar_insumo` con
+      `id_excluir` en edición).
+    - Tour: `#btn-ayuda` en crear; el objetivo de un `select2` apunta a su
+      `.select2-container`.
+    - **Deuda hallada (no tocada)**: `MedicinaModel` descuento marca
+      `'Agotado'` con stock restante > 0 (`SET cantidad = cantidad - :c,
+      estatus = CASE WHEN (cantidad - :c) <= 0` evalúa con el valor ya
+      nuevo). Reportada al usuario; sin corregir.
   - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
   - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
   - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
   - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
     Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-  - **Faltan los módulos de negocio pesados**: inventario, referencias,
-    jornadas, mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
+  - **Faltan los módulos de negocio pesados**: referencias, jornadas,
+    mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
     cards con `'disponible' => false` son los pendientes).
 
 ### Repositorio y relación con el sistema completo
@@ -358,7 +391,9 @@ Páginas: `modulo/accion` (GET). API: `api/modulo/accion` (GET leer / POST escri
 **Sidebar**: entrada en `app/Config/modulos_sidebar.php` con clave = `id_modulo`
 real de la BD. El módulo debe existir en la tabla `modulo` y tener filas en
 `rol_modulo_permiso` para verse. Hoy tiene entradas para Empleados (1),
-Beneficiarios (2), Citas (3), Horarios (18) y Configuración (14, con subitems
+Beneficiarios (2), Citas (3), Inventario Médico (9), Psicología (4, con
+subitems de Psicología/Medicina/Orientación/Discapacidad/Trabajo Social),
+Horarios (18) y Configuración (14, con subitems
 de Bitácora/Permisos/Respaldo que usan `id_modulo` explícito porque validan
 contra otro módulo); AGREGA AHÍ tu módulo nuevo al crearlo.
 
@@ -443,12 +478,13 @@ app/Controllers/        loginController.php, notificacionesController.php,
                         citaController.php, horarioController.php,
                         permisosController.php, configuracionController.php,
                         bitacoraController.php, backupController.php,
-                        trabajoSocialController.php (solo funciones)
+                        trabajoSocialController.php, inventarioController.php
+                        (solo funciones)
 app/Models/             loginModel, PermisosModel, NotificacionesModel,
                         DashboardModel, CalendarioModel, SecurityModel, BusinessModel,
                         EmpleadoModel, BeneficiarioModel, CitaModel, HorarioModel,
                         ConfiguracionModel, BitacoraModel,
-                        BackupModel
+                        BackupModel, InventarioModel
 app/Views/              template/ (head, header, sidebar, footer, script),
                         inicio/dashboard.php (shell compuesto por rol), login.php,
                         errors/ (404, error, rate_limit, access_denied),
@@ -460,15 +496,17 @@ app/Views/              template/ (head, header, sidebar, footer, script),
                         configuracion/ (crear + consultar catálogos, respaldo BD),
                         bitacora/ (consulta de auditoría),
                         trabajo-social/ (hub crear con 4 pestañas + consultar con
-                        DataTables; components/ con stats y estudio-socioeconomico)
+                        DataTables; components/ con stats y estudio-socioeconomico),
+                        inventario/ (crear + consultar con DataTables y modales
+                        de editar/entrada/salida/historial; components/stats.php)
 app/Config/             modulos_sidebar.php, dashboard_cards.php, roles_sistema.php,
                         configuracion_catalogos.php, Keys/ (RSA, no versionadas)
                         (NO existe config.php: la config va por .env)
 app/routes/             notificaciones.php, dashboard.php, empleados.php,
                         beneficiarios.php, citas.php, horarios.php,
                         permisos.php, configuracion.php, bitacora.php,
-                        backup.php, trabajo-social.php (los demás módulos los
-                        creas tú)
+                        backup.php, trabajo-social.php, inventario.php
+                        (los demás módulos los creas tú)
 docs/                   docs/MANUAL_DIRPOLES_CONTEXTO.md (manual de contexto),
                         docs/guia_arquitectura_dirpoles.md (arquitectura),
                         docs/GUIA-BACKEND.MD (guía backend),
@@ -483,6 +521,8 @@ dist/                   CSS/JS/IMG propios:
                         js/modulos/{empleado,beneficiario,cita,horario,configuracion,bitacora,permisos}/,
                         js/modulos/trabajo-social/ (crear, consultar, editar,
                         pendientes, estudio, stats, tour, validaciones*),
+                        js/modulos/inventario/ (stats, tour, validaciones,
+                        crear, editar, consultar),
                         css/dashboard/dashboard.css
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)
