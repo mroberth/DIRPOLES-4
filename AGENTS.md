@@ -120,19 +120,133 @@ antes de proponer código nuevo.
       `id_excluir` en edición).
     - Tour: `#btn-ayuda` en crear; el objetivo de un `select2` apunta a su
       `.select2-container`.
-    - **Deuda hallada (no tocada)**: `MedicinaModel` descuento marca
-      `'Agotado'` con stock restante > 0 (`SET cantidad = cantidad - :c,
-      estatus = CASE WHEN (cantidad - :c) <= 0` evalúa con el valor ya
-      nuevo). Reportada al usuario; sin corregir.
+    - **Bug corregido (2026-09-29)**: el `UPDATE` de descuento de
+      `MedicinaModel.registrarInsumos` marcaba `'Agotado'` con stock restante
+      > 0: MySQL evalúa el `SET` de arriba hacia abajo con el valor ya
+      actualizado, así que el `CASE WHEN (cantidad - :c) <= 0` restaba dos
+      veces (ej: stock 5, uso 4 → quedaba 1 pero 'Agotado'). Corregido
+      reordenando: el `CASE` se evalúa ANTES de restar y usa el stock
+      original. Verificar al usar insumos en Medicina que el estatus quede
+      correcto.
+  - **Referencias** (id_modulo 10): flujo de referencias entre áreas
+    (`referencias` + `log_referencias`) con crear, consulta con DataTables,
+    detalle con historial y acciones aceptar/rechazar/eliminar. **Reglas
+    permanentes** (decisiones del usuario):
+    - RBAC: nombre `'referencias'`; permisos en BD ya existentes: roles
+      1, 2, 3, 4, 5, 6 y 10 (no se agregaron Secretaria/Enfermero: decisión
+      del usuario; no hay SQL nuevo).
+    - Origen/destino: el **Administrador elige quién refiere y quién
+      recibe**; cualquier otro empleado es SIEMPRE el origen (forzado en
+      servidor: se ignora `id_empleado_origen` enviado por el cliente).
+    - El servicio destino debe ser **DISTINTO** al de origen (referir entre
+      áreas); se valida en backend aunque el frontend excluye el origen de
+      la lista de destinos.
+    - Crear: beneficiario + origen + destino + **motivo y observaciones
+      OBLIGATORIOS** (decisión del usuario: como el sistema viejo) →
+      estado `'Pendiente'` + notificación al destino (tipo `'referencia'`,
+      url `referencias/consultar`).
+    - Aceptar/Rechazar: solo el **destino** o admin, y solo desde
+      `'Pendiente'` (transacción + `FOR UPDATE`); el rechazo exige motivo
+      que se guarda en `log_referencias.observaciones` (NO pisa las
+      observaciones originales de la referencia); bitácora + notificación
+      al origen en ambos casos.
+    - Eliminar: solo el **origen** o admin, y solo `'Pendiente'`; borra
+      `log_referencias` primero (FK) y luego la fila, en transacción, y
+      notifica al destino (si el que borra no es él).
+    - Cada transición inserta el log con `estado_anterior` REAL (el sistema
+      viejo lo hardcodeaba en `'Pendiente'` y no validaba el estado previo).
+    - Alcance de datos: sin admin solo se listan/stats las referencias donde
+      el empleado es origen o destino; admin ve todas.
+    - Stats: `referencias_total`, `referencias_pendientes`,
+      `referencias_aceptadas`, `referencias_mes` (con alcance); el
+      dashboard usa la clave global `admin_referidos_total`.
+    - Tour: `#btn-ayuda` en crear; el objetivo de un `select2` apunta a su
+      `.select2-container`.
+  - **Mobiliario** (id_modulo 12): hub con 3 sub-flujos (mobiliario,
+    equipos y fichas técnicas) sobre las tablas `mobiliario`, `equipos`,
+    `fichas_tecnicas`, `detalle_ficha_mobiliario`, `detalle_ficha_equipo` e
+    `historial_inventario` (kardex). Crear con pestañas y consulta con
+    DataTables por pestaña. **Reglas permanentes** (decisiones del usuario,
+    2026-09-29):
+    - RBAC: nombre `'mobiliario'`; permisos en BD ya existentes: roles
+      (`id_tipo_emp`) 6 y 10 con los 4 permisos (no hay SQL nuevo).
+    - Ficha técnica: **UNA activa por empleado responsable**, y enlaza ítems
+      reales (`detalle_ficha_*`, que el sistema viejo no usaba); obligatorio
+      **al menos un ítem** de mobiliario o un equipo (modelo `validarDetalles`
+      + `MobiliarioValidaciones.detalle.validar`).
+    - Alta pieza a pieza; el kardex registra `asignacion`, `reubicacion`,
+      `modificacion` y `baja`. El historial SIEMPRE se escribe (bitácora aparte).
+    - Equipos: **serial único y obligatorio** con validación remota
+      `api/mobiliario/validar_serial` (`id_excluir` en edición).
+    - Disponibilidad de mobiliario = `cantidad` − asignado en fichas activas
+      (calculada en SQL, nunca se muta `mobiliario.cantidad`); un equipo no
+      puede estar en dos fichas activas.
+    - Edición de mobiliario no puede bajar `cantidad` por debajo de lo ya
+      asignado; **el estatus nunca se edita** (solo el botón Baja).
+    - Baja lógica (`estatus='Inactivo'`) bloqueada si el ítem está en una
+      ficha activa; eliminación bloqueada si está en `detalle_ficha_*` o
+      `inventario_mob` (ambas con transacción).
+    - La edición SOLO permite los campos editables del sub-flujo (nunca
+      estatus); las filas de detalle se REEMPLAZAN completas al editar la
+      ficha.
+    - Stats: `total_mobiliarios`, `total_equipos`, `fichas_activas`,
+      `inventario_mes`; el dashboard usa la clave `admin_mobiliario_total`.
+    - Tour: `#btn-ayuda` en crear (pasos por pestaña activa); los formularios
+      de edición viven en modales de `consultar.php` (sin tour propio).
+    - Los listados aceptan `limit`/`offset` con defecto 200 (patrón de
+      Inventario): es una carga cliente, no server-side de DataTables.
+  - **Jornadas Médicas** (id_modulo 11): 3 páginas — `jornadas/crear`,
+    `jornadas/consultar` (DataTables + modal de edición) y
+    `jornadas/detalle/{id}` (cabecera + aforo + asistentes + diagnósticos) —
+    sobre `jornadas_medicas`, `jornada_beneficiarios`, `jornada_diagnosticos`
+    y `jornada_insumos` (todas en business, ya existentes). **Reglas
+    permanentes** (decisiones del usuario, 2026-09-29):
+    - RBAC: nombre `'jornadas'`; permisos en BD ya existentes: roles
+      (`id_tipo_emp`) 2 (Médico), 6 (Administrador) y 10 (Superusuario) con
+      los 4 permisos. **No hay SQL nuevo.**
+    - Aforo: transacción + `FOR UPDATE` sobre la cabecera; dos altas
+      simultáneas nunca lo rebasan y al editar no puede bajar por debajo de
+      los ya registrados. La jornada nace `'Activa'`.
+    - Asistentes: alta **manual** con autocompletar opcional por cédula
+      (`api/jornadas/buscar_persona`, que solo SUGIERE datos de
+      `beneficiario` y `empleado`; quien confirma es el usuario). Una misma
+      cédula no se repite en la MISMA jornada (distintas jornadas sí) y solo
+      se registra mientras la jornada esté `'Activa'` y `fecha_fin` vigente.
+    - Eliminar asistente: bloqueado si ya tiene diagnóstico o si la jornada
+      no está Activa; eliminar jornada: solo si NO tiene asistentes (si no,
+      Cancelarla).
+    - Diagnósticos: **VARIOS por asistente** (mejora sobre el sistema viejo,
+      que dejaba uno); se agregan solo en jornada Activa; los 3 textos son
+      obligatorios (`tratamiento` es NULL en BD pero se exige, como el
+      sistema viejo); la edición SOLO corrige textos (nunca persona ni
+      insumos); al eliminar NO se devuelve el stock.
+    - Insumos: transacción + `FOR UPDATE` sobre `insumos`, estatus
+      `'Disponible'`, no vencidos y con stock; descuento con `CASE` a
+      `'Agotado'` **antes** de restar (el `SET` de MySQL se evalúa de arriba
+      hacia abajo) y movimiento `'Salida'` en el kardex
+      `inventario_medico` (patrón Medicina). Máx. 30 insumos por
+      diagnóstico, sin repetidos (el frontend los fusiona).
+    - Sin alcance de datos: quien tiene permiso ve todas las jornadas.
+    - Stats: `jornadas_total`, `jornadas_activas`, `jornadas_finalizadas`,
+      `jornadas_mes`; el dashboard usa la clave `admin_jornadas_total`.
+    - Tour: `#btn-ayuda` con `JornadasTour.iniciar()` (crear) e
+      `iniciarDetalle()` (detalle, abre el colapso del asistente antes de
+      empezar); la edición usa el tour de crear dentro del modal.
+    - Los permisos de la API: leer → `leer`; crear/asistente/diagnóstico
+      (alta)/buscar/insumos → `crear`; actualizar/corregir diagnóstico →
+      `editar`; eliminar → `eliminar`.
+    - El tipo de jornada puede venir de datos heredados fuera del catálogo
+      fijo (p. ej. `'Medica'` del seed): `editar.js` lo conserva como opción
+      extra en el `<select>` para no perderlo al abrir el modal.
   - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
   - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
   - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
   - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
     Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-  - **Faltan los módulos de negocio pesados**: referencias, jornadas,
-    mobiliario y transporte (ver `app/Config/dashboard_cards.php`, las
-    cards con `'disponible' => false` son los pendientes).
+  - **Faltan los módulos de negocio pesados**: transporte (ver
+    `app/Config/dashboard_cards.php`, las cards con `'disponible' => false`
+    son los pendientes).
 
 ### Repositorio y relación con el sistema completo
 
@@ -391,11 +505,11 @@ Páginas: `modulo/accion` (GET). API: `api/modulo/accion` (GET leer / POST escri
 **Sidebar**: entrada en `app/Config/modulos_sidebar.php` con clave = `id_modulo`
 real de la BD. El módulo debe existir en la tabla `modulo` y tener filas en
 `rol_modulo_permiso` para verse. Hoy tiene entradas para Empleados (1),
-Beneficiarios (2), Citas (3), Inventario Médico (9), Psicología (4, con
-subitems de Psicología/Medicina/Orientación/Discapacidad/Trabajo Social),
-Horarios (18) y Configuración (14, con subitems
-de Bitácora/Permisos/Respaldo que usan `id_modulo` explícito porque validan
-contra otro módulo); AGREGA AHÍ tu módulo nuevo al crearlo.
+Beneficiarios (2), Citas (3), Inventario Médico (9), Referencias (10),
+Mobiliario (12), Psicología (4, con subitems de Psicología/Medicina/
+Orientación/Discapacidad/Trabajo Social), Horarios (18) y Configuración (14,
+con subitems de Bitácora/Permisos/Respaldo que usan `id_modulo` explícito
+porque validan contra otro módulo); AGREGA AHÍ tu módulo nuevo al crearlo.
 
 ### Convenciones de nombres frontend
 
@@ -478,13 +592,16 @@ app/Controllers/        loginController.php, notificacionesController.php,
                         citaController.php, horarioController.php,
                         permisosController.php, configuracionController.php,
                         bitacoraController.php, backupController.php,
-                        trabajoSocialController.php, inventarioController.php
+                        trabajoSocialController.php, inventarioController.php,
+                        referenciaController.php, mobiliarioController.php,
+                        jornadaController.php
                         (solo funciones)
 app/Models/             loginModel, PermisosModel, NotificacionesModel,
                         DashboardModel, CalendarioModel, SecurityModel, BusinessModel,
                         EmpleadoModel, BeneficiarioModel, CitaModel, HorarioModel,
                         ConfiguracionModel, BitacoraModel,
-                        BackupModel, InventarioModel
+                        BackupModel, InventarioModel, ReferenciaModel,
+                        MobiliarioModel, JornadaModel
 app/Views/              template/ (head, header, sidebar, footer, script),
                         inicio/dashboard.php (shell compuesto por rol), login.php,
                         errors/ (404, error, rate_limit, access_denied),
@@ -498,14 +615,24 @@ app/Views/              template/ (head, header, sidebar, footer, script),
                         trabajo-social/ (hub crear con 4 pestañas + consultar con
                         DataTables; components/ con stats y estudio-socioeconomico),
                         inventario/ (crear + consultar con DataTables y modales
-                        de editar/entrada/salida/historial; components/stats.php)
+                        de editar/entrada/salida/historial; components/stats.php),
+                        referencias/ (crear con cascada servicio→empleados +
+                        consultar con DataTables, detalle con historial y modal
+                        de rechazo; components/stats.php),
+                        mobiliario/ (hub crear con 3 pestañas + consultar con
+                        DataTables por pestaña, modales de editar ×3,
+                        reubicación e historial; components/stats.php),
+                        jornadas/ (crear + consultar con DataTables y modal
+                        de edición, detalle/{id} con asistentes y
+                        diagnósticos; components/stats.php)
 app/Config/             modulos_sidebar.php, dashboard_cards.php, roles_sistema.php,
                         configuracion_catalogos.php, Keys/ (RSA, no versionadas)
                         (NO existe config.php: la config va por .env)
 app/routes/             notificaciones.php, dashboard.php, empleados.php,
                         beneficiarios.php, citas.php, horarios.php,
                         permisos.php, configuracion.php, bitacora.php,
-                        backup.php, trabajo-social.php, inventario.php
+                        backup.php, trabajo-social.php, inventario.php,
+                        referencias.php, mobiliario.php, jornadas.php
                         (los demás módulos los creas tú)
 docs/                   docs/MANUAL_DIRPOLES_CONTEXTO.md (manual de contexto),
                         docs/guia_arquitectura_dirpoles.md (arquitectura),
@@ -523,6 +650,12 @@ dist/                   CSS/JS/IMG propios:
                         pendientes, estudio, stats, tour, validaciones*),
                         js/modulos/inventario/ (stats, tour, validaciones,
                         crear, editar, consultar),
+                        js/modulos/referencias/ (stats, tour, validaciones,
+                        crear, consultar),
+                        js/modulos/mobiliario/ (stats, tour, validaciones,
+                        crear, editar, consultar),
+                        js/modulos/jornadas/ (stats, tour, validaciones,
+                        crear, editar, consultar, detalle, diagnosticos),
                         css/dashboard/dashboard.css
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)

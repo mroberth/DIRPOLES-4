@@ -424,8 +424,8 @@ class MedicinaModel extends BusinessModel
 
             $stmt = $this->conn->prepare(
                 'UPDATE insumos
-                 SET cantidad = cantidad - :cantidad,
-                     estatus = CASE WHEN (cantidad - :cantidad) <= 0 THEN \'Agotado\' ELSE estatus END
+                 SET estatus = CASE WHEN (cantidad - :cantidad) <= 0 THEN \'Agotado\' ELSE estatus END,
+                     cantidad = cantidad - :cantidad
                  WHERE id_insumo = :id'
             );
             $stmt->execute([':cantidad' => $cantidad, ':id' => $idInsumo]);

@@ -63,6 +63,34 @@ return [
             ['url' => 'inventario/consultar', 'texto' => 'Consultar', 'permiso' => 2],
         ],
     ],
+    10 => [ // id_modulo real = 10 (Referencias)
+        'key'    => 'referencias',
+        'icon'   => 'fa-share-nodes',
+        'titulo' => 'Gestionar Referencias',
+        'subitems' => [
+            ['url' => 'referencias/crear',     'texto' => 'Crear',     'permiso' => 1],
+            ['url' => 'referencias/consultar', 'texto' => 'Consultar', 'permiso' => 2],
+        ],
+    ],
+    11 => [ // id_modulo real = 11 (Jornadas Médicas)
+        'key'    => 'jornadas',
+        'icon'   => 'fa-briefcase-medical',
+        'titulo' => 'Gestionar Jornadas',
+        'subitems' => [
+            ['url' => 'jornadas/crear',     'texto' => 'Crear',     'permiso' => 1],
+            ['url' => 'jornadas/consultar', 'texto' => 'Consultar', 'permiso' => 2,
+             'activo' => ['jornadas/detalle']],
+        ],
+    ],
+    12 => [ // id_modulo real = 12 (Mobiliario)
+        'key'    => 'mobiliario',
+        'icon'   => 'fa-chair',
+        'titulo' => 'Gestionar Mobiliario',
+        'subitems' => [
+            ['url' => 'mobiliario/crear',     'texto' => 'Crear',     'permiso' => 1],
+            ['url' => 'mobiliario/consultar', 'texto' => 'Consultar', 'permiso' => 2],
+        ],
+    ],
     4 => [ // id_modulo real = 4 (Psicología)
         'key'    => 'psicologia',
         'icon'   => 'fa-brain',

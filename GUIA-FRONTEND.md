@@ -243,6 +243,13 @@ Reglas duras (todas están implementadas en Empleados, respétalas):
 8. En el `submit` del formulario **siempre** se llama a `validarTodo()` otra
    vez, aunque en vivo ya se haya validado.
 9. Nunca un `alert()` ni un `console.log` como feedback de usuario.
+10. **Nunca reescribir `campo.value` en la validación EN VIVO**: si haces
+    `campo.value = v.trim()` en cada `input`, el usuario no puede escribir
+    espacios finales ("nada que agregar" se queda en "nadaqueagregar" porque
+    cada tecla recorta el espacio final). Patrón: `validarTexto(campo, escribir = true)`
+    y llamarlo con `false` desde el listener `input`; el trim/sanitizado se
+    aplica SOLO en `validarTodo()` (al enviar). Igual para `serial` y
+    cualquier otro valor normalizado.
 
 > **Estado (2026-09-24)**: la regla 3 ya está aplicada en todos los módulos
 > con validación remota: `empleado` (y `perfil`, que lo reutiliza),
