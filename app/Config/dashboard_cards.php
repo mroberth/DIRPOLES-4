@@ -33,8 +33,11 @@ return [
     10 => ['icon' => 'fa-share-nodes',        'color' => 'secondary', 'titulo' => 'Referencias',      'url' => 'referencias/consultar',      'disponible' => true,  'stat' => 'admin_referidos_total'],
     11 => ['icon' => 'fa-briefcase-medical',  'color' => 'success',   'titulo' => 'Jornadas',         'url' => 'jornadas/consultar',         'disponible' => true,  'stat' => 'admin_jornadas_total'],
     12 => ['icon' => 'fa-chair',              'color' => 'warning',   'titulo' => 'Mobiliario',       'url' => 'mobiliario/consultar',        'disponible' => true,  'stat' => 'admin_mobiliario_total'],
-    13 => ['icon' => 'fa-truck',              'color' => 'dark',      'titulo' => 'Transporte',       'url' => 'transporte_consulta',        'disponible' => false, 'stat' => 'admin_vehiculos_total'],
+    13 => ['icon' => 'fa-truck',              'color' => 'dark',      'titulo' => 'Transporte',       'url' => 'transporte/consultar',       'disponible' => true,  'stat' => 'admin_vehiculos_total'],
     14 => ['icon' => 'fa-gear',               'color' => 'secondary', 'titulo' => 'Configuración',    'url' => 'configuracion/crear',        'disponible' => true],
+    // Reportes Estadísticos: SIN 'stat' (como Configuración): sus tarjetas
+    // viven dentro de cada reporte y se pintan con api/reportes/stats.
+    15 => ['icon' => 'fa-chart-pie',          'color' => 'dark',      'titulo' => 'Reportes Estadísticos', 'url' => 'reportes/general',      'disponible' => true],
     16 => ['icon' => 'fa-clipboard-list',     'color' => 'dark',      'titulo' => 'Bitácora',         'url' => 'bitacora/consultar',         'disponible' => true,  'stat' => 'admin_bitacora_total'],
     17 => ['icon' => 'fa-user-shield',        'color' => 'danger',    'titulo' => 'Permisos',         'url' => 'permisos/gestionar',         'disponible' => true,  'stat' => 'admin_permisos_total'],
     18 => ['icon' => 'fa-clock',              'color' => 'info',      'titulo' => 'Horarios',         'url' => 'horarios/consultar',          'disponible' => true,  'stat' => 'admin_horarios_total'],

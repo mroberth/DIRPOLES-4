@@ -91,6 +91,15 @@ return [
             ['url' => 'mobiliario/consultar', 'texto' => 'Consultar', 'permiso' => 2],
         ],
     ],
+    13 => [ // id_modulo real = 13 (Transporte)
+        'key'    => 'transporte',
+        'icon'   => 'fa-truck',
+        'titulo' => 'Gestionar Transporte',
+        'subitems' => [
+            ['url' => 'transporte/crear',     'texto' => 'Crear',     'permiso' => 1],
+            ['url' => 'transporte/consultar', 'texto' => 'Consultar', 'permiso' => 2],
+        ],
+    ],
     4 => [ // id_modulo real = 4 (Psicología)
         'key'    => 'psicologia',
         'icon'   => 'fa-brain',
@@ -112,6 +121,23 @@ return [
             // de empleado 'Trabajador Social' (3) no tiene permiso en
             // Psicología (4).
             ['url' => 'trabajo-social/crear', 'texto' => 'Trabajo Social', 'permiso' => 2, 'id_modulo' => 7, 'activo' => ['trabajo-social/consultar']],
+        ],
+    ],
+    15 => [ // id_modulo real = 15 (Reportes)
+        'key'    => 'reportes',
+        'icon'   => 'fa-chart-pie',
+        'titulo' => 'Reportes Estadísticos',
+        'subitems' => [
+            ['url' => 'reportes/general',        'texto' => 'General',        'permiso' => 2],
+            ['url' => 'reportes/medicina',       'texto' => 'Medicina',       'permiso' => 2],
+            ['url' => 'reportes/psicologia',     'texto' => 'Psicología',     'permiso' => 2],
+            ['url' => 'reportes/orientacion',    'texto' => 'Orientación',    'permiso' => 2],
+            ['url' => 'reportes/trabajo-social', 'texto' => 'Trabajo Social', 'permiso' => 2],
+            ['url' => 'reportes/discapacidad',   'texto' => 'Discapacidad',   'permiso' => 2],
+            ['url' => 'reportes/referencias',    'texto' => 'Referencias',    'permiso' => 2],
+            ['url' => 'reportes/jornadas',       'texto' => 'Jornadas',       'permiso' => 2],
+            ['url' => 'reportes/mobiliario',     'texto' => 'Mobiliario',     'permiso' => 2],
+            ['url' => 'reportes/transporte',     'texto' => 'Transporte',     'permiso' => 2],
         ],
     ],
     18 => [ // id_modulo real = 18 (Horarios)

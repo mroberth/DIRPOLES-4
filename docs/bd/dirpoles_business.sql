@@ -1533,6 +1533,12 @@ ALTER TABLE `vehiculos`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `asignaciones_rutas`
+--
+ALTER TABLE `asignaciones_rutas`
+  MODIFY `id_asignacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `becas`
 --
 ALTER TABLE `becas`

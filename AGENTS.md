@@ -238,13 +238,120 @@ antes de proponer código nuevo.
     - El tipo de jornada puede venir de datos heredados fuera del catálogo
       fijo (p. ej. `'Medica'` del seed): `editar.js` lo conserva como opción
       extra en el `<select>` para no perderlo al abrir el modal.
+  - **Transporte** (id_modulo 13): hub con 6 sub-flujos (rutas, vehículos,
+    proveedores, repuestos, asignaciones, mantenimientos) sobre `rutas`,
+    `vehiculos`, `proveedores`, `repuestos_vehiculos`, `inventario_repuestos`
+    (kardex), `asignaciones_rutas`, `mantenimiento_vehiculos` y
+    `repuestos_mantenimiento`. Crear con pestañas y consulta con DataTables +
+    modales (editar ×4, entrada/salida de stock, historial del kardex y
+    detalle de mantenimiento). **Reglas permanentes** (decisiones del
+    usuario, 2026-09-30):
+    - RBAC: nombre `'transporte'`; permisos en BD ya existentes: roles
+      (`id_tipo_emp`) 6 (Administrador) y 10 (Superusuario) con los 4
+      permisos. **No hay SQL nuevo.**
+    - Asignaciones: un vehículo/chofer sí puede tener 2+ asignaciones
+      activas, pero **NO dos activas el MISMO día** (misma
+      `fecha_asignacion` y `estatus='Activa'`): chequeo en crear Y en
+      editar con `verificarSolapamientoDia()` (excluye el propio
+      `id_asignacion`).
+    - Asignaciones: el selector de choferes SOLO lista empleados activos
+      con `tipo_empleado = 'Chofer'` (`id_tipo_emp` 8; los choferes no
+      usan el sistema pero son los únicos asignables) y `validarChofer()`
+      lo re-verifica en backend al crear y al editar (decisión del
+      usuario). Si el asignado de una fila heredada ya no es chofer,
+      `editar.js` lo conserva como opción extra en el `<select>` (el
+      backend rechaza guardarlo).
+    - **BD**: `asignaciones_rutas.id_asignacion` nació en el dump SIN
+      `AUTO_INCREMENT` (los demás IDs del módulo sí lo tienen); sin él,
+      el INSERT responde 1364. Corregido en `dirpoles_business.sql` y
+      con script idempotente
+      `docs/bd/transporte_asignaciones_autoincrement.sql` (hay que
+      ejecutarlo en BDs ya creadas).
+    - Unicidad de placa/documento/correo/teléfono **solo en código** (sin
+      `UNIQUE KEY` en BD; deuda conocida); documento/correo/teléfono del
+      proveedor compiten en el `UNION ALL` global con `empleado` y
+      `beneficiario`, con `id_excluir` solo en la rama propia.
+    - Catálogo fijo de motivos del kardex (`MOTIVOS_ENTRADA` /
+      `MOTIVOS_SALIDA`): entrada `Compra|Devolución|Donación|Ajuste de
+      inventario`; salida `Uso en mantenimiento|Vencimiento|Daño|Pérdida|
+      Donación` (select en los modales + validación backend; los
+      movimientos automáticos por mantenimiento se generan en backend).
+    - Repuesto: nace con stock 0 y `'Agotado'` + movimiento `'Registro'`;
+      eliminar está bloqueado si tiene stock, si aparece en
+      `repuestos_mantenimiento` o si el kardex tiene movimientos ≠
+      `'Registro'` (el kardex es auditoría: solo se borra la fila de alta).
+    - Entrada/Salida: transacción + `FOR UPDATE` sobre
+      `repuestos_vehiculos` y estatus `'Disponible'`/`'Agotado'`; el
+      kardex usa `idEmpleadoSesion()` (403 si no hay sesión; nunca
+      inventa el ID 1).
+    - Mantenimiento: crear pone el vehículo en `'Mantenimiento'`;
+      eliminar SOLO lo reactiva a `'Activo'` si ya no le quedan
+      mantenimientos (y nunca pisa un `'Inactivo'`).
+    - Eliminar ruta/vehículo/proveedor: transacción + `FOR UPDATE` sobre
+      la fila padre + chequeo de usos.
+    - `__set` completo con `default` que lanza `validacion()` (atributo no
+      reconocido), saneo anti-XSS con `texto()` y fechas/horas validadas
+      (`fecha()`/`hora()`): un payload incompleto responde 400, nunca 500.
+      Los controladores NO ponen defaults que enmascaren validaciones.
+    - Stats: `total_vehiculos`, `vehiculos_activos`,
+      `vehiculos_mantenimiento`, `total_rutas`, `rutas_activas`,
+      `total_proveedores`, `total_repuestos`, `repuestos_bajo_stock`,
+      `asignaciones_activas`.
+    - Listados aceptan `limit`/`offset` con defecto 200; los repuestos de
+      cada mantenimiento cargan en UNA query (sin N+1).
+    - Permisos visibles con `window.TRANSPORTE_PUEDE_*` (ocultan botones;
+      el backend re-verifica cada escritura). Tour: `#btn-ayuda` SOLO en
+      `transporte/crear`; la edición usa los modales de `consultar`.
+    - Reporte de transporte: `ReportesModel::getReportDataTransporte` usa
+      las tablas reales `asignaciones_rutas`/`mantenimiento_vehiculos` y
+      audita con acción `'Lectura'`.
   - **Configuración** (id_modulo 14): catálogos del sistema (crear/consultar).
+  - **Reportes Estadísticos** (id_modulo 15): 10 reportes
+    (`reportes/general|medicina|psicologia|orientacion|trabajo-social|
+    discapacidad|referencias|jornadas|mobiliario|transporte`), cada uno con
+    tarjetas `data-stat`, filtros, gráficos Chart.js y tabla con DataTables +
+    exportaciones. **Reglas permanentes** (dictamen de auditoría aprobado por
+    el usuario, 2026-09-30):
+    - RBAC: nombre `'reportes'`; permisos en BD ya existentes: roles
+      (`id_tipo_emp`) 1, 2, 3, 4, 5, 6, 10 y 11 con los 4 permisos.
+      **No hay SQL nuevo.**
+    - **Filtros server-side**: la lista blanca vive en
+      `reportesAplicarFiltros()` (`reportesController.php`) y solo acepta
+      `fecha_inicio, fecha_fin, genero, pnf, servicio_destino, area, estado,
+      tipo_consulta, submodulo, grado, tipo_discapacidad, tipo_bien,
+      tipo_vehiculo, reporte, limit`. Un parámetro ajeno se ignora; un valor
+      inválido responde 400 desde `__set` (listas ENUM validadas en el
+      modelo). El futuro microservicio IA consume los mismos `GET
+      api/reportes/*` sin navegador.
+    - Contrato: los 8 reportes simples devuelven `datos` = array de filas;
+      Psicología → `{morbilidad:[], citas:[]}`; Medicina →
+      `{consultas:[], insumos:[]}`; `stats?reporte=<clave>` → objeto de
+      contadores; `catalogos` → catálogos de los selects (esta última NO
+      registra bitácora: es carga auxiliar de UI).
+    - `limit` defecto 5000, tope 20000, siempre `PARAM_INT`.
+    - Bitácora acción `'Lectura'` en los 10 endpoints de datos y en `stats`
+      (nunca `'Consulta'`, rechazada por `Bitacora::ACCIONES`).
+    - Sin alcance de datos (decisión del usuario): no se limitan cédulas ni
+      registros por rol; quien tiene permiso `leer` ve todo.
+    - Chart.js **local** `dist/js/dashboard/Chart.min.js` (v2.9.4, sin CDN):
+      usar la API v2 (`options.legend`, NO `options.plugins.legend`) vía
+      `ReportesComunes.grafico()`.
+    - Tour compartido `dist/js/modulos/reportes/tour.js`
+      (`ReportesTour.iniciar(tipo)`) con botón `#btn-ayuda` y
+      `window.REPORTES_TIPO` declarado en línea en cada vista; los pasos se
+      omiten con gracia si el select no existe.
+    - Stats: una sola llamada a `api/reportes/stats?reporte=<clave>` con los
+      MISMOS filtros del formulario; los contadores `*_mes` ignoran
+      `fecha_inicio/fecha_fin` y usan el rango del mes actual.
+    - Card del dashboard (clave 15) **sin `stat`** (patrón Configuración):
+      el contador vive dentro de cada reporte, no en `api/dashboard/stats`.
+    - Sidebar: entrada con subitems por reporte (permiso 2/Leer).
   - **Bitácora** (id_modulo 16): consulta de auditoría con filtros y exportación.
   - **Permisos** (id_modulo 17): matriz rol × módulo × permiso.
   - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
     Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-  - **Faltan los módulos de negocio pesados**: transporte (ver
+  - **Faltan los módulos de negocio pesados** (ver
     `app/Config/dashboard_cards.php`, las cards con `'disponible' => false`
     son los pendientes).
 
@@ -530,7 +637,8 @@ porque validan contra otro módulo); AGREGA AHÍ tu módulo nuevo al crearlo.
 
 - Esquemas SQL de referencia en `docs/bd/dirpoles_{security,business}.sql`
   y scripts incrementales idempotentes: `docs/bd/notificaciones_modulo.sql`,
-  `docs/bd/login_intentos.sql`, `docs/bd/bitacora_respaldo.sql`.
+  `docs/bd/login_intentos.sql`, `docs/bd/bitacora_respaldo.sql`,
+  `docs/bd/transporte_asignaciones_autoincrement.sql`.
 - RBAC: tablas `modulo`, `permiso` (**1=Crear, 2=Leer, 3=Editar, 4=Eliminar**),
   `rol_modulo_permiso` (rol × módulo × permiso). El sidebar se filtra por
   permiso id 2 (Leer) vía `PermisosModel::obtenerPermisosSidebar`.
@@ -594,14 +702,14 @@ app/Controllers/        loginController.php, notificacionesController.php,
                         bitacoraController.php, backupController.php,
                         trabajoSocialController.php, inventarioController.php,
                         referenciaController.php, mobiliarioController.php,
-                        jornadaController.php
+                        jornadaController.php, reportesController.php
                         (solo funciones)
 app/Models/             loginModel, PermisosModel, NotificacionesModel,
                         DashboardModel, CalendarioModel, SecurityModel, BusinessModel,
                         EmpleadoModel, BeneficiarioModel, CitaModel, HorarioModel,
                         ConfiguracionModel, BitacoraModel,
                         BackupModel, InventarioModel, ReferenciaModel,
-                        MobiliarioModel, JornadaModel
+                        MobiliarioModel, JornadaModel, ReportesModel
 app/Views/              template/ (head, header, sidebar, footer, script),
                         inicio/dashboard.php (shell compuesto por rol), login.php,
                         errors/ (404, error, rate_limit, access_denied),
@@ -624,7 +732,11 @@ app/Views/              template/ (head, header, sidebar, footer, script),
                         reubicación e historial; components/stats.php),
                         jornadas/ (crear + consultar con DataTables y modal
                         de edición, detalle/{id} con asistentes y
-                        diagnósticos; components/stats.php)
+                        diagnósticos; components/stats.php),
+                        reportes/ (10 vistas: general, medicina, psicologia,
+                        orientacion, trabajo_social, discapacidad,
+                        referencias, jornadas, mobiliario, transporte; cada
+                        una con stats + filtros + gráficos + tabla)
 app/Config/             modulos_sidebar.php, dashboard_cards.php, roles_sistema.php,
                         configuracion_catalogos.php, Keys/ (RSA, no versionadas)
                         (NO existe config.php: la config va por .env)
@@ -632,7 +744,8 @@ app/routes/             notificaciones.php, dashboard.php, empleados.php,
                         beneficiarios.php, citas.php, horarios.php,
                         permisos.php, configuracion.php, bitacora.php,
                         backup.php, trabajo-social.php, inventario.php,
-                        referencias.php, mobiliario.php, jornadas.php
+                        referencias.php, mobiliario.php, jornadas.php,
+                        reportes.php
                         (los demás módulos los creas tú)
 docs/                   docs/MANUAL_DIRPOLES_CONTEXTO.md (manual de contexto),
                         docs/guia_arquitectura_dirpoles.md (arquitectura),
@@ -656,6 +769,11 @@ dist/                   CSS/JS/IMG propios:
                         crear, editar, consultar),
                         js/modulos/jornadas/ (stats, tour, validaciones,
                         crear, editar, consultar, detalle, diagnosticos),
+                        js/modulos/reportes/ (comunes, stats, tour +
+                        un archivo por reporte: general, medicina,
+                        psicologia, orientacion, trabajo_social,
+                        discapacidad, referencias, jornadas, mobiliario,
+                        transporte),
                         css/dashboard/dashboard.css
 plugins/                Librerías front auto-hospedadas (Bootstrap 5, DataTables, Select2,
                         SweetAlert2, FullCalendar, jsPDF, jsencrypt...)
