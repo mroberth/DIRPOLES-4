@@ -116,41 +116,61 @@
         });
     }
 
+    function formatoTiempo(minutos, fechaIso) {
+        if (minutos !== undefined && minutos !== null) {
+            const m = parseInt(minutos, 10) || 0;
+            if (m < 1) return 'hace momentos';
+            if (m < 60) return `hace ${m}m`;
+            if (m < 1440) return `hace ${Math.floor(m / 60)}h`;
+            return `hace ${Math.floor(m / 1440)}d`;
+        }
+        return fechaIso ? fechaIso.substring(0, 10) : '';
+    }
+
     async function cargarNotificacionesRecientes() {
         const contenedor = document.getElementById('feed-notificaciones-dashboard');
         const badge = document.getElementById('badge-total-notif');
         if (!contenedor) return;
 
         try {
-            const notifs = await apiFetch(window.BASE_URL + 'api/notificaciones/listar');
-            const lista = Array.isArray(notifs) ? notifs : (notifs.notificaciones || []);
+            const datos = await apiFetch(window.BASE_URL + 'api/notificaciones/listar');
+            const lista = Array.isArray(datos) ? datos : (datos.notifications || []);
+            const sinLeerCount = datos.unread_count !== undefined ? datos.unread_count : lista.filter(n => parseInt(n.leido, 10) === 0).length;
 
             if (badge) {
-                badge.textContent = `${lista.length} aviso${lista.length !== 1 ? 's' : ''}`;
+                badge.textContent = `${sinLeerCount} no leída${sinLeerCount !== 1 ? 's' : ''}`;
             }
 
             if (!lista.length) {
                 contenedor.innerHTML = `
                     <div class="p-4 text-center text-muted">
                         <i class="fas fa-check-circle text-success fa-2x mb-2 d-block"></i>
-                        <span class="small font-weight-bold">¡Todo al día! No tienes notificaciones pendientes.</span>
+                        <span class="small font-weight-bold">¡Todo al día! No tienes avisos ni notificaciones.</span>
                     </div>
                 `;
                 return;
             }
 
-            const ultimas = lista.slice(0, 4);
-            contenedor.innerHTML = ultimas.map(item => `
-                <a href="${item.url ? (window.BASE_URL + item.url) : '#'}" class="list-group-item list-group-item-action p-3">
+            const ultimas = lista.slice(0, 5);
+            contenedor.innerHTML = ultimas.map(item => {
+                const emisor = item.nombre_empleado ? `De: ${escapar(item.nombre_empleado)}` : 'Aviso del Sistema';
+                const fechaTxt = formatoTiempo(item.time_ago, item.fecha_creacion);
+                const noLeida = parseInt(item.leido, 10) === 0;
+
+                return `
+                <a href="${item.url ? (window.BASE_URL + item.url) : '#'}" class="list-group-item list-group-item-action p-3 ${noLeida ? 'border-start border-primary border-3 bg-light' : ''}">
                     <div class="d-flex w-100 justify-content-between align-items-center mb-1">
                         <h6 class="mb-0 font-weight-bold text-dark small">
-                            <i class="fas fa-bell text-primary me-2"></i>${escapar(item.titulo || 'Notificación')}
+                            <i class="fas fa-bell ${noLeida ? 'text-primary' : 'text-muted'} me-2"></i>${escapar(item.titulo || 'Notificación')}
                         </h6>
-                        <small class="text-muted" style="font-size: 0.7rem;">${item.fecha_creacion ? item.fecha_creacion.substring(0, 10) : ''}</small>
+                        <small class="text-muted" style="font-size: 0.7rem;">${fechaTxt}</small>
                     </div>
-                    <p class="mb-1 text-muted small text-truncate">${escapar(item.mensaje || '')}</p>
+                    <p class="mb-0 text-muted small text-truncate" style="font-size: 0.8rem;">
+                        <i class="fas fa-user-circle me-1"></i>${emisor}
+                    </p>
                 </a>
-            `).join('');
+            `;
+            }).join('');
         } catch (err) {
             console.warn('No se pudieron cargar las notificaciones para el feed:', err);
             contenedor.innerHTML = `

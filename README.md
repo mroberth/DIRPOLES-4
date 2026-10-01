@@ -1,445 +1,339 @@
 # DIRPOLES-4
 
-### Sistema de Gestión de la Dirección de Políticas Estudiantiles — UPTAEB
+### Sistema de Gestión Administrativa para la Dirección de Políticas Estudiantiles
+**Universidad Politécnica Territorial del Estado Lara "Andrés Eloy Blanco" (UPTAEB)**
 
 [![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL%20%2F%20MariaDB-8%20%2F%2010.4%2B-4479A1?logo=mysql&logoColor=white)](https://mariadb.org/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Composer](https://img.shields.io/badge/Composer-2.x-885630?logo=composer&logoColor=white)](https://getcomposer.org/)
-[![License](https://img.shields.io/badge/Licencia-Académica-lightgrey)](#-licencia)
+[![License](https://img.shields.io/badge/Licencia-Institucional%20%2F%20Acad%C3%A9mica-blue)](#-licencia-y-propiedad-intelectual)
 
-**DIRPOLES-4** es el sistema de gestión Administrativa para la dirección de políticas estudiantiles de la Universidad Politécnica Territorial del Estado Lara Andrés Eloy Blanco (UPTAEB)**. Es un **monolito híbrido en PHP 8** con
-**MVC propio** (sin framework) que sirve **páginas HTML renderizadas en el
-servidor** y una **API JSON** con contrato único.
+**DIRPOLES-4** es el **Sistema de Gestión Administrativa para la Dirección de Políticas Estudiantiles (DIRPOLES)** de la Universidad Politécnica Territorial del Estado Lara "Andrés Eloy Blanco" (UPTAEB). Desarrollado como un **monolito modular híbrido en PHP 8+** con **MVC propio** (sin frameworks comerciales), sirve páginas HTML renderizadas en el servidor (Puerta HTML) y una API RESTful JSON estricta (Puerta JSON) desacoplada para consumo web y preparado para servicios de Inteligencia Artificial (FastAPI).
 
-Este repositorio es una **reconstrucción limpia** del sistema anterior
-(`DIRPOLES_4`): conserva su funcionalidad pero corrige sus inconsistencias de
-arquitectura, seguridad y manejo de errores. Se construye **módulo a módulo**
-siguiendo [`GUIA-MODULOS.md`](GUIA-MODULOS.md).
+Este repositorio constituye la versión final refactorizada, segura e inmutable del sistema, abarcando la automatización integral de **18 módulos funcionales, clínicos, logísticos y administrativos**.
 
-> Proyecto final — 4to trayecto, PNF Informática.
+> **Proyecto Socio-Integrador y Tecnológico (PSIT)** — Trabajo Especial de Grado para la obtención del título de **Ingeniero(a) en Informática** (Trayecto IV, PNF Informática, UPTAEB).
 
 ---
 
-## 📖 Tabla de contenido
+## 📖 Tabla de Contenido
 
-- [✨ Características](#-características)
-- [🧱 Stack tecnológico](#-stack-tecnológico)
-- [🏛 Arquitectura](#-arquitectura)
-- [📋 Requisitos](#-requisitos)
-- [🚀 Instalación](#-instalación)
-  - [Opción A — Script automático (Linux)](#opción-a--script-automático-linux)
-  - [Opción B — Manual paso a paso](#opción-b--manual-paso-a-paso)
-- [🔑 Crear/restablecer un usuario](#-crearrestablecer-un-usuario)
-- [✅ Verificar la instalación](#-verificar-la-instalación)
-- [⚙ Variables de entorno](#-variables-de-entorno)
-- [🗂 Estructura del proyecto](#-estructura-del-proyecto)
-- [🧩 Módulos](#-módulos)
-- [🔐 Seguridad](#-seguridad)
-- [📚 Documentación](#-documentación)
-- [🛠 Solución de problemas](#-solución-de-problemas)
-- [📄 Licencia](#-licencia)
-
----
-
-## ✨ Características
-
-- **Autenticación completa y endurecida**
-  - Contraseña cifrada con **RSA (PKCS#1)** en el navegador → descifrada en el
-    servidor → almacenada con **bcrypt**.
-  - **JWT RS256** en cookie `HttpOnly` + **refresh token con rotación**
-    (un solo uso).
-  - **Bloqueo por intentos fallidos** persistido en base de datos.
-  - `session_regenerate_id` (anti *session fixation*).
-- **Autorización RBAC** (roles × módulos × permisos: Crear/Leer/Editar/Eliminar).
-- **Contrato JSON único** y manejo de errores centralizado.
-- **Rate limiting** por *Token Bucket* (IP × endpoint).
-- **Auditoría** (bitácora) y **notificaciones** en tiempo real (SSE) con campana
-  en el topbar.
-- **Panel de Inicio** compuesto por rol/permisos (cards de módulos, estadísticas
-  y calendario personal).
-- **Módulos de gestión** con CRUD, búsqueda, exportación a Excel/PDF y tours
-  guiados (Driver.js).
-- **Respaldo de base de datos** descargable en `.sql`.
+- [✨ Características Principales](#-características-principales)
+- [🧱 Stack Tecnológico](#-stack-tecnológico)
+- [🏛 Arquitectura del Sistema](#-arquitectura-del-sistema)
+- [📋 Requisitos de Infraestructura](#-requisitos-de-infraestructura)
+- [🚀 Instalación y Despliegue](#-instalación-y-despliegue)
+  - [Opción A — Script Automatizado (Linux)](#opción-a--script-automatizado-linux)
+  - [Opción B — Instalación Manual](#opción-b--instalación-manual)
+- [🔑 Gestión de Credenciales Iniciales](#-gestión-de-credenciales-iniciales)
+- [✅ Verificación del Despliegue](#-verificación-del-despliegue)
+- [⚙ Variables de Entorno (.env)](#-variables-de-entorno-env)
+- [🗂 Estructura del Código Fuente](#-estructura-del-código-fuente)
+- [🧩 Módulos del Sistema (18/18 Operativos)](#-módulos-del-sistema-1818-operativos)
+- [🔐 Marco de Seguridad Defensiva](#-marco-de-seguridad-defensiva)
+- [📚 Documentación Técnica](#-documentación-técnica)
+- [🛠 Solución de Problemas Frecuentes](#-solución-de-problemas-frecuentes)
+- [📄 Licencia y Propiedad Intelectual](#-licencia-y-propiedad-intelectual)
 
 ---
 
-## 🧱 Stack tecnológico
+## ✨ Características Principales
 
-| Capa | Tecnología |
+- **Criptografía Asimétrica y Autenticación Defensiva:**
+  - Cifrado en tránsito asimétrico con **RSA-2048 (PKCS#1)** en cliente → descifrado seguro en servidor → almacenamiento con hash **Bcrypt (cost factor 10)**.
+  - **Tokens JWT RS256** en cookie `HttpOnly` + **Refresh Tokens con rotación de un solo uso** (*one-time use*) con digest SHA-256 en base de datos.
+  - **Protección Anti-Fuerza Bruta Persistente** en BD (`login_intentos`) con bloqueo automático a los 3 intentos fallidos.
+- **Doble Base de Datos Aislada:**
+  - `dirpoles_security`: Autenticación, matriz RBAC, auditoría forense (`bitacora`), tokens y notificaciones.
+  - `dirpoles_business`: Expedientes clínicos, beneficiarios, inventario médico, jornadas, transporte y becas.
+- **Concurrencia e Integridad Transaccional:**
+  - Bloqueo pesimista nivel de fila (`SELECT ... FOR UPDATE`) en descuento de insumos médicos y control de aforo masivo en jornadas.
+  - Kardex de movimientos transaccionales en tiempo real para inventario médico, mobiliario y flota de transporte.
+- **Autorización Atómica RBAC:** Matriz dinámica (Roles × Módulos × Permisos: `crear`, `leer`, `editar`, `eliminar`).
+- **Streaming SSE:** Canal bidireccional asíncrono (*Server-Sent Events*) para la campana de notificaciones del topbar sin bloqueo de sesión (`session_write_close()`).
+- **Analítica y Reportes:** 10 tableros estadísticos dinámicos con filtrado server-side en whitelist, gráficos Chart.js v2.9.4 local y exportación a PDF y Excel.
+
+---
+
+## 🧱 Stack Tecnológico
+
+| Capa / Componente | Tecnología / Estándar |
 |---|---|
-| Backend | **PHP 8.1+** (MVC propio, sin framework) |
-| Base de datos | **MySQL / MariaDB** (dos esquemas) |
-| Servidor web | **Apache 2.4+** con `mod_rewrite` |
-| Dependencias PHP | [Composer](https://getcomposer.org/) · `firebase/php-jwt` · `vlucas/phpdotenv` |
-| Frontend | **HTML5 + Bootstrap 5** (tema SB Admin 2) + **jQuery** |
-| Librerías front | DataTables, Select2, SweetAlert2, Driver.js, FullCalendar, jsPDF, JSEncrypt |
-| Autenticación | RSA (OpenSSL) · bcrypt · JWT RS256 |
+| **Lenguaje Backend** | **PHP 8.1+** (MVC propio modular nativo, sin frameworks comerciales) |
+| **Bases de Datos** | **MySQL 8.0+ / MariaDB 10.4+** (Dos esquemas aislados: `dirpoles_security` y `dirpoles_business`) |
+| **Servidor Web** | **Apache 2.4+** con módulo `mod_rewrite` activo |
+| **Dependencias PHP** | [Composer 2.x](https://getcomposer.org/) · `firebase/php-jwt` · `vlucas/phpdotenv` |
+| **Frontend & UI** | **HTML5 + Vanilla JS Modular + Bootstrap 5** (SB Admin 2) |
+| **Librerías Frontend Local** | DataTables, Select2, SweetAlert2, Driver.js, FullCalendar, Chart.js v2.9.4 local |
+| **Seguridad / Criptografía** | RSA-2048 (OpenSSL) · Bcrypt · JWT RS256 · SHA-256 |
 
 ---
 
-## 🏛 Arquitectura
+## 🏛 Arquitectura del Sistema
 
-**Monolito híbrido con *Front Controller***: todas las peticiones entran por
-`index.php`, que aplica CORS, sesión, middlewares y el manejo global de errores.
+DIRPOLES-4 opera bajo el patrón **Monolito Modular con Front Controller Híbrido (Regla de las Dos Puertas)**:
 
 ```
-Navegador ──▶ .htaccess ──▶ index.php ──▶ Router
+Navegador ──▶ .htaccess ──▶ index.php (Front Controller)
                                    │
-                                   ├─ RateLimitMiddleware   (Token Bucket)
-                                   ├─ SessionAuthMiddleware (sesión + JWT)
-                                   └─ Ruta ──▶ Controlador ──▶ Modelo (SQL)
-                                                        └──▶ Respuesta (JSON/HTML)
+                                   ├─ RateLimitMiddleware   (Token Bucket por IP/Endpoint)
+                                   ├─ SessionAuthMiddleware (Sesión PHP + Validación JWT RS256)
+                                   └─ Router ──▶ Controlador Funcional ──▶ Modelo (SQL PDO)
+                                                                 └──▶ Respuesta (JSON / HTML)
 ```
 
-### La regla de las **dos puertas**
+### Regla de las Puertas y Canales
 
-| Puerta | Ruta | Responde | Ejemplo |
+| Puerta / Canal | Identificador | Tipo de Respuesta | Propósito |
 |---|---|---|---|
-| **HTML** | fuera de `api/` | Página renderizada o redirección | `empleados/consultar` |
-| **JSON** | bajo `api/` (o `Accept: application/json`) | JSON del contrato | `api/empleados/listar` |
-| *SSE* | `sse/notificaciones` | `text/event-stream` | campana en vivo |
-| *Archivo* | `respaldo/descargar` | `.sql` | respaldo de BD |
-
-**Contrato JSON único:**
-
-```jsonc
-// Éxito
-{ "exito": true, "datos": { "...": "..." } }
-
-// Error
-{ "exito": false, "error": { "codigo": "ALREADY_EXISTS", "estado": 409, "mensaje": "..." } }
-```
-
-El backend **decide el formato** según la puerta; un endpoint `api/*` nunca
-devuelve HTML y una página nunca devuelve JSON.
+| **Puerta HTML** | Rutas estándar (ej: `medicina/consultar`) | Renderizado HTML Server-Side (SSR) | Navegación entre vistas y plantillas del sistema. |
+| **Puerta JSON** | Rutas bajo `api/` (ej: `api/medicina/listar`) | JSON con Contrato Único (`{exito: bool, datos/error}`) | Operaciones asíncronas AJAX, DataTables y API. |
+| **Streaming SSE** | `sse/notificaciones` | `text/event-stream` | Eventos y alertas en tiempo real en la barra superior. |
+| **Tercera Puerta** | Endpoints binarios (ej: `respaldo/descargar`) | Stream `application/octet-stream` o PDF | Descarga de respaldos `.sql` e informes FPDF. |
 
 ---
 
-## 📋 Requisitos
+## 📋 Requisitos de Infraestructura
 
-| Componente | Versión mínima | Notas |
+| Requisito | Versión Mínima | Extensión / Módulo Requerido |
 |---|---|---|
-| **PHP** | 8.1+ | extensiones: `openssl`, `pdo_mysql`, `mbstring` |
-| **MySQL / MariaDB** | 8.0 / 10.4+ | dos bases: `dirpoles_security` y `dirpoles_business` |
-| **Apache** | 2.4+ | con `mod_rewrite` habilitado |
-| **Composer** | 2.x | gestor de dependencias PHP |
-| **OpenSSL** | CLI | para generar las llaves RSA |
-
-Verifica con:
-
-```bash
-php -v
-php -m | grep -E "pdo_mysql|openssl|mbstring"
-composer --version
-apache2 -v
-```
+| **Servidor PHP** | 8.1 o superior | `openssl`, `pdo_mysql`, `mbstring`, `fileinfo`, `json` |
+| **Motor MySQL / MariaDB** | 8.0+ / 10.4+ | Motor InnoDB con soporte de transacciones ACID y `FOR UPDATE` |
+| **Servidor Web** | Apache 2.4+ | `mod_rewrite` e `AllowOverride All` habilitados |
+| **Gestor de Paquetes** | Composer 2.x | Para autoloader PSR-4 y librerías base |
+| **Herramientas de Red** | OpenSSL CLI | Para generación de pares de claves RSA |
 
 ---
 
-## 🚀 Instalación
+## 🚀 Instalación y Despliegue
 
-### Opción A — Script automático (Linux)
+### Opción A — Script Automatizado (Linux)
 
-El repositorio incluye `setup_linux.sh`, que hace casi todo:
+El repositorio incluye el script ejecutable `setup_linux.sh` para entorno Linux (Debian, Ubuntu, Linux Mint):
 
 ```bash
-git clone <url-del-repo> DIRPOLES-4
+git clone https://github.com/mroberth/DIRPOLES-4.git DIRPOLES-4
 cd DIRPOLES-4
 chmod +x setup_linux.sh
 ./setup_linux.sh
 ```
 
-El script:
+El script ejecuta automáticamente:
+1. Creación del archivo de configuración Apache Alias (`/DIRPOLES-4`).
+2. Generación del archivo `.env` a partir de `.env.example`.
+3. Generación criptográfica de las llaves RSA de 2048 bits para Login y JWT en `app/Config/Keys/` con permisos `600`.
+4. Creación de directorios de almacenamiento (`logs/`, `uploads/`) con permisos requeridos.
+5. Instalación de dependencias de PHP vía Composer.
+6. Importación automática de los dos esquemas SQL desde `docs/bd/`.
+7. Reinicio del servicio Apache.
 
-1. Configura un **Alias de Apache** (`/DIRPOLES-4`).
-2. Crea el `.env` desde `.env.example`.
-3. **Genera las llaves RSA** (login + JWT, privadas con permisos `600`).
-4. Crea `logs/` y ajusta permisos.
-5. Instala dependencias con **Composer**.
-6. **Importa las bases de datos** desde `docs/bd/`.
-7. Reinicia Apache.
-
-Al terminar, abre `http://localhost/DIRPOLES-4`.
-
-> Requiere permisos de `sudo` para Apache.
+Acceso inmediato en: `http://localhost/DIRPOLES-4`
 
 ---
 
-### Opción B — Manual paso a paso
+### Opción B — Instalación Manual Paso a Paso
 
 #### 1. Clonar el repositorio
-
 ```bash
-git clone <url-del-repo> DIRPOLES-4
+git clone https://github.com/mroberth/DIRPOLES-4.git DIRPOLES-4
 cd DIRPOLES-4
 ```
 
-> El nombre de la carpeta puede ser cualquiera: la URL base se detecta sola.
-
-#### 2. Variables de entorno
-
+#### 2. Configurar variables de entorno
 ```bash
 cp .env.example .env
 ```
+Ajusta credenciales de base de datos en `.env`.
 
-Edita `.env` con los datos de tu servidor MySQL (ver
-[tabla de variables](#-variables-de-entorno)).
-
-#### 3. Dependencias PHP
-
+#### 3. Instalar dependencias PHP
 ```bash
 composer install
 ```
 
-#### 4. Llaves RSA
-
+#### 4. Generar Llaves Criptográficas RSA
 ```bash
 mkdir -p app/Config/Keys
 
-# Llaves para el LOGIN (cifrado de la contraseña)
+# Llaves RSA para cifrado de login en cliente
 openssl genrsa -out app/Config/Keys/login_private.pem 2048
 openssl rsa -in app/Config/Keys/login_private.pem -pubout -out app/Config/Keys/login_public.pem
 
-# Llaves para el JWT (firma y verificación de tokens)
+# Llaves RSA para firma asimétrica de JWT (RS256)
 openssl genrsa -out app/Config/Keys/jwt_private.pem 2048
 openssl rsa -in app/Config/Keys/jwt_private.pem -pubout -out app/Config/Keys/jwt_public.pem
 
-# La privada solo la lee el servidor
+# Permisos strictly de lectura por el servidor
 chmod 600 app/Config/Keys/*_private.pem
 chmod 644 app/Config/Keys/*_public.pem
 ```
 
-> ⚠️ Las llaves **nunca** se suben al repositorio (están en `.gitignore`).
-
-#### 5. Base de datos
-
-Los dumps ya crean las bases y sus tablas:
-
+#### 5. Importar Bases de Datos
 ```bash
 mysql -u root -p < docs/bd/dirpoles_security.sql
 mysql -u root -p < docs/bd/dirpoles_business.sql
 ```
 
-> **¿Ya tenías las bases creadas?** Aplica solo los scripts incrementales
-> (son **idempotentes**, se pueden repetir sin romper nada):
->
-> ```bash
-> mysql -u root -p dirpoles_security < docs/bd/login_intentos.sql
-> mysql -u root -p dirpoles_security < docs/bd/notificaciones_modulo.sql
-> mysql -u root -p dirpoles_security < docs/bd/bitacora_respaldo.sql
-> ```
-
-#### 6. Permisos
-
+#### 6. Permisos de Directorios
 ```bash
-mkdir -p logs
-chmod 777 logs
-chmod 644 .env
-# El servidor web (www-data) debe poder escribir archivos subidos:
-mkdir -p uploads
-chmod -R 777 uploads
-```
-
-#### 7. Servidor web (Apache)
-
-El proyecto trae un `.htaccess` que redirige todo a `index.php`. Necesitas un
-*Alias* o *VirtualHost*. Opción rápida (Debian/Ubuntu):
-
-```bash
-sudo tee /etc/apache2/conf-available/dirpoles.conf > /dev/null <<'EOF'
-Alias /DIRPOLES-4 "/ruta/absoluta/DIRPOLES-4"
-<Directory "/ruta/absoluta/DIRPOLES-4">
-    Options FollowSymLinks
-    AllowOverride All
-    Require all granted
-</Directory>
-EOF
-
-sudo a2enconf dirpoles
-sudo a2enmod rewrite
-sudo systemctl restart apache2
+mkdir -p logs uploads
+chmod 777 logs uploads
 ```
 
 ---
 
-## 🔑 Crear/restablecer un usuario
+## 🔑 Gestión de Credenciales Iniciales
 
-Los dumps incluyen usuarios de ejemplo (p. ej. `admin@gmail.com`). Sus
-contraseñas están **hasheadas con bcrypt**, así que no se pueden "leer". Para
-dejar una cuenta operativa con una contraseña conocida:
+El esquema inicial incluye usuarios administrativos pre-configurados. Las contraseñas están resguardadas con hash **Bcrypt**. Para establecer una contraseña conocida para pruebas o administración:
 
 ```bash
-# 1) Genera el hash bcrypt de tu nueva contraseña
-php -r "echo password_hash('TuClave123!', PASSWORD_BCRYPT), PHP_EOL;"
+# 1) Genera el hash Bcrypt de tu nueva contraseña desde la terminal:
+php -r "echo password_hash('TuClaveSegura123!', PASSWORD_BCRYPT), PHP_EOL;"
 ```
 
-Copia el hash y actualízalo:
+Actualiza el hash en la base de datos de seguridad:
 
-```bash
-mysql -u root dirpoles_security -e \
-"UPDATE empleado SET clave='PEGA_AQUI_EL_HASH', estatus=1 WHERE correo='admin@gmail.com';"
-```
-
-> La contraseña del **login** debe tener **al menos 8 caracteres** e incluir
-> letra, número y un carácter especial (así lo pide la validación del sistema).
-
----
-
-## ✅ Verificar la instalación
-
-1. Abre `http://localhost/DIRPOLES-4/login`.
-2. Inicia sesión con el usuario que configuraste.
-3. Deberías llegar al **Panel de Inicio** con tus tarjetas y el calendario.
-
-Comprobaciones rápidas:
-
-```bash
-# ¿Conecta la base de seguridad?
-mysql -u root dirpoles_security -e "SELECT COUNT(*) FROM empleado;"
-
-# ¿Hay errores de PHP?
-tail -n 30 logs/php_errors.log
+```sql
+UPDATE dirpoles_security.empleado 
+   SET clave = 'HASH_GENERADO_AQUI', estatus = 1 
+ WHERE correo = 'admin@gmail.com';
 ```
 
 ---
 
-## ⚙ Variables de entorno
+## ✅ Verificación del Despliegue
+
+1. Abre `http://localhost/DIRPOLES-4/login` en el navegador.
+2. Inicia sesión con las credenciales configuradas.
+3. Deberías visualizar el **Panel de Inicio** con las tarjetas estadísticas del módulo y el calendario operativo personal.
+
+---
+
+## ⚙ Variables de Entorno (.env)
 
 | Variable | Descripción | Ejemplo |
 |---|---|---|
-| `APP_DEBUG` | `true` muestra detalles de error (solo desarrollo) | `false` |
-| `DB_HOST` | Host de ambas bases de datos | `localhost` |
-| `DB_NAME` | Base de datos de **negocio** | `dirpoles_business` |
-| `DB_USER` / `DB_PASS` | Usuario/contraseña de negocio | `root` / *(vacío)* |
-| `DB_SECURITY_NAME` | Base de datos de **seguridad** | `dirpoles_security` |
-| `DB_SECURITY_USER` / `DB_SECURITY_PASS` | Usuario/contraseña de seguridad | `root` / *(vacío)* |
-| `JWT_EXPIRATION` | Vida del JWT en segundos | `3600` (1 h) |
-| `REFRESH_EXPIRATION` | Vida del refresh token en segundos | `2592000` (30 días) |
-| `APP_ENV` | Entorno | `local` \| `staging` \| `production` |
-| `CORS_ALLOWED_ORIGINS` | Orígenes permitidos (coma) | `http://localhost:5173` |
+| `APP_DEBUG` | Muestra detalles de depuración (`true` desarrollo) | `false` |
+| `DB_HOST` | Host del motor de base de datos MySQL | `localhost` |
+| `DB_NAME` | Nombre del esquema de **negocio** | `dirpoles_business` |
+| `DB_USER` / `DB_PASS` | Credenciales de la BD de negocio | `root` / *(vacío)* |
+| `DB_SECURITY_NAME` | Nombre del esquema de **seguridad** | `dirpoles_security` |
+| `DB_SECURITY_USER` / `DB_SECURITY_PASS` | Credenciales de la BD de seguridad | `root` / *(vacío)* |
+| `JWT_EXPIRATION` | Expiración del token JWT en segundos | `3600` (1 h) |
+| `REFRESH_EXPIRATION` | Expiración del Refresh Token en segundos | `1296000` (15 días) |
+| `APP_ENV` | Entorno de ejecución | `local` \| `staging` \| `production` |
+| `CORS_ALLOWED_ORIGINS` | Dominio(s) permitidos en CORS | `http://localhost:5173` |
 
 ---
 
-## 🗂 Estructura del proyecto
+## 🗂 Estructura del Código Fuente
 
 ```
 DIRPOLES-4/
 ├── index.php                  Front Controller (CORS → sesión → handler → Router)
-├── .htaccess                  Redirige todo a index.php
-├── .env / .env.example        Configuración por entorno
+├── .htaccess                  Redirección centralizada a index.php
+├── .env / .env.example        Configuración de entorno
 ├── composer.json              Autoload PSR-4 + dependencias
-├── setup_linux.sh             Instalación automática
+├── setup_linux.sh             Script de instalación automatizado (Linux)
 │
 ├── app/
 │   ├── Core/                  Infraestructura: Router, Database, Respuesta,
 │   │                          ExcepcionApi, ErrorCodes, Autorizacion,
 │   │                          Bitacora, Notificador, JwtHandler
 │   ├── Middlewares/           RateLimitMiddleware, SessionAuthMiddleware
-│   ├── Controllers/           SOLO funciones (login, dashboard, empleados,
-│   │                          beneficiarios, permisos, configuración,
-│   │                          bitácora, respaldo, notificaciones, SSE)
-│   ├── Models/                Clases con manejarAccion() (negocio/seguridad)
-│   ├── Views/                 Plantillas HTML (template/, inicio/, errors/, …)
-│   ├── routes/                Un archivo por módulo (autocarga)
-│   ├── Config/                modulos_sidebar.php, dashboard_cards.php,
-│   │                          configuracion_catalogos.php, roles_sistema.php,
-│   │                          Keys/ (RSA, no versionadas)
-│   ├── bootstrap.php          Carga de controladores + logs
-│   └── routes.php             Rutas esenciales + middlewares globales
+│   ├── Controllers/           Controladores funcionales (rutas web y APIs)
+│   ├── Models/                Modelos de negocio y seguridad (con manejarAccion)
+│   ├── Views/                 Plantillas HTML renderizadas en servidor (SSR)
+│   ├── routes/                Unidades de enrutamiento por módulo
+│   ├── Config/                Catálogos, tarjetas dashboard, permisos RBAC
+│   │                          Keys/ (Llaves RSA no versionadas)
+│   ├── bootstrap.php          Inicializador de la aplicación
+│   └── routes.php             Rutas principales y middlewares globales
 │
 ├── dist/
-│   ├── css/                   Estilos propios
+│   ├── css/                   Estilos CSS Vanilla y temas custom
 │   └── js/
-│       ├── core/              apiFetch, AlertManager, logout, select-2-init…
-│       └── modulos/           JS por módulo (validaciones, tour, stats, crear…)
+│       ├── core/              apiFetch, AlertManager, logout, select2-init...
+│       └── modulos/           Lógica cliente por módulo (tours, stats, CRUD)
 │
-├── plugins/                   Librerías front auto-hospedadas (Bootstrap,
-│                              DataTables, Select2, SweetAlert2, FullCalendar…)
+├── plugins/                   Librerías frontend auto-hospedadas (Bootstrap,
+│                              DataTables, Select2, SweetAlert2, FullCalendar...)
 │
 ├── docs/
-│   ├── bd/                    Esquemas SQL + scripts incrementales
-│   └── …                      Manuales y guías
+│   ├── MANUAL_TECNICO_DIRPOLES4.md Manual Técnico Maestro (Capítulos 1 al 6)
+│   ├── bd/                    Esquemas SQL completos (security y business)
+│   └── auditoria/             Informes de auditoría de seguridad
 │
-├── logs/                      php_errors.log
-└── vendor/                    Dependencias de Composer (no versionado)
+├── logs/                      Registros de errores php_errors.log (no versionado)
+└── vendor/                    Dependencias Composer (no versionado)
 ```
 
 ---
 
-## 🧩 Módulos
+## 🧩 Módulos del Sistema (18/18 Operativos)
 
-| Módulo | Estado | Descripción |
-|---|---|---|
-| Autenticación | ✅ | Login RSA+bcrypt, JWT RS256, refresh con rotación, logout |
-| Panel de Inicio | ✅ | Shell por rol, cards de módulos, stats, calendario |
-| Notificaciones | ✅ | Bandeja + campana en tiempo real (SSE) |
-| Empleados | ✅ | Crear, consultar, editar (modal), eliminar, stats |
-| Beneficiarios | ✅ | Crear, consultar, editar (modal), eliminar, stats |
-| Permisos | ✅ | Matriz rol × módulo × permiso |
-| Configuración | ✅ | Crear/consultar los catálogos del sistema |
-| Bitácora | ✅ | Auditoría con filtros y exportación |
-| Respaldo BD | ✅ | Descarga `.sql` de negocio o seguridad |
-| Módulos de negocio | 🔜 | Citas, Psicología, Medicina, Inventario, Reportes… |
-
----
-
-## 🔐 Seguridad
-
-- **Contraseñas**: nunca viajan ni se guardan en texto plano.
-  `RSA (cliente) → OpenSSL (servidor) → bcrypt (BD)`.
-- **Inyección SQL**: 100 % de consultas con **sentencias preparadas** (PDO).
-- **XSS**: escapado de salida con `htmlspecialchars()`.
-- **CSRF/mitigación**: cookies `HttpOnly` + `SameSite=Lax`.
-- **JWT** firmado con **RS256** (solo el servidor firma).
-- **Rate limiting** por *Token Bucket* y **bloqueo por intentos fallidos**.
-- **RBAC** verificado en el servidor (no se confía en ocultar botones).
-- **Auditoría** de todas las operaciones de escritura.
-
-El detalle completo está en [`GUIA-BACKEND-FRONTEND.md`](GUIA-BACKEND-FRONTEND.md).
+| Módulo | ID | Estado | Descripción Funcional |
+|---|:---:|:---:|---|
+| **Gestionar Empleados** | 1 | ✅ | Administra personal médico, docente, técnico y administrativo, roles y accesos. |
+| **Gestionar Beneficiarios** | 2 | ✅ | Expedientes de estudiantes de la UPTAEB por PNF, trayecto, sección y contacto. |
+| **Gestionar Citas** | 3 | ✅ | Agenda de Psicología y atención clínica contra horarios de disponibilidad. |
+| **Diagnósticos de Psicología** | 4 | ✅ | Evaluaciones clínicas, seguimiento psicológico y constancias en PDF. |
+| **Diagnósticos de Medicina** | 5 | ✅ | Consultas médicas primarias y descuento automático de medicamentos con `FOR UPDATE`. |
+| **Diagnósticos de Orientación** | 6 | ✅ | Asistencia socioeducativa, vocacional, motivos y recomendaciones institucionales. |
+| **Diagnósticos de Trabajo Social**| 7 | ✅ | Hub de 4 sub-flujos (becas, exoneraciones, FAMES, embarazadas) + Estudio Socioeconómico FPDF. |
+| **Diagnósticos de Discapacidad** | 8 | ✅ | Expediente de atención a personas con diversidad funcional y habilidades. |
+| **Gestionar Inventario Médico** | 9 | ✅ | Kardex transaccional de medicamentos, entradas, salidas justificadas y vencimiento. |
+| **Gestionar Referencias** | 10 | ✅ | Remisión interdepartamental entre áreas de salud con historial de transiciones. |
+| **Gestionar Jornadas Médicas** | 11 | ✅ | Eventos masivos de salud, control de aforo pesimista `FOR UPDATE` y consumo de insumos. |
+| **Gestionar Mobiliario y Equipos**| 12 | ✅ | Hub de 3 pestañas (bienes muebles, equipos con serial único y Fichas Técnicas responsables). |
+| **Gestionar Transporte** | 13 | ✅ | Control de flota vehicular, rutas universitarias, choferes (`id_tipo_emp=8`) y repuestos. |
+| **Configuraciones del Sistema** | 14 | ✅ | Administración centralizada de catálogos y parámetros globales. |
+| **Reportes Estadísticos** | 15 | ✅ | 10 tableros estadísticos con filtrado server-side, Chart.js local v2.9.4 y consumo IA. |
+| **Auditoría / Bitácora** | 16 | ✅ | Registro inmutable de trazabilidad forense por IP, usuario y catálogo de acciones. |
+| **Matriz de Permisos (RBAC)** | 17 | ✅ | Matriz dinámica de permisos atómicos (`crear`, `leer`, `editar`, `eliminar`) por rol. |
+| **Gestionar Horarios** | 18 | ✅ | Administración exclusiva de turnos y agendas por especialista de salud. |
 
 ---
 
-## 📚 Documentación
+## 🔐 Marco de Seguridad Defensiva
 
-| Documento | Contenido |
-|---|---|
-| [`GUIA-MODULOS.md`](GUIA-MODULOS.md) | **Cómo crear un módulo nuevo**, paso a paso |
-| [`GUIA-BACKEND-FRONTEND.md`](GUIA-BACKEND-FRONTEND.md) | Explicación completa de backend y frontend, con conceptos y estándares |
-| [`GUIA_ARQUITECTURA_API.md`](GUIA_ARQUITECTURA_API.md) | Arquitectura de la API |
-| [`docs/bd/`](docs/bd/) | Esquemas SQL y scripts incrementales |
-| [`AGENTS.md`](AGENTS.md) | Contexto técnico del repositorio (reglas y convenciones) |
+DIRPOLES-4 cumple estrictamente con el estándar **OWASP ASVS v4.0.3**:
 
----
-
-## 🛠 Solución de problemas
-
-| Síntoma | Causa probable | Solución |
-|---|---|---|
-| `404 Not Found` | Apache no encuentra el proyecto | Configura el *Alias* / *VirtualHost* |
-| `500 Internal Server Error` | Falta una base, permisos o `vendor/` | Revisa `logs/php_errors.log` |
-| "No se pudo procesar la contraseña" | Apache no lee la llave privada | `chmod 644 app/Config/Keys/login_private.pem` |
-| `Unknown database 'dirpoles_…'` | Bases no importadas | Importa los SQL de `docs/bd/` |
-| `Class "App\Models\…" not found` | `vendor/` ausente | `composer install` |
-| Redirección constante al login | Cookie JWT no se guarda | Revisa `APP_URL`/dominio y `SameSite` |
-| Página en blanco | Error fatal | Revisa `logs/php_errors.log` |
-| "Cuenta bloqueada" | 3 intentos fallidos | Reactiva con `UPDATE empleado SET estatus=1 …` |
-| "Límite de peticiones excedido" | Rate limit (429) | Espera lo indicado en `Retry-After` |
+- **Cifrado Híbrido en Tránsito y Reposo:** RSA-2048 en navegador + Bcrypt en servidor.
+- **Inmunidad a Inyecciones SQL:** 100% de consultas preparadas PDO con tipado explícito (`PARAM_INT`, `PARAM_STR`).
+- **Inmunidad a XSS:** Sanitización fail-fast en modelo (`__set()`) + escape contextual en vistas (`htmlspecialchars()`).
+- **Seguridad en Cookies y JWT:** Firma RS256, cookies `HttpOnly`, `SameSite=Lax` y rotación de Refresh Token.
+- **Protección contra BOLA / IDOR:** Métodos de autorización a nivel de fila (`asegurarAlcance()`) en controladores y modelos.
 
 ---
 
-## 📄 Licencia
+## 📚 Documentación Técnica
 
-Proyecto **académico** desarrollado para la **UPTAEB** (Universidad Politécnica
-Territorial de los Altos Llanos Occidentales "José Antonio Anzoátegui").
-Software de uso educativo; consulta con el autor antes de reutilizarlo.
+Toda la arquitectura, especificaciones de base de datos, lógica de los 18 módulos y argumentos para la defensa de grado se encuentran detallados en:
+
+* **[Manual Técnico Maestro de DIRPOLES-4](docs/MANUAL_TECNICO_DIRPOLES4.md):** Documento oficial consolidado (Capítulos 1 al 6, Glosario y Estándares ISO/OWASP).
+* **[Guía de Construcción de Módulos](GUIA-MODULOS.md):** Guía paso a paso para la incorporación de nuevas funcionalidades.
+* **[Reglas de Desarrollo para IA / Agentes](AGENTS.md):** Estándares y convenciones de código del repositorio.
+
+---
+
+## 📄 Licencia y Propiedad Intelectual
+
+**Licencia Institucional / Académica**
+
+El sistema **DIRPOLES-4** es un desarrollo tecnológico y académico original diseñado para la **Dirección de Políticas Estudiantiles (DIRPOLES)** de la **Universidad Politécnica Territorial del Estado Lara "Andrés Eloy Blanco" (UPTAEB)**, Barquisimeto, Estado Lara, Venezuela.
+
+Desarrollado como **Trabajo Especial de Grado / Proyecto Socio-Integrador y Tecnológico (PSIT)** para la obtención del título de **Ingeniero(a) en Informática** en el Programa Nacional de Formación (PNF) en Informática (Trayecto IV).
+
+* **Institución Beneficiaria:** Universidad Politécnica Territorial del Estado Lara "Andrés Eloy Blanco" (UPTAEB).
+* **Todos los derechos reservados © UPTAEB — DIRPOLES.**
+* **Uso exclusivo institucional y académico.** Queda prohibida la comercialización o distribución sin la debida autorización de las autoridades institucionales y autores del proyecto.
 
 ---
 
 <div align="center">
 
-**DIRPOLES-4** · Dirección de Políticas Estudiantiles · UPTAEB
-
-Hecho con PHP, mucho café y buenas prácticas ☕
+**DIRPOLES-4** · Dirección de Políticas Estudiantiles · UPTAEB  
+Barquisimeto, Venezuela  
 
 </div>

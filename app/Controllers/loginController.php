@@ -76,6 +76,8 @@ function iniciar_sesion()
     Bitacora::registrar('Login', 'Inicio de sesión', "El empleado {$_SESSION['nombre']} ha iniciado sesión.");
 
     // --- JWT + refresh token en cookies HttpOnly ---
+    $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
+
     $jwtHandler = new JwtHandler();
     $jwtHandler->__set('data', [
         'id_empleado'      => $_SESSION['id_empleado'],
@@ -91,6 +93,7 @@ function iniciar_sesion()
     setcookie('jwt_token', $jwtResult['token'], [
         'expires'  => $jwtResult['expiracion'],
         'path'     => '/',
+        'secure'   => $cookieSecure,
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -101,6 +104,7 @@ function iniciar_sesion()
         setcookie('refresh_token', $refreshResult['token'], [
             'expires'  => $refreshResult['expiracion'],
             'path'     => '/',
+            'secure'   => $cookieSecure,
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
@@ -119,6 +123,8 @@ function cerrar_sesion()
         session_start();
     }
 
+    $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
+
     // Auditoría ANTES de destruir la sesión (Bitacora lee id_empleado de $_SESSION).
     if (isset($_SESSION['id_empleado'])) {
         $nombre = $_SESSION['nombre'] ?? 'Usuario desconocido';
@@ -132,7 +138,7 @@ function cerrar_sesion()
     // Eliminar cookie de sesión
     if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 86400, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+        setcookie(session_name(), '', time() - 86400, $params['path'], $params['domain'], $cookieSecure, $params['httponly']);
     }
 
     // Revocar el refresh token en BD (JwtHandler nunca lanza) y limpiar cookies
@@ -141,8 +147,20 @@ function cerrar_sesion()
         $jwtHandler->__set('refresh_token', $_COOKIE['refresh_token']);
         $jwtHandler->manejarAccion('revocar_refresh');
     }
-    setcookie('jwt_token', '', time() - 3600, '/');
-    setcookie('refresh_token', '', time() - 3600, '/');
+    setcookie('jwt_token', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'secure'   => $cookieSecure,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    setcookie('refresh_token', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'secure'   => $cookieSecure,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
 
     // Redirigir (puerta HTML)
     header('Location: ' . BASE_URL . 'login?logout=true');
@@ -156,6 +174,8 @@ function refresh_token()
     if (!$refreshToken) {
         throw new ExcepcionApi(ErrorCodes::TOKEN_FALTANTE, 401, 'No hay refresh token.');
     }
+
+    $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
 
     $jwtHandler = new JwtHandler();
     $jwtHandler->__set('refresh_token', $refreshToken);
@@ -172,6 +192,7 @@ function refresh_token()
     setcookie('jwt_token', $resultado['token'], [
         'expires'  => $resultado['expiracion'],
         'path'     => '/',
+        'secure'   => $cookieSecure,
         'httponly' => true,
         'samesite' => 'Lax',
     ]);
@@ -181,6 +202,7 @@ function refresh_token()
         setcookie('refresh_token', $resultado['refresh_token'], [
             'expires'  => $resultado['refresh_expiracion'],
             'path'     => '/',
+            'secure'   => $cookieSecure,
             'httponly' => true,
             'samesite' => 'Lax',
         ]);

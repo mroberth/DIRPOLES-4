@@ -665,9 +665,7 @@ porque validan contra otro módulo); AGREGA AHÍ tu módulo nuevo al crearlo.
   `SessionAuthMiddleware` (id_empleado sesión vs payload JWT). Refresh tokens
   en BD (`refresh_tokens`) con **rotación one-time use**: `renovar_jwt` revoca
   el token usado y emite uno nuevo en la misma transacción; revocados en logout.
-  - **Deuda vigente (verificada 2026-09-14)**: el refresh token se guarda en
-    texto plano en `refresh_tokens`; lo ideal es hashearlo (SHA-256) como una
-    contraseña. No ha sido resuelta aún.
+  - **Deuda resuelta (2026-10-01)**: el refresh token se almacena mediante su hash SHA-256 (`hash('sha256', $token)`) en `refresh_tokens`, entregando únicamente la cadena aleatoria original en texto plano al cliente en la cookie HttpOnly.
 - `session.gc_maxlifetime` se fija en `index.php` al máximo entre
   `JWT_EXPIRATION` y `REFRESH_EXPIRATION`, para que la sesión no muera antes
   que el JWT (el refresh depende de la sesión).

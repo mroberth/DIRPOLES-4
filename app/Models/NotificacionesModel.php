@@ -103,6 +103,7 @@ class NotificacionesModel extends SecurityModel
                         n.titulo,
                         n.url,
                         n.tipo,
+                        n.fecha_creacion,
                         ne.leido,
                         CONCAT(e.nombre, ' ', e.apellido) AS nombre_empleado,
                         TIMESTAMPDIFF(MINUTE, n.fecha_creacion, NOW()) AS time_ago

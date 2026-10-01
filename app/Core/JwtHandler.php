@@ -128,6 +128,9 @@ class JwtHandler
     /**
      * Genera un refresh token y lo almacena en la BD
      */
+    /**
+     * Genera un refresh token y almacena únicamente su hash SHA-256 en la BD.
+     */
     private function generarRefreshToken()
     {
         try {
@@ -136,11 +139,12 @@ class JwtHandler
                 throw new Exception("id_empleado es requerido para generar refresh token.");
             }
 
-            // Generar token aleatorio seguro
+            // Generar token aleatorio seguro (cadena original para la cookie)
             $token = bin2hex(random_bytes(64));
+            $tokenHash = hash('sha256', $token);
             $expiresAt = date('Y-m-d H:i:s', time() + (int) env('REFRESH_EXPIRATION', '2592000'));
 
-            // Almacenar en BD
+            // Almacenar únicamente el HASH en BD
             $pdo = $this->getSecurityConnection();
             $stmt = $pdo->prepare(
                 "INSERT INTO refresh_tokens (id_empleado, token, expires_at) 
@@ -148,13 +152,13 @@ class JwtHandler
             );
             $stmt->execute([
                 ':id_empleado' => $id_empleado,
-                ':token' => $token,
-                ':expires_at' => $expiresAt
+                ':token'       => $tokenHash,
+                ':expires_at'  => $expiresAt
             ]);
 
             return [
                 'estado' => 'exito',
-                'token' => $token,
+                'token'  => $token,
                 'expiracion' => time() + (int) env('REFRESH_EXPIRATION', '2592000')
             ];
         } catch (Throwable $e) {
@@ -167,7 +171,7 @@ class JwtHandler
     }
 
     /**
-     * Renueva el JWT usando un refresh token válido.
+     * Renueva el JWT usando un refresh token válido (verificado mediante su hash SHA-256).
      *
      * ROTACIÓN (one-time use): el refresh token recibido se marca como
      * revocado y se emite uno NUEVO en la misma transacción. Así, si un
@@ -185,6 +189,8 @@ class JwtHandler
                 return ['estado' => 'error', 'mensaje' => 'Refresh token no proporcionado'];
             }
 
+            $tokenHash = hash('sha256', $refreshToken);
+
             $pdo = $this->getSecurityConnection();
             $pdo->beginTransaction();
 
@@ -194,7 +200,7 @@ class JwtHandler
                  WHERE token = :token AND revoked = 0 AND expires_at > NOW()
                  FOR UPDATE"
             );
-            $stmt->execute([':token' => $refreshToken]);
+            $stmt->execute([':token' => $tokenHash]);
             $record = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$record) {
@@ -208,8 +214,9 @@ class JwtHandler
             );
             $stmt->execute([':id' => $record['id']]);
 
-            // 2. Emitir un refresh token NUEVO.
+            // 2. Emitir un refresh token NUEVO (persistir solo su hash).
             $nuevoRefreshToken = bin2hex(random_bytes(64));
+            $nuevoTokenHash = hash('sha256', $nuevoRefreshToken);
             $nuevaExpiracion = time() + (int) env('REFRESH_EXPIRATION', '2592000');
 
             $stmt = $pdo->prepare(
@@ -218,7 +225,7 @@ class JwtHandler
             );
             $stmt->execute([
                 ':id_empleado' => $record['id_empleado'],
-                ':token'       => $nuevoRefreshToken,
+                ':token'       => $nuevoTokenHash,
                 ':expires_at'  => date('Y-m-d H:i:s', $nuevaExpiracion)
             ]);
 
@@ -256,7 +263,7 @@ class JwtHandler
     }
 
     /**
-     * Revoca un refresh token (lo marca como usado)
+     * Revoca un refresh token buscando por su hash SHA-256
      */
     private function revocarRefreshToken()
     {
@@ -266,11 +273,13 @@ class JwtHandler
                 return ['estado' => 'error', 'mensaje' => 'Token no proporcionado'];
             }
 
+            $tokenHash = hash('sha256', $token);
+
             $pdo = $this->getSecurityConnection();
             $stmt = $pdo->prepare(
                 "UPDATE refresh_tokens SET revoked = 1 WHERE token = :token"
             );
-            $stmt->execute([':token' => $token]);
+            $stmt->execute([':token' => $tokenHash]);
 
             return ['estado' => 'exito', 'mensaje' => 'Refresh token revocado'];
         } catch (Throwable $e) {

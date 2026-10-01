@@ -554,20 +554,28 @@ class TransporteModel extends BusinessModel
             throw ExcepcionApi::yaExiste("Ya existe un vehículo registrado con la placa '{$placa}'.");
         }
 
-        $stmt = $this->conn->prepare("
-            INSERT INTO vehiculos (placa, modelo, tipo, fecha_adquisicion, estado)
-            VALUES (:placa, :modelo, :tipo, :fecha, :estado)
-        ");
-        $stmt->execute([
-            ':placa'  => $placa,
-            ':modelo' => $this->__get('modelo') ?: null,
-            ':tipo'   => $this->__get('tipo_vehiculo') ?? 'Autobús',
-            ':fecha'  => $this->__get('fecha_adquisicion') ?: null,
-            ':estado' => $this->__get('estado_vehiculo') ?? 'Activo',
-        ]);
+        try {
+            $stmt = $this->conn->prepare("
+                INSERT INTO vehiculos (placa, modelo, tipo, fecha_adquisicion, estado)
+                VALUES (:placa, :modelo, :tipo, :fecha, :estado)
+            ");
+            $stmt->execute([
+                ':placa'  => $placa,
+                ':modelo' => $this->__get('modelo') ?: null,
+                ':tipo'   => $this->__get('tipo_vehiculo') ?? 'Autobús',
+                ':fecha'  => $this->__get('fecha_adquisicion') ?: null,
+                ':estado' => $this->__get('estado_vehiculo') ?? 'Activo',
+            ]);
 
-        $id = (int) $this->conn->lastInsertId();
-        return $this->obtenerVehiculoPorId($id);
+            $id = (int) $this->conn->lastInsertId();
+            return $this->obtenerVehiculoPorId($id);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw ExcepcionApi::yaExiste("Ya existe un vehículo registrado con la placa '{$placa}'.");
+            }
+            error_log('TransporteModel::crearVehiculo - ' . $e->getMessage());
+            throw ExcepcionApi::errorInterno('No se pudo registrar el vehículo.');
+        }
     }
 
     private function obtenerVehiculo(): array
@@ -597,25 +605,33 @@ class TransporteModel extends BusinessModel
             throw ExcepcionApi::yaExiste("Ya existe otro vehículo registrado con la placa '{$placa}'.");
         }
 
-        $stmt = $this->conn->prepare("
-            UPDATE vehiculos SET
-                placa = :placa,
-                modelo = :modelo,
-                tipo = :tipo,
-                fecha_adquisicion = :fecha,
-                estado = :estado
-            WHERE id_vehiculo = :id
-        ");
-        $stmt->execute([
-            ':placa'  => $placa,
-            ':modelo' => $this->__get('modelo') ?: null,
-            ':tipo'   => $this->__get('tipo_vehiculo') ?? 'Autobús',
-            ':fecha'  => $this->__get('fecha_adquisicion') ?: null,
-            ':estado' => $this->__get('estado_vehiculo') ?? 'Activo',
-            ':id'     => $id,
-        ]);
+        try {
+            $stmt = $this->conn->prepare("
+                UPDATE vehiculos SET
+                    placa = :placa,
+                    modelo = :modelo,
+                    tipo = :tipo,
+                    fecha_adquisicion = :fecha,
+                    estado = :estado
+                WHERE id_vehiculo = :id
+            ");
+            $stmt->execute([
+                ':placa'  => $placa,
+                ':modelo' => $this->__get('modelo') ?: null,
+                ':tipo'   => $this->__get('tipo_vehiculo') ?? 'Autobús',
+                ':fecha'  => $this->__get('fecha_adquisicion') ?: null,
+                ':estado' => $this->__get('estado_vehiculo') ?? 'Activo',
+                ':id'     => $id,
+            ]);
 
-        return $this->obtenerVehiculoPorId($id);
+            return $this->obtenerVehiculoPorId($id);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw ExcepcionApi::yaExiste("Ya existe otro vehículo registrado con la placa '{$placa}'.");
+            }
+            error_log('TransporteModel::actualizarVehiculo - ' . $e->getMessage());
+            throw ExcepcionApi::errorInterno('No se pudo actualizar el vehículo.');
+        }
     }
 
     private function eliminarVehiculo(): array
@@ -705,22 +721,30 @@ class TransporteModel extends BusinessModel
             throw ExcepcionApi::yaExiste("El teléfono '{$tel}' ya está registrado en el sistema.");
         }
 
-        $stmt = $this->conn->prepare("
-            INSERT INTO proveedores (tipo_documento, num_documento, nombre, telefono, correo, direccion, estatus)
-            VALUES (:tipo, :num, :nombre, :tel, :correo, :dir, :estatus)
-        ");
-        $stmt->execute([
-            ':tipo'    => $tipoDoc,
-            ':num'     => $numDoc,
-            ':nombre'  => $this->__get('nombre_proveedor'),
-            ':tel'     => $tel,
-            ':correo'  => $correo,
-            ':dir'     => $this->__get('direccion_proveedor'),
-            ':estatus' => $this->__get('estatus_proveedor') ?? 'Activo',
-        ]);
+        try {
+            $stmt = $this->conn->prepare("
+                INSERT INTO proveedores (tipo_documento, num_documento, nombre, telefono, correo, direccion, estatus)
+                VALUES (:tipo, :num, :nombre, :tel, :correo, :dir, :estatus)
+            ");
+            $stmt->execute([
+                ':tipo'    => $tipoDoc,
+                ':num'     => $numDoc,
+                ':nombre'  => $this->__get('nombre_proveedor'),
+                ':tel'     => $tel,
+                ':correo'  => $correo,
+                ':dir'     => $this->__get('direccion_proveedor'),
+                ':estatus' => $this->__get('estatus_proveedor') ?? 'Activo',
+            ]);
 
-        $id = (int) $this->conn->lastInsertId();
-        return $this->obtenerProveedorPorId($id);
+            $id = (int) $this->conn->lastInsertId();
+            return $this->obtenerProveedorPorId($id);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw ExcepcionApi::yaExiste("El proveedor ya se encuentra registrado (documento, correo o teléfono duplicado).");
+            }
+            error_log('TransporteModel::crearProveedor - ' . $e->getMessage());
+            throw ExcepcionApi::errorInterno('No se pudo registrar el proveedor.');
+        }
     }
 
     private function obtenerProveedor(): array
@@ -762,29 +786,37 @@ class TransporteModel extends BusinessModel
             throw ExcepcionApi::yaExiste("El teléfono '{$tel}' ya está registrado en el sistema.");
         }
 
-        $stmt = $this->conn->prepare("
-            UPDATE proveedores SET
-                tipo_documento = :tipo,
-                num_documento = :num,
-                nombre = :nombre,
-                telefono = :tel,
-                correo = :correo,
-                direccion = :dir,
-                estatus = :estatus
-            WHERE id_proveedor = :id
-        ");
-        $stmt->execute([
-            ':tipo'    => $tipoDoc,
-            ':num'     => $numDoc,
-            ':nombre'  => $this->__get('nombre_proveedor'),
-            ':tel'     => $tel,
-            ':correo'  => $correo,
-            ':dir'     => $this->__get('direccion_proveedor'),
-            ':estatus' => $this->__get('estatus_proveedor') ?? 'Activo',
-            ':id'      => $id,
-        ]);
+        try {
+            $stmt = $this->conn->prepare("
+                UPDATE proveedores SET
+                    tipo_documento = :tipo,
+                    num_documento = :num,
+                    nombre = :nombre,
+                    telefono = :tel,
+                    correo = :correo,
+                    direccion = :dir,
+                    estatus = :estatus
+                WHERE id_proveedor = :id
+            ");
+            $stmt->execute([
+                ':tipo'    => $tipoDoc,
+                ':num'     => $numDoc,
+                ':nombre'  => $this->__get('nombre_proveedor'),
+                ':tel'     => $tel,
+                ':correo'  => $correo,
+                ':dir'     => $this->__get('direccion_proveedor'),
+                ':estatus' => $this->__get('estatus_proveedor') ?? 'Activo',
+                ':id'      => $id,
+            ]);
 
-        return $this->obtenerProveedorPorId($id);
+            return $this->obtenerProveedorPorId($id);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw ExcepcionApi::yaExiste("El proveedor ya se encuentra registrado (documento, correo o teléfono duplicado).");
+            }
+            error_log('TransporteModel::actualizarProveedor - ' . $e->getMessage());
+            throw ExcepcionApi::errorInterno('No se pudo actualizar el proveedor.');
+        }
     }
 
     private function eliminarProveedor(): array
@@ -925,27 +957,35 @@ class TransporteModel extends BusinessModel
         $nombre = $this->__get('nombre_repuesto');
         $provId = (int) ($this->__get('id_proveedor') ?? 0);
 
-        $stmt = $this->conn->prepare("
-            INSERT INTO repuestos_vehiculos (nombre, descripcion, cantidad, id_proveedor, fecha_creacion, estatus)
-            VALUES (:nombre, :desc, 0, :prov, CURRENT_DATE(), 'Agotado')
-        ");
-        $stmt->execute([
-            ':nombre' => $nombre,
-            ':desc'   => $this->__get('descripcion_repuesto') ?: null,
-            ':prov'   => $provId > 0 ? $provId : null,
-        ]);
+        try {
+            $stmt = $this->conn->prepare("
+                INSERT INTO repuestos_vehiculos (nombre, descripcion, cantidad, id_proveedor, fecha_creacion, estatus)
+                VALUES (:nombre, :desc, 0, :prov, CURRENT_DATE(), 'Agotado')
+            ");
+            $stmt->execute([
+                ':nombre' => $nombre,
+                ':desc'   => $this->__get('descripcion_repuesto') ?: null,
+                ':prov'   => $provId > 0 ? $provId : null,
+            ]);
 
-        $id = (int) $this->conn->lastInsertId();
+            $id = (int) $this->conn->lastInsertId();
 
-        // Registrar en Kardex
-        $idEmp = $this->idEmpleadoSesion();
-        $stmtK = $this->conn->prepare("
-            INSERT INTO inventario_repuestos (id_repuesto, id_empleado, cantidad, tipo_movimiento, razon_movimiento)
-            VALUES (:id, :emp, '0', 'Registro', 'Alta inicial de repuesto')
-        ");
-        $stmtK->execute([':id' => $id, ':emp' => $idEmp]);
+            // Registrar en Kardex
+            $idEmp = $this->idEmpleadoSesion();
+            $stmtK = $this->conn->prepare("
+                INSERT INTO inventario_repuestos (id_repuesto, id_empleado, cantidad, tipo_movimiento, razon_movimiento)
+                VALUES (:id, :emp, '0', 'Registro', 'Alta inicial de repuesto')
+            ");
+            $stmtK->execute([':id' => $id, ':emp' => $idEmp]);
 
-        return $this->obtenerRepuestoPorId($id);
+            return $this->obtenerRepuestoPorId($id);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw ExcepcionApi::yaExiste("El repuesto ya existe en el sistema.");
+            }
+            error_log('TransporteModel::crearRepuesto - ' . $e->getMessage());
+            throw ExcepcionApi::errorInterno('No se pudo registrar el repuesto.');
+        }
     }
 
     private function obtenerRepuesto(): array
@@ -977,21 +1017,29 @@ class TransporteModel extends BusinessModel
 
         $provId = (int) ($this->__get('id_proveedor') ?? 0);
 
-        $stmt = $this->conn->prepare("
-            UPDATE repuestos_vehiculos SET
-                nombre = :nombre,
-                descripcion = :desc,
-                id_proveedor = :prov
-            WHERE id_repuesto = :id
-        ");
-        $stmt->execute([
-            ':nombre' => $this->__get('nombre_repuesto'),
-            ':desc'   => $this->__get('descripcion_repuesto') ?: null,
-            ':prov'   => $provId > 0 ? $provId : null,
-            ':id'     => $id,
-        ]);
+        try {
+            $stmt = $this->conn->prepare("
+                UPDATE repuestos_vehiculos SET
+                    nombre = :nombre,
+                    descripcion = :desc,
+                    id_proveedor = :prov
+                WHERE id_repuesto = :id
+            ");
+            $stmt->execute([
+                ':nombre' => $this->__get('nombre_repuesto'),
+                ':desc'   => $this->__get('descripcion_repuesto') ?: null,
+                ':prov'   => $provId > 0 ? $provId : null,
+                ':id'     => $id,
+            ]);
 
-        return $this->obtenerRepuestoPorId($id);
+            return $this->obtenerRepuestoPorId($id);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw ExcepcionApi::yaExiste("El repuesto ya existe en el sistema.");
+            }
+            error_log('TransporteModel::actualizarRepuesto - ' . $e->getMessage());
+            throw ExcepcionApi::errorInterno('No se pudo actualizar el repuesto.');
+        }
     }
 
     private function eliminarRepuesto(): array

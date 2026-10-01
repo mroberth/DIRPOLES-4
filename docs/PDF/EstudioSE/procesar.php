@@ -57,15 +57,29 @@ class GenerarPDF
         if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] == 0) {
             $extension = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
             $extensionesPermitidas = ['jpg', 'jpeg', 'png', 'gif'];
-        
-            if (in_array($extension, $extensionesPermitidas)) {
-                $ruta_temporal = $_FILES['imagen']['tmp_name'];
+            $mimesPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
+
+            $ruta_temporal = $_FILES['imagen']['tmp_name'];
+            $mimeActual = false;
+
+            if (function_exists('finfo_open')) {
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                if ($finfo !== false) {
+                    $mimeActual = finfo_file($finfo, $ruta_temporal);
+                    finfo_close($finfo);
+                }
+            } elseif (function_exists('mime_content_type')) {
+                $mimeActual = mime_content_type($ruta_temporal);
+            }
+
+            if (in_array($extension, $extensionesPermitidas, true) &&
+                ($mimeActual === false || in_array($mimeActual, $mimesPermitidos, true))) {
                 fixImageOrientation($ruta_temporal, $extension);
             } else {
                 // Las dos puertas: nunca redirigir desde una API. El error
                 // lo convierte el handler global en el contrato JSON.
                 throw \App\Core\ExcepcionApi::validacion(
-                    'Tipo de archivo no permitido para la imagen del Estudio Socioeconómico. Solo se permiten JPG, JPEG, GIF y PNG.'
+                    'Tipo de archivo no permitido para la imagen del Estudio Socioeconómico. Solo se permiten archivos de imagen válidos (JPG, JPEG, GIF y PNG).'
                 );
             }
         }

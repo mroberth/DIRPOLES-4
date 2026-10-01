@@ -252,6 +252,29 @@ class ReportesModel extends BusinessModel
         return [date('Y-m-01'), date('Y-m-t')];
     }
 
+    private function esAdmin(): bool
+    {
+        $tipo = $_SESSION['tipo_empleado'] ?? '';
+        return strpos(strtolower($tipo), 'administrador') !== false
+            || strpos(strtolower($tipo), 'superusuario') !== false;
+    }
+
+    private function idEmpleadoSesion(): int
+    {
+        return (int) ($_SESSION['id_empleado'] ?? 0);
+    }
+
+    /**
+     * Aplica el alcance confidencial por empleado si el usuario no es Admin/Superusuario.
+     */
+    private function filtroEmpleado(array &$where, array &$params, string $columna = 'ss.id_empleado'): void
+    {
+        if (!$this->esAdmin()) {
+            $where[] = "{$columna} = :f_id_empleado_sesion";
+            $params['f_id_empleado_sesion'] = $this->idEmpleadoSesion();
+        }
+    }
+
     // ==================== Helpers de ejecución ====================
 
     /**
@@ -398,6 +421,8 @@ class ReportesModel extends BusinessModel
             ['Psicología', 'consulta_psicologica', 'cp', 'cp.fecha_creacion'],
         ];
 
+        $filtroEmp = !$this->esAdmin() ? ' AND ss.id_empleado = ' . $this->idEmpleadoSesion() : '';
+
         $consultas = [];
         foreach ($ramas as [$area, $tabla, $alias, $fecha]) {
             $consultas[] = "
@@ -415,7 +440,7 @@ class ReportesModel extends BusinessModel
                 JOIN solicitud_de_servicio ss ON {$alias}.id_solicitud_serv = ss.id_solicitud_serv
                 JOIN beneficiario b ON ss.id_beneficiario = b.id_beneficiario
                 LEFT JOIN pnf ON b.id_pnf = pnf.id_pnf
-                WHERE {$fecha} IS NOT NULL";
+                WHERE {$fecha} IS NOT NULL{$filtroEmp}";
         }
 
         return implode(' UNION ALL ', $consultas);
@@ -446,6 +471,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($where, $params, 'cm.fecha_creacion');
         $this->filtro($where, $params, 'genero', 'b.genero');
         $this->filtro($where, $params, 'pnf', 'b.id_pnf');
+        $this->filtroEmpleado($where, $params, 'ss.id_empleado');
 
         $sql = "SELECT
                     cm.id_consulta_med,
@@ -503,6 +529,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($whereMorb, $paramsMorb, 'cp.fecha_creacion');
         $this->filtro($whereMorb, $paramsMorb, 'pnf', 'b.id_pnf');
         $this->filtro($whereMorb, $paramsMorb, 'tipo_consulta', 'cp.tipo_consulta');
+        $this->filtroEmpleado($whereMorb, $paramsMorb, 'ss.id_empleado');
 
         $sqlMorb = "SELECT
                     cp.id_psicologia,
@@ -528,6 +555,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($whereCitas, $paramsCitas, 'c.fecha');
         $this->filtro($whereCitas, $paramsCitas, 'pnf', 'b.id_pnf');
         $this->filtro($whereCitas, $paramsCitas, 'estado', 'ec.nombre');
+        $this->filtroEmpleado($whereCitas, $paramsCitas, 'c.id_empleado');
 
         $sqlCitas = "SELECT
                     c.id_cita,
@@ -564,6 +592,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($where, $params, 'o.fecha_creacion');
         $this->filtro($where, $params, 'genero', 'b.genero');
         $this->filtro($where, $params, 'pnf', 'b.id_pnf');
+        $this->filtroEmpleado($where, $params, 'ss.id_empleado');
 
         $sql = "SELECT
                     o.id_orientacion,
@@ -595,6 +624,7 @@ class ReportesModel extends BusinessModel
      */
     private function subqueryTrabajoSocial(): string
     {
+        $filtroEmp = !$this->esAdmin() ? ' AND ss.id_empleado = ' . $this->idEmpleadoSesion() : '';
         return "
             SELECT
                 'Becas' AS submodulo,
@@ -608,6 +638,7 @@ class ReportesModel extends BusinessModel
             JOIN solicitud_de_servicio ss ON bec.id_solicitud_serv = ss.id_solicitud_serv
             JOIN beneficiario b ON ss.id_beneficiario = b.id_beneficiario
             LEFT JOIN pnf ON b.id_pnf = pnf.id_pnf
+            WHERE 1=1{$filtroEmp}
 
             UNION ALL
 
@@ -623,6 +654,7 @@ class ReportesModel extends BusinessModel
             JOIN solicitud_de_servicio ss ON exo.id_solicitud_serv = ss.id_solicitud_serv
             JOIN beneficiario b ON ss.id_beneficiario = b.id_beneficiario
             LEFT JOIN pnf ON b.id_pnf = pnf.id_pnf
+            WHERE 1=1{$filtroEmp}
 
             UNION ALL
 
@@ -638,6 +670,7 @@ class ReportesModel extends BusinessModel
             JOIN solicitud_de_servicio ss ON fam.id_solicitud_serv = ss.id_solicitud_serv
             JOIN beneficiario b ON ss.id_beneficiario = b.id_beneficiario
             LEFT JOIN pnf ON b.id_pnf = pnf.id_pnf
+            WHERE 1=1{$filtroEmp}
 
             UNION ALL
 
@@ -652,7 +685,8 @@ class ReportesModel extends BusinessModel
             FROM gestion_emb emb
             JOIN solicitud_de_servicio ss ON emb.id_solicitud_serv = ss.id_solicitud_serv
             JOIN beneficiario b ON ss.id_beneficiario = b.id_beneficiario
-            LEFT JOIN pnf ON b.id_pnf = pnf.id_pnf";
+            LEFT JOIN pnf ON b.id_pnf = pnf.id_pnf
+            WHERE 1=1{$filtroEmp}";
     }
 
     private function getReportDataTrabajoSocial(): array
@@ -681,6 +715,7 @@ class ReportesModel extends BusinessModel
         $this->filtro($where, $params, 'pnf', 'b.id_pnf');
         $this->filtro($where, $params, 'tipo_discapacidad', 'd.tipo_discapacidad');
         $this->filtro($where, $params, 'grado', 'd.grado');
+        $this->filtroEmpleado($where, $params, 'ss.id_empleado');
 
         $sql = "SELECT
                     d.id_discapacidad,
@@ -998,6 +1033,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($where, $params, 'cm.fecha_creacion');
         $this->filtro($where, $params, 'genero', 'b.genero');
         $this->filtro($where, $params, 'pnf', 'b.id_pnf');
+        $this->filtroEmpleado($where, $params, 'ss.id_empleado');
 
         $from = " FROM consulta_medica cm
                  JOIN solicitud_de_servicio ss ON cm.id_solicitud_serv = ss.id_solicitud_serv
@@ -1012,6 +1048,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($whereMes, $paramsMes, 'cm.fecha_creacion', $mesIni, $mesFin);
         $this->filtro($whereMes, $paramsMes, 'genero', 'b.genero');
         $this->filtro($whereMes, $paramsMes, 'pnf', 'b.id_pnf');
+        $this->filtroEmpleado($whereMes, $paramsMes, 'ss.id_empleado');
         $mes = $this->contar('SELECT COUNT(*)' . ' FROM consulta_medica cm
                  JOIN solicitud_de_servicio ss ON cm.id_solicitud_serv = ss.id_solicitud_serv
                  JOIN beneficiario b ON ss.id_beneficiario = b.id_beneficiario'
@@ -1049,6 +1086,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($whereMorb, $paramsMorb, 'cp.fecha_creacion');
         $this->filtro($whereMorb, $paramsMorb, 'pnf', 'b.id_pnf');
         $this->filtro($whereMorb, $paramsMorb, 'tipo_consulta', 'cp.tipo_consulta');
+        $this->filtroEmpleado($whereMorb, $paramsMorb, 'ss.id_empleado');
 
         $morbilidad = $this->contar(
             'SELECT COUNT(*) FROM consulta_psicologica cp
@@ -1063,6 +1101,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($whereCitas, $paramsCitas, 'c.fecha');
         $this->filtro($whereCitas, $paramsCitas, 'pnf', 'b.id_pnf');
         $this->filtro($whereCitas, $paramsCitas, 'estado', 'ec.nombre');
+        $this->filtroEmpleado($whereCitas, $paramsCitas, 'c.id_empleado');
 
         $fromCitas = " FROM cita c
                        JOIN beneficiario b ON c.id_beneficiario = b.id_beneficiario
@@ -1094,6 +1133,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($where, $params, 'o.fecha_creacion');
         $this->filtro($where, $params, 'genero', 'b.genero');
         $this->filtro($where, $params, 'pnf', 'b.id_pnf');
+        $this->filtroEmpleado($where, $params, 'ss.id_empleado');
 
         $from = " FROM orientacion o
                  JOIN solicitud_de_servicio ss ON o.id_solicitud_serv = ss.id_solicitud_serv
@@ -1108,6 +1148,7 @@ class ReportesModel extends BusinessModel
         $this->filtroFechas($whereMes, $paramsMes, 'o.fecha_creacion', $mesIni, $mesFin);
         $this->filtro($whereMes, $paramsMes, 'genero', 'b.genero');
         $this->filtro($whereMes, $paramsMes, 'pnf', 'b.id_pnf');
+        $this->filtroEmpleado($whereMes, $paramsMes, 'ss.id_empleado');
         $mes = $this->contar(
             'SELECT COUNT(*) FROM orientacion o
              JOIN solicitud_de_servicio ss ON o.id_solicitud_serv = ss.id_solicitud_serv
@@ -1177,6 +1218,7 @@ class ReportesModel extends BusinessModel
         $this->filtro($where, $params, 'pnf', 'b.id_pnf');
         $this->filtro($where, $params, 'tipo_discapacidad', 'd.tipo_discapacidad');
         $this->filtro($where, $params, 'grado', 'd.grado');
+        $this->filtroEmpleado($where, $params, 'ss.id_empleado');
         $clausula = $this->clausulaWhere($where);
 
         $from = " FROM discapacidad d
@@ -1194,6 +1236,7 @@ class ReportesModel extends BusinessModel
         $this->filtro($whereMes, $paramsMes, 'pnf', 'b.id_pnf');
         $this->filtro($whereMes, $paramsMes, 'tipo_discapacidad', 'd.tipo_discapacidad');
         $this->filtro($whereMes, $paramsMes, 'grado', 'd.grado');
+        $this->filtroEmpleado($whereMes, $paramsMes, 'ss.id_empleado');
         $mes = $this->contar(
             'SELECT COUNT(*) FROM discapacidad d
              JOIN solicitud_de_servicio ss ON d.id_solicitud_serv = ss.id_solicitud_serv

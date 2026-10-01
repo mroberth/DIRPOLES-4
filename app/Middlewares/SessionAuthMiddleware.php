@@ -64,7 +64,15 @@ class SessionAuthMiddleware
             unset($_SESSION['id_empleado']);
             unset($_SESSION['nombre']);
 
-            setcookie('jwt_token', '', time() - 3600, '/');
+            $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
+
+            setcookie('jwt_token', '', [
+                'expires'  => time() - 3600,
+                'path'     => '/',
+                'secure'   => $cookieSecure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
 
             self::redirigirLogin('Error de validación de seguridad (JWT). Por favor, inicie sesión de nuevo.', 'Error de Seguridad');
         }
@@ -76,7 +84,15 @@ class SessionAuthMiddleware
             unset($_SESSION['id_empleado']);
             unset($_SESSION['nombre']);
 
-            setcookie('jwt_token', '', time() - 3600, '/');
+            $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
+
+            setcookie('jwt_token', '', [
+                'expires'  => time() - 3600,
+                'path'     => '/',
+                'secure'   => $cookieSecure,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
 
             self::redirigirLogin('Se ha detectado una inconsistencia en su sesión.', 'Fallo de Integridad');
         }

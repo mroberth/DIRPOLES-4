@@ -12,6 +12,8 @@ app/Config/Keys/*.pub
 # Logs
 /logs/*.log
 
-# IDE
+# IDE y Antigravity
 /.vscode/
 /.idea/
+.antigravity/
+
