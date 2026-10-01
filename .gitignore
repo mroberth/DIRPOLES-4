@@ -16,4 +16,6 @@ app/Config/Keys/*.pub
 /.vscode/
 /.idea/
 .antigravity/
-
+# Archivos subidos
+/uploads/*
+!/uploads/.gitkeep
