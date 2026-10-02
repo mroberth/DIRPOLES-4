@@ -53,7 +53,10 @@ window.BeneficiarioEditar = (function () {
                     setValor('telefono', b.telefono);
                     setValor('genero', b.genero);
                     setValor('id_pnf', b.id_pnf);
-                    setValor('seccion', b.seccion);
+                    const partsSec = (b.seccion || '').split('-');
+                    setValor('seccion_numero', partsSec[0] || '');
+                    setValor('seccion_sede', partsSec[1] || '');
+                    setValor('seccion', b.seccion || '');
                     setValor('fecha_nac', b.fecha_nac);
                     setValor('direccion', b.direccion);
                     setValor('estatus', String(b.estatus));

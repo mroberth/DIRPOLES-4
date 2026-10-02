@@ -90,8 +90,25 @@ include 'app/Views/template/head.php';
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Sección *</label>
-                                        <input type="text" name="seccion" id="seccion" class="form-control" maxlength="20" placeholder="Ej: 3102-B" required>
-                                        <div id="seccionError" class="form-text text-danger"></div>
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <input type="text" id="seccion_numero" class="form-control" placeholder="Ej: 3102" maxlength="4" required>
+                                                <div id="seccion_numeroError" class="form-text text-danger small"></div>
+                                            </div>
+                                            <div class="col-6">
+                                                <select id="seccion_sede" class="form-select select2" data-placeholder="Sede…" required>
+                                                    <option value="">Sede…</option>
+                                                    <option value="M">MORÁN</option>
+                                                    <option value="C">CRESPO</option>
+                                                    <option value="J">JIMÉNEZ</option>
+                                                    <option value="U">URDANETA</option>
+                                                    <option value="B">BARQUISIMETO</option>
+                                                </select>
+                                                <div id="seccion_sedeError" class="form-text text-danger small"></div>
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="seccion" id="seccion">
+                                        <div id="seccionError" class="form-text text-danger small"></div>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Fecha de nacimiento *</label>

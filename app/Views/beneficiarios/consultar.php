@@ -175,11 +175,28 @@ include 'app/Views/template/head.php';
                                         </div>
 
                                         <div class="mb-3">
-                                            <label for="seccion" class="form-label text-muted small mb-1">
+                                            <label class="form-label text-muted small mb-1">
                                                 <i class="fas fa-layer-group text-primary me-1"></i> Sección *
                                             </label>
-                                            <input type="text" class="form-control" name="seccion" id="seccion" maxlength="20" required>
-                                            <div id="seccionError" class="form-text text-danger"></div>
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <input type="text" class="form-control" id="seccion_numero" placeholder="Ej: 3102" maxlength="4" required>
+                                                    <div id="seccion_numeroError" class="form-text text-danger small"></div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <select id="seccion_sede" class="form-select select2" data-placeholder="Sede…" required>
+                                                        <option value="">Sede…</option>
+                                                        <option value="M">MORÁN</option>
+                                                        <option value="C">CRESPO</option>
+                                                        <option value="J">JIMÉNEZ</option>
+                                                        <option value="U">URDANETA</option>
+                                                        <option value="B">BARQUISIMETO</option>
+                                                    </select>
+                                                    <div id="seccion_sedeError" class="form-text text-danger small"></div>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" name="seccion" id="seccion">
+                                            <div id="seccionError" class="form-text text-danger small"></div>
                                         </div>
 
                                         <div class="mb-3">

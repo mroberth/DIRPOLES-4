@@ -31,12 +31,56 @@ class SessionAuthMiddleware
             return;
         }
 
-        // 2. VALIDACIÓN DE SESIÓN
+        // 3.5 RUTAS QUE NO REQUIEREN VALIDACIÓN DE JWT
+        // refresh_token necesita funcionar aunque el JWT haya expirado
+        $rutasSoloSesion = ['refresh_token'];
+        if (in_array($rutaActual, $rutasSoloSesion)) {
+            return;
+        }
+
+        // 4. VERIFICACIÓN JWT E HIDRATACIÓN DE SESIÓN PARA CLIENTES STATELESS (MÓVIL)
+        $jwtToken = JwtHandler::obtenerToken();
+
+        if ($jwtToken) {
+            $jwtHandler = new JwtHandler();
+            $jwtHandler->__set('token', $jwtToken);
+            $validacion = $jwtHandler->manejarAccion('validar');
+
+            if ($validacion['estado'] !== 'exito') {
+                error_log("Fallo de validación JWT para ruta: " . $rutaActual . " - Razon: " . ($validacion['mensaje'] ?? 'Sin mensaje'));
+
+                unset($_SESSION['id_empleado']);
+                unset($_SESSION['nombre']);
+
+                $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
+
+                setcookie('jwt_token', '', [
+                    'expires'  => time() - 3600,
+                    'path'     => '/',
+                    'secure'   => $cookieSecure,
+                    'httponly' => true,
+                    'samesite' => 'Lax',
+                ]);
+
+                self::redirigirLogin('Error de validación de seguridad (JWT). Por favor, inicie sesión de nuevo.', 'Error de Seguridad');
+            }
+
+            // Si el cliente es una app móvil sin cookie de sesión PHPSESSID, hidrata la sesión temporalmente con los claims del JWT
+            if (!isset($_SESSION['id_empleado']) && !empty($validacion['data']['id_empleado'])) {
+                $_SESSION['id_empleado']      = (int) $validacion['data']['id_empleado'];
+                $_SESSION['nombre']           = $validacion['data']['nombre'] ?? 'Usuario';
+                $_SESSION['id_tipo_empleado'] = (int) ($validacion['data']['id_tipo_empleado'] ?? 0);
+                $_SESSION['tipo_empleado']    = $validacion['data']['tipo_empleado'] ?? '';
+                $_SESSION['estatus']          = 1;
+            }
+        }
+
+        // 5. VALIDACIÓN DE SESIÓN
         if (!isset($_SESSION['id_empleado'])) {
             self::redirigirLogin('Debes iniciar sesión primero', 'Acceso denegado');
         }
 
-        // 3. VALIDACIÓN DE ESTATUS (BLOQUEO)
+        // 6. VALIDACIÓN DE ESTATUS (BLOQUEO)
         if (isset($_SESSION['estatus']) && $_SESSION['estatus'] == 0) {
             $msg = 'Tu cuenta ha sido desactivada. Contacta al administrador.';
             unset($_SESSION['id_empleado']);
@@ -45,40 +89,8 @@ class SessionAuthMiddleware
             self::redirigirLogin($msg, 'Cuenta bloqueada');
         }
 
-        // 3.5 RUTAS QUE SOLO REQUIEREN SESIÓN (no validación JWT)
-        // refresh_token necesita funcionar cuando el JWT ya expiró
-        $rutasSoloSesion = ['refresh_token'];
-        if (in_array($rutaActual, $rutasSoloSesion)) {
-            return;
-        }
-
-        // 4. VERIFICACIÓN DUAL (JWT)
-        $jwtToken = JwtHandler::obtenerToken();
-        $jwtHandler = new JwtHandler();
-        $jwtHandler->__set('token', $jwtToken);
-        $validacion = $jwtHandler->manejarAccion('validar');
-
-        if ($validacion['estado'] !== 'exito') {
-            error_log("Fallo de validación JWT para ruta: " . $rutaActual . " - Razon: " . ($validacion['mensaje'] ?? 'Sin mensaje'));
-
-            unset($_SESSION['id_empleado']);
-            unset($_SESSION['nombre']);
-
-            $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
-
-            setcookie('jwt_token', '', [
-                'expires'  => time() - 3600,
-                'path'     => '/',
-                'secure'   => $cookieSecure,
-                'httponly' => true,
-                'samesite' => 'Lax',
-            ]);
-
-            self::redirigirLogin('Error de validación de seguridad (JWT). Por favor, inicie sesión de nuevo.', 'Error de Seguridad');
-        }
-
-        // 5. INTEGRIDAD DE DATOS (Sesión vs JWT)
-        if ($validacion['data']['id_empleado'] != $_SESSION['id_empleado']) {
+        // 7. INTEGRIDAD DE DATOS (Sesión vs JWT)
+        if ($jwtToken && isset($validacion['data']['id_empleado']) && $validacion['data']['id_empleado'] != $_SESSION['id_empleado']) {
             error_log("Discrepancia detectada: JWT id_empleado (" . $validacion['data']['id_empleado'] . ") vs SESIÓN id_empleado (" . $_SESSION['id_empleado'] . ")");
 
             unset($_SESSION['id_empleado']);

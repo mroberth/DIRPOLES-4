@@ -37,8 +37,9 @@ function showInicio()
 
 function iniciar_sesion()
 {
-    $correo   = trim((string) filter_input(INPUT_POST, 'correo', FILTER_SANITIZE_FULL_SPECIAL_CHARS));
-    $password = (string) ($_POST['password'] ?? '');
+    $entrada  = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $correo   = trim((string) ($entrada['correo'] ?? filter_input(INPUT_POST, 'correo', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? ''));
+    $password = (string) ($entrada['password'] ?? $_POST['password'] ?? '');
 
     // --- Descifrado RSA: la contraseña viaja cifrada desde el cliente ---
     $keyPath = BASE_PATH . 'app/Config/Keys/login_private.pem';
@@ -111,9 +112,19 @@ function iniciar_sesion()
     }
 
     Respuesta::exito([
-        'titulo'  => '¡Bienvenido!',
-        'mensaje' => 'Has iniciado sesión correctamente.',
-        'jwt_exp' => (int) env('JWT_EXPIRATION', '3600'),
+        'titulo'        => '¡Bienvenido!',
+        'mensaje'       => 'Has iniciado sesión correctamente.',
+        'token'         => $jwtResult['token'],
+        'refresh_token' => $refreshResult['token'] ?? null,
+        'jwt_exp'       => (int) env('JWT_EXPIRATION', '3600'),
+        'usuario'       => [
+            'id_empleado'      => $_SESSION['id_empleado'],
+            'nombre'           => $_SESSION['nombre'],
+            'apellido'         => $_SESSION['apellido'],
+            'correo'           => $_SESSION['correo'],
+            'id_tipo_empleado' => $_SESSION['id_tipo_empleado'],
+            'tipo_empleado'    => $_SESSION['tipo_empleado'],
+        ],
     ]);
 }
 
@@ -122,6 +133,9 @@ function cerrar_sesion()
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
+
+    $entrada = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $refreshToken = $entrada['refresh_token'] ?? $_COOKIE['refresh_token'] ?? null;
 
     $cookieSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443) || filter_var(env('COOKIE_SECURE', false), FILTER_VALIDATE_BOOLEAN);
 
@@ -142,9 +156,9 @@ function cerrar_sesion()
     }
 
     // Revocar el refresh token en BD (JwtHandler nunca lanza) y limpiar cookies
-    if (isset($_COOKIE['refresh_token'])) {
+    if (!empty($refreshToken)) {
         $jwtHandler = new JwtHandler();
-        $jwtHandler->__set('refresh_token', $_COOKIE['refresh_token']);
+        $jwtHandler->__set('refresh_token', $refreshToken);
         $jwtHandler->manejarAccion('revocar_refresh');
     }
     setcookie('jwt_token', '', [
@@ -162,15 +176,21 @@ function cerrar_sesion()
         'samesite' => 'Lax',
     ]);
 
+    if (Respuesta::esApi() || !empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        Respuesta::exito(['mensaje' => 'Sesión cerrada exitosamente.']);
+    }
+
     // Redirigir (puerta HTML)
     header('Location: ' . BASE_URL . 'login?logout=true');
     exit;
 }
 
-/** Renueva el JWT usando el refresh token de la cookie (puerta JSON). */
+/** Renueva el JWT usando el refresh token (vía cookie o body JSON). */
 function refresh_token()
 {
-    $refreshToken = $_COOKIE['refresh_token'] ?? null;
+    $entrada = json_decode(file_get_contents('php://input'), true) ?: $_POST;
+    $refreshToken = $entrada['refresh_token'] ?? $_COOKIE['refresh_token'] ?? null;
+
     if (!$refreshToken) {
         throw new ExcepcionApi(ErrorCodes::TOKEN_FALTANTE, 401, 'No hay refresh token.');
     }
@@ -209,7 +229,9 @@ function refresh_token()
     }
 
     Respuesta::exito([
-        'mensaje' => 'Token renovado exitosamente.',
-        'jwt_exp' => (int) env('JWT_EXPIRATION', '3600'),
+        'mensaje'       => 'Token renovado exitosamente.',
+        'token'         => $resultado['token'],
+        'refresh_token' => $resultado['refresh_token'] ?? null,
+        'jwt_exp'       => (int) env('JWT_EXPIRATION', '3600'),
     ]);
 }

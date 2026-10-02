@@ -12,7 +12,7 @@ window.BeneficiarioTour = (function () {
         { element: '#telefono',    title: 'Teléfono',       description: '0412/0414/0416/0422/0424/0426 + 7 dígitos.' },
         { element: '#genero',      title: 'Género',         description: 'Masculino o Femenino.' },
         { element: '#id_pnf',      title: 'PNF',            description: 'Selecciona el programa nacional de formación.' },
-        { element: '#seccion',     title: 'Sección',        description: 'Sección del beneficiario (ej: 3102-B).' },
+        { element: '#seccion_numero', title: 'Sección',        description: 'Número de sección (4 dígitos, ej: 3102) y Sede (ej: BARQUISIMETO).' },
         { element: '#fecha_nac',   title: 'Fecha de nacimiento', description: 'Selecciona la fecha de nacimiento.' },
         { element: '#estatus',     title: 'Estatus',        description: 'Activo o Inactivo.' },
         { element: '#direccion',   title: 'Dirección',      description: 'Dirección del beneficiario.' },

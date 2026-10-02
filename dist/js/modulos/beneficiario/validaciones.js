@@ -15,10 +15,10 @@ window.BeneficiarioValidaciones = (function () {
     'use strict';
 
     const RX = {
-        nombre:    /^[A-Za-zÀ-ÿ\u00f1\u00d1\s]{2,100}$/,
-        correo:    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-        telefono:  /^(0412|0414|0416|0422|0424|0426)\d{7}$/,
-        seccion:   /^[A-Za-z0-9\-]{1,20}$/,
+        nombre:         /^[A-Za-zÀ-ÿ\u00f1\u00d1\s]{2,100}$/,
+        correo:         /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        telefono:       /^(0412|0414|0416|0422|0424|0426)\d{7}$/,
+        seccion_numero: /^[1-4]\d{3}$/,
     };
 
     function marcarSelect2(campo, conError) {
@@ -64,18 +64,20 @@ window.BeneficiarioValidaciones = (function () {
         const idExcluirActual = () => Number(opciones.idExcluir || 0);
 
         const c = {
-            tipo_cedula: form.querySelector('#tipo_cedula'),
-            cedula:      form.querySelector('#cedula'),
-            nombres:     form.querySelector('#nombres'),
-            apellidos:   form.querySelector('#apellidos'),
-            correo:      form.querySelector('#correo'),
-            telefono:    form.querySelector('#telefono'),
-            genero:      form.querySelector('#genero'),
-            id_pnf:      form.querySelector('#id_pnf'),
-            seccion:     form.querySelector('#seccion'),
-            fecha_nac:   form.querySelector('#fecha_nac'),
-            estatus:     form.querySelector('#estatus'),
-            direccion:   form.querySelector('#direccion'),
+            tipo_cedula:    form.querySelector('#tipo_cedula'),
+            cedula:         form.querySelector('#cedula'),
+            nombres:        form.querySelector('#nombres'),
+            apellidos:      form.querySelector('#apellidos'),
+            correo:         form.querySelector('#correo'),
+            telefono:       form.querySelector('#telefono'),
+            genero:         form.querySelector('#genero'),
+            id_pnf:         form.querySelector('#id_pnf'),
+            seccion_numero: form.querySelector('#seccion_numero'),
+            seccion_sede:   form.querySelector('#seccion_sede'),
+            seccion:        form.querySelector('#seccion'),
+            fecha_nac:      form.querySelector('#fecha_nac'),
+            estatus:        form.querySelector('#estatus'),
+            direccion:      form.querySelector('#direccion'),
         };
 
         async function consultar(url, datos) {
@@ -258,17 +260,37 @@ window.BeneficiarioValidaciones = (function () {
         }
 
         function validarSeccion() {
-            if (!c.seccion) return true;
-            const v = c.seccion.value.trim().toUpperCase();
-            c.seccion.value = v;
-            if (v === '') {
-                mostrarError(c.seccion, 'La sección es obligatoria');
+            if (!c.seccion_numero || !c.seccion_sede || !c.seccion) return true;
+
+            const num = (c.seccion_numero.value || '').trim();
+            c.seccion_numero.value = num;
+            const sede = (c.seccion_sede.value || '').trim().toUpperCase();
+
+            let numOk = true;
+            if (num === '') {
+                mostrarError(c.seccion_numero, 'Número obligatorio');
+                numOk = false;
+            } else if (!RX.seccion_numero.test(num)) {
+                mostrarError(c.seccion_numero, '4 dígitos (ej: 3102)');
+                numOk = false;
+            } else {
+                limpiarError(c.seccion_numero);
+            }
+
+            let sedeOk = true;
+            if (sede === '') {
+                mostrarError(c.seccion_sede, 'Selecciona sede');
+                sedeOk = false;
+            } else {
+                limpiarError(c.seccion_sede);
+            }
+
+            if (!numOk || !sedeOk) {
+                c.seccion.value = '';
                 return false;
             }
-            if (!RX.seccion.test(v)) {
-                mostrarError(c.seccion, 'Máximo 20 caracteres (letras, números y guiones)');
-                return false;
-            }
+
+            c.seccion.value = `${num}-${sede}`;
             limpiarError(c.seccion);
             return true;
         }
@@ -343,18 +365,19 @@ window.BeneficiarioValidaciones = (function () {
             timer = setTimeout(fn, 450);
         };
 
-        c.tipo_cedula && c.tipo_cedula.addEventListener('change', validarCedula);
-        c.cedula      && c.cedula.addEventListener('input', () => debounce(validarCedula));
-        c.nombres     && c.nombres.addEventListener('input', validarNombres);
-        c.apellidos   && c.apellidos.addEventListener('input', validarApellidos);
-        c.correo      && c.correo.addEventListener('input', () => debounce(validarCorreo));
-        c.telefono    && c.telefono.addEventListener('input', () => debounce(validarTelefono));
-        c.genero      && c.genero.addEventListener('change', validarGenero);
-        c.id_pnf      && c.id_pnf.addEventListener('change', validarPnf);
-        c.seccion     && c.seccion.addEventListener('input', validarSeccion);
-        c.fecha_nac   && c.fecha_nac.addEventListener('input', validarFechaNac);
-        c.estatus     && c.estatus.addEventListener('change', validarEstatus);
-        c.direccion   && c.direccion.addEventListener('input', validarDireccion);
+        c.tipo_cedula    && c.tipo_cedula.addEventListener('change', validarCedula);
+        c.cedula         && c.cedula.addEventListener('input', () => debounce(validarCedula));
+        c.nombres        && c.nombres.addEventListener('input', validarNombres);
+        c.apellidos      && c.apellidos.addEventListener('input', validarApellidos);
+        c.correo         && c.correo.addEventListener('input', () => debounce(validarCorreo));
+        c.telefono       && c.telefono.addEventListener('input', () => debounce(validarTelefono));
+        c.genero         && c.genero.addEventListener('change', validarGenero);
+        c.id_pnf         && c.id_pnf.addEventListener('change', validarPnf);
+        c.seccion_numero && c.seccion_numero.addEventListener('input', validarSeccion);
+        c.seccion_sede   && c.seccion_sede.addEventListener('change', validarSeccion);
+        c.fecha_nac      && c.fecha_nac.addEventListener('input', validarFechaNac);
+        c.estatus        && c.estatus.addEventListener('change', validarEstatus);
+        c.direccion      && c.direccion.addEventListener('input', validarDireccion);
 
         // Select2 dispara 'change' como evento de jQuery (no llega a addEventListener).
         if (typeof jQuery !== 'undefined' && $.fn && $.fn.select2) {
@@ -362,6 +385,7 @@ window.BeneficiarioValidaciones = (function () {
                 [c.tipo_cedula, validarCedula],
                 [c.genero, validarGenero],
                 [c.id_pnf, validarPnf],
+                [c.seccion_sede, validarSeccion],
                 [c.estatus, validarEstatus],
             ].forEach(function (par) {
                 const campo = par[0];

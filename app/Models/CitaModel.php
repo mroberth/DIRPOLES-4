@@ -137,8 +137,10 @@ class CitaModel extends BusinessModel
                        TIME_FORMAT(c.hora, '%H:%i') AS hora_formateada,
                        c.id_beneficiario, c.id_empleado, c.estatus,
                        b.nombres AS beneficiario_nombres, b.apellidos AS beneficiario_apellidos,
+                       CONCAT(b.nombres, ' ', b.apellidos) AS beneficiario,
                        CONCAT(b.tipo_cedula, '-', b.cedula) AS cedula_beneficiario,
                        CONCAT(e.nombre, ' ', e.apellido) AS psicologo,
+                       CONCAT(e.nombre, ' ', e.apellido) AS empleado,
                        CONCAT(e.tipo_cedula, '-', e.cedula) AS cedula_psicologo,
                        ec.nombre AS nombre_estado
                 FROM cita c
