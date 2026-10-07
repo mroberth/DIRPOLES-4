@@ -351,9 +351,12 @@ antes de proponer código nuevo.
   - **Horarios** (id_modulo 18): administración exclusiva de Administrador/
     Superusuario, un horario por psicólogo y día, rango 07:00–17:00.
   - **Respaldo BD** (tercera puerta: descarga `.sql`, solo Administrador/Superusuario).
-  - **Faltan los módulos de negocio pesados** (ver
-    `app/Config/dashboard_cards.php`, las cards con `'disponible' => false`
-    son los pendientes).
+  - **Centro de Ayuda** (grupo transversal `group_ayuda`): hub de asistencia interactiva
+    con buscador en tiempo real, filtros por departamento, modal de guías paso a paso
+    filtradas dinámicamente según permisos de rol (`modulosPermitidos` + `es_admin`),
+    redirección directa a módulos y botón global de descarga de manual.
+  - **Módulos del esqueleto base totalmente construidos y operativos.**
+
 
 ### Repositorio y relación con el sistema completo
 
@@ -700,14 +703,15 @@ app/Controllers/        loginController.php, notificacionesController.php,
                         bitacoraController.php, backupController.php,
                         trabajoSocialController.php, inventarioController.php,
                         referenciaController.php, mobiliarioController.php,
-                        jornadaController.php, reportesController.php
+                        jornadaController.php, reportesController.php,
+                        ayudaController.php
                         (solo funciones)
 app/Models/             loginModel, PermisosModel, NotificacionesModel,
                         DashboardModel, CalendarioModel, SecurityModel, BusinessModel,
                         EmpleadoModel, BeneficiarioModel, CitaModel, HorarioModel,
                         ConfiguracionModel, BitacoraModel,
                         BackupModel, InventarioModel, ReferenciaModel,
-                        MobiliarioModel, JornadaModel, ReportesModel
+                        MobiliarioModel, JornadaModel, ReportesModel, AyudaModel
 app/Views/              template/ (head, header, sidebar, footer, script),
                         inicio/dashboard.php (shell compuesto por rol), login.php,
                         errors/ (404, error, rate_limit, access_denied),
@@ -734,7 +738,8 @@ app/Views/              template/ (head, header, sidebar, footer, script),
                         reportes/ (10 vistas: general, medicina, psicologia,
                         orientacion, trabajo_social, discapacidad,
                         referencias, jornadas, mobiliario, transporte; cada
-                        una con stats + filtros + gráficos + tabla)
+                        una con stats + filtros + gráficos + tabla),
+                        ayuda/ (vista principal del Centro de Ayuda)
 app/Config/             modulos_sidebar.php, dashboard_cards.php, roles_sistema.php,
                         configuracion_catalogos.php, Keys/ (RSA, no versionadas)
                         (NO existe config.php: la config va por .env)
@@ -743,7 +748,7 @@ app/routes/             notificaciones.php, dashboard.php, empleados.php,
                         permisos.php, configuracion.php, bitacora.php,
                         backup.php, trabajo-social.php, inventario.php,
                         referencias.php, mobiliario.php, jornadas.php,
-                        reportes.php
+                        reportes.php, ayuda.php
                         (los demás módulos los creas tú)
 docs/                   docs/MANUAL_DIRPOLES_CONTEXTO.md (manual de contexto),
                         docs/guia_arquitectura_dirpoles.md (arquitectura),

@@ -163,4 +163,13 @@ return [
             ['url' => 'respaldo', 'texto' => 'Respaldo BD', 'permiso' => 2, 'solo_admin' => true],
         ],
     ],
+    'group_ayuda' => [
+        'key'    => 'ayuda',
+        'icon'   => 'fa-circle-question',
+        'titulo' => 'Centro de Ayuda',
+        'subitems' => [
+            ['url' => 'ayuda', 'texto' => 'Guías y Preguntas Frecuentes'],
+        ],
+    ],
 ];
+

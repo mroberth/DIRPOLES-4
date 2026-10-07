@@ -1,0 +1,273 @@
+/* dist/css/modulos/ayuda/ayuda.css */
+
+/* ─── Hero Section ─── */
+.help-hero {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #3a7bd5 100%);
+    color: #ffffff;
+    padding: 3.5rem 1.5rem 4.5rem;
+    border-radius: 1.25rem;
+    margin-bottom: -2.5rem;
+    box-shadow: 0 10px 30px rgba(30, 60, 114, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.help-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.help-hero-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.help-hero-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* ─── Search Container ─── */
+.help-search-container {
+    position: relative;
+    max-width: 680px;
+    margin: 1.5rem auto 0;
+}
+
+.help-search-input {
+    height: 3.5rem;
+    border-radius: 50rem;
+    padding-left: 3.25rem;
+    padding-right: 1.5rem;
+    font-size: 1.05rem;
+    border: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.help-search-input:focus {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    transform: translateY(-2px);
+}
+
+.help-search-icon {
+    position: absolute;
+    left: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+
+/* ─── Filter Chips / Nav Tabs ─── */
+.help-filters-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.help-filter-chip {
+    border: 1px solid #e2e8f0;
+    background-color: #ffffff;
+    color: #4a5568;
+    padding: 0.5rem 1.25rem;
+    border-radius: 50rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.help-filter-chip:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
+    color: #2d3748;
+    transform: translateY(-1px);
+}
+
+.help-filter-chip.active {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(78, 115, 223, 0.35);
+}
+
+/* ─── Category Cards ─── */
+.topic-card {
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    background: #ffffff;
+    height: 100%;
+}
+
+.topic-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e0;
+}
+
+.topic-icon-container {
+    width: 52px;
+    height: 52px;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+}
+
+/* Soft Color Variants for Badges */
+.bg-soft-primary { background-color: #e8f0fe; color: #1a73e8; }
+.bg-soft-success { background-color: #e6f4ea; color: #137333; }
+.bg-soft-info { background-color: #e4f7fb; color: #0288d1; }
+.bg-soft-warning { background-color: #fef7e0; color: #b06000; }
+.bg-soft-danger { background-color: #fce8e6; color: #c5221f; }
+.bg-soft-secondary { background-color: #f1f3f4; color: #5f6368; }
+.bg-soft-dark { background-color: #e9ecef; color: #212529; }
+
+/* ─── FAQ Lists ─── */
+.faq-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
+.faq-item {
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.35rem;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.faq-item:hover {
+    background-color: #f8fafc;
+    color: #4e73df;
+    padding-left: 0.95rem;
+}
+
+.faq-item i {
+    transition: transform 0.2s ease;
+}
+
+.faq-item:hover i {
+    transform: translateX(3px);
+    color: #4e73df !important;
+}
+
+/* ─── Guide Modal Styling ─── */
+.guide-modal-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 1.25rem 1.75rem;
+}
+
+.guide-breadcrumb {
+    font-size: 0.825rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #718096;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.guide-modal-body {
+    padding: 1.75rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.guide-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+}
+
+.guide-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    transition: background-color 0.2s ease;
+}
+
+.guide-step:hover {
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.guide-step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #4e73df;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.guide-step-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    background: #eef2ff;
+    color: #4e73df;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.guide-step-text {
+    font-size: 0.975rem;
+    color: #2d3748;
+    line-height: 1.5;
+    padding-top: 0.2rem;
+}
+
+.guide-tip {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    background-color: #fffbea;
+    border-left: 4px solid #f6ad55;
+    border-radius: 0.5rem;
+    color: #744210;
+    font-size: 0.925rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.guide-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+}

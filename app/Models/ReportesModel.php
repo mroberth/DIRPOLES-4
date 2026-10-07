@@ -211,6 +211,20 @@ class ReportesModel extends BusinessModel
     private function validarEstado(array $permitidos): void
     {
         $estado = $this->__get('estado');
+        if ($estado !== null && is_numeric($estado) && in_array('Atendida', $permitidos, true)) {
+            $mapaCitas = [
+                1 => 'Pendiente',
+                2 => 'Confirmada',
+                3 => 'Atendida',
+                4 => 'Cancelada',
+                5 => 'No asistió',
+            ];
+            if (isset($mapaCitas[(int) $estado])) {
+                $estado = $mapaCitas[(int) $estado];
+                $this->atributos['estado'] = $estado;
+            }
+        }
+
         if ($estado !== null && !in_array($estado, $permitidos, true)) {
             throw ExcepcionApi::validacion(
                 'El estado "' . $estado . '" no es válido. Opciones: ' . implode(', ', $permitidos) . '.'
@@ -1103,18 +1117,17 @@ class ReportesModel extends BusinessModel
         $this->filtro($whereCitas, $paramsCitas, 'estado', 'ec.nombre');
         $this->filtroEmpleado($whereCitas, $paramsCitas, 'c.id_empleado');
 
-        $fromCitas = " FROM cita c
+        $baseCitas = " FROM cita c
                        JOIN beneficiario b ON c.id_beneficiario = b.id_beneficiario
-                       LEFT JOIN estado_cita ec ON ec.id_estado = c.estatus"
-                   . $this->clausulaWhere($whereCitas);
+                       LEFT JOIN estado_cita ec ON ec.id_estado = c.estatus";
 
-        $citas = $this->contar('SELECT COUNT(*)' . $fromCitas, $paramsCitas);
+        $citas = $this->contar('SELECT COUNT(*)' . $baseCitas . $this->clausulaWhere($whereCitas), $paramsCitas);
         $atendidas = $this->contar(
-            'SELECT COUNT(*)' . $this->clausulaCon($whereCitas, "ec.nombre = 'Atendida'"),
+            'SELECT COUNT(*)' . $baseCitas . $this->clausulaCon($whereCitas, "ec.nombre = 'Atendida'"),
             $paramsCitas
         );
         $pendientes = $this->contar(
-            'SELECT COUNT(*)' . $this->clausulaCon($whereCitas, "ec.nombre = 'Pendiente'"),
+            'SELECT COUNT(*)' . $baseCitas . $this->clausulaCon($whereCitas, "ec.nombre = 'Pendiente'"),
             $paramsCitas
         );
 
@@ -1406,7 +1419,7 @@ class ReportesModel extends BusinessModel
             'SELECT id_servicios AS id, nombre_serv AS nombre FROM servicio WHERE estatus = 1 ORDER BY nombre_serv'
         );
         $estadosCita = $this->consultar(
-            'SELECT id_estado AS id, nombre AS nombre FROM estado_cita WHERE es_activo = 1 ORDER BY nombre'
+            'SELECT nombre AS id, nombre AS nombre FROM estado_cita WHERE es_activo = 1 ORDER BY nombre'
         );
 
         return [
