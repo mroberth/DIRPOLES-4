@@ -75,6 +75,8 @@ include BASE_PATH . '/app/Views/template/head.php';
                         </div>
                     </div>
 
+                    <?php include BASE_PATH . '/app/Views/reportes/components/ia_card.php'; ?>
+
                     <div id="contenedor_mobiliario" style="display: none;">
                         <div class="card shadow mb-4">
                             <div class="card-header py-3 d-flex justify-content-between align-items-center">
@@ -139,6 +141,9 @@ include BASE_PATH . '/app/Views/template/head.php';
         window.REPORTES_TIPO = 'mobiliario';
     </script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/comunes.js" defer></script>
+    <script src="<?= BASE_URL ?>plugins/marked/marked.min.js"></script>
+    <script src="<?= BASE_URL ?>plugins/dompurify/purify.min.js"></script>
+    <script src="<?= BASE_URL ?>dist/js/modulos/reportes/ia.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/pdf-completo.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/tour.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/stats.js" defer></script>

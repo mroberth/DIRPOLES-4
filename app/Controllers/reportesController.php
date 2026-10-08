@@ -266,3 +266,129 @@ function obtenerReportesCatalogos(): void
     $datos = $modelo->manejarAccion('catalogos');
     Respuesta::exito($datos);
 }
+
+/**
+ * Llama al microservicio DIRPOLES-IA y devuelve ['informe_markdown' => ..., 'meta' => ...].
+ * La X-API-Key y el id_empleado se inyectan AQUÍ (server-side): el navegador
+ * nunca ve la clave ni decide la visibilidad de datos.
+ */
+function reportesIaGenerar(string $modulo, string $intencion, array $filtros, ?string $observacion): array
+{
+    $urlRaw = $_ENV['DIRPOLES_IA_URL'] ?? $_SERVER['DIRPOLES_IA_URL'] ?? getenv('DIRPOLES_IA_URL') ?: 'http://127.0.0.1:8000';
+    $url = rtrim((string) $urlRaw, '/');
+    $clave = (string) ($_ENV['DIRPOLES_IA_API_KEY'] ?? $_SERVER['DIRPOLES_IA_API_KEY'] ?? getenv('DIRPOLES_IA_API_KEY') ?: '');
+    if ($clave === '') {
+        throw App\Core\ExcepcionApi::errorInterno('Servicio de IA no configurado (falta DIRPOLES_IA_API_KEY).');
+    }
+
+
+    // Visibilidad: admin ve todo; el resto solo SUS registros (espejo de filtroEmpleado).
+    $esAdmin = isset($_SESSION['tipo_empleado']) &&
+        (stripos($_SESSION['tipo_empleado'], 'administrador') !== false ||
+         stripos($_SESSION['tipo_empleado'], 'superusuario') !== false);
+
+    $filtrosLimpios = [];
+    foreach ($filtros as $k => $v) {
+        if ($v !== null && $v !== '') {
+            if ($k === 'pnf' || $k === 'servicio_destino' || $k === 'limit') {
+                $filtrosLimpios[$k] = (int) $v;
+            } else {
+                $filtrosLimpios[$k] = $v;
+            }
+        }
+    }
+
+    $payload = [
+        'modulo' => $modulo,
+        'intencion' => $intencion,
+        'filtros' => empty($filtrosLimpios) ? (object) [] : $filtrosLimpios,
+        'observacion_usuario' => $observacion ?: null,
+        'id_empleado' => $esAdmin ? null : (int) ($_SESSION['id_empleado'] ?? 0),
+    ];
+
+
+    $ch = curl_init($url . '/api/v1/reportes/generar');
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 120,
+        CURLOPT_NOPROXY => '*',
+
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+            'X-API-Key: ' . $clave,
+        ],
+        CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+    ]);
+
+    $cuerpo = curl_exec($ch);
+    $codigo = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $fallo = curl_error($ch);
+    curl_close($ch);
+
+    if ($cuerpo === false) {
+        throw App\Core\ExcepcionApi::errorInterno('Servicio de IA no disponible: ' . $fallo);
+    }
+    $datos = json_decode($cuerpo, true);
+    if ($codigo === 200 && ($datos['exito'] ?? false) === true) {
+        return [
+            'informe_markdown' => $datos['informe_markdown'],
+            'meta' => $datos['meta'],
+        ];
+    }
+
+    // Mapear los códigos del microservicio a mensajes del monolito (§8).
+    $detalle = $datos['detail'] ?? null;
+    if ($codigo === 401) {
+        throw App\Core\ExcepcionApi::errorInterno('Servicio de IA no configurado.');
+    }
+    if ($codigo === 422 && is_array($detalle)) {
+        $msg = $detalle[0]['msg'] ?? 'Datos inválidos para el informe.';
+        throw App\Core\ExcepcionApi::validacion('El informe no pudo generarse: ' . $msg);
+    }
+    if ($codigo === 503 && isset($datos['error'])) {
+        throw App\Core\ExcepcionApi::errorInterno('Datos no disponibles temporalmente para el informe de IA.');
+    }
+    throw App\Core\ExcepcionApi::errorInterno('El servicio de IA respondió un error (' . $codigo . ').');
+}
+
+/**
+ * POST api/reportes/ia/informe
+ * Body del navegador: { modulo, intencion, filtros, observacion_usuario }
+ * (id_empleado e X-API-Key NO vienen del navegador: los agrega reportesIaGenerar).
+ */
+function apiReportesIaInforme(): void
+{
+    Autorizacion::verificar('reportes', 'leer');
+
+    $entrada = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($entrada)) {
+        throw App\Core\ExcepcionApi::jsonInvalido();
+    }
+
+    $modulo = (string) ($entrada['modulo'] ?? '');
+    // 'general' es solo administrador (misma regla que la vista tradicional).
+    if ($modulo === 'general') {
+        verificarAccesoReporte('', true);
+    } elseif ($modulo !== '') {
+        $moduloEsp = match ($modulo) {
+            'trabajo_social' => 'trabajo-social',
+            default => $modulo,
+        };
+        verificarAccesoReporte($moduloEsp);
+    }
+
+    $resultado = reportesIaGenerar(
+        $modulo,
+        (string) ($entrada['intencion'] ?? ''),
+        is_array($entrada['filtros'] ?? null) ? $entrada['filtros'] : [],
+        isset($entrada['observacion_usuario']) ? (string) $entrada['observacion_usuario'] : null
+    );
+
+    // Auditoría: misma acción 'Lectura' que los endpoints de reportes.
+    Bitacora::registrar('Reportes', 'Lectura', 'Generó informe de IA: ' . $modulo);
+
+    Respuesta::exito($resultado);
+}
+

@@ -126,3 +126,10 @@ Router::get('api/reportes/catalogos', function () {
     load_controller('reportesController.php');
     obtenerReportesCatalogos();
 });
+
+// Puerta JSON: informe de IA para el módulo de reportes (integración DIRPOLES-IA)
+Router::post('api/reportes/ia/informe', function () {
+    load_controller('reportesController.php');
+    apiReportesIaInforme();
+});
+

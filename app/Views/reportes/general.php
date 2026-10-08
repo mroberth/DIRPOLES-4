@@ -95,6 +95,8 @@ include BASE_PATH . '/app/Views/template/head.php';
                         </div>
                     </div>
 
+                    <?php include BASE_PATH . '/app/Views/reportes/components/ia_card.php'; ?>
+
                     <!-- Contenedor de Resultados (Gráficos + Tabla) -->
                     <div id="contenedor_general" style="display: none;">
                         <!-- Gráficas Estadísticas -->
@@ -176,6 +178,9 @@ include BASE_PATH . '/app/Views/template/head.php';
         window.REPORTES_TIPO = 'general';
     </script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/comunes.js" defer></script>
+    <script src="<?= BASE_URL ?>plugins/marked/marked.min.js"></script>
+    <script src="<?= BASE_URL ?>plugins/dompurify/purify.min.js"></script>
+    <script src="<?= BASE_URL ?>dist/js/modulos/reportes/ia.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/pdf-completo.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/tour.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/reportes/stats.js" defer></script>
