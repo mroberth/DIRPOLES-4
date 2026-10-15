@@ -20,3 +20,6 @@ app/Config/Keys/*.pub
 /uploads/*
 !/uploads/.gitkeep
 .agents/*
+
+# PHPUnit Cache
+.phpunit.result.cache
