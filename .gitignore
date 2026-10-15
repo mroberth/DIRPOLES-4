@@ -19,3 +19,4 @@ app/Config/Keys/*.pub
 # Archivos subidos
 /uploads/*
 !/uploads/.gitkeep
+.agents/*
