@@ -3,15 +3,15 @@
 ### Sistema de Gestión Administrativa para la Dirección de Políticas Estudiantiles
 **Universidad Politécnica Territorial del Estado Lara "Andrés Eloy Blanco" (UPTAEB)**
 
-[![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
+[![PHP](https://img.shields.io/badge/PHP-8.2%20%2F%208.3%2B-777BB4?logo=php&logoColor=white)](https://www.php.net/)
 [![MySQL](https://img.shields.io/badge/MySQL%20%2F%20MariaDB-8%20%2F%2010.4%2B-4479A1?logo=mysql&logoColor=white)](https://mariadb.org/)
 [![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 [![Composer](https://img.shields.io/badge/Composer-2.x-885630?logo=composer&logoColor=white)](https://getcomposer.org/)
 [![License](https://img.shields.io/badge/Licencia-Institucional%20%2F%20Acad%C3%A9mica-blue)](#-licencia-y-propiedad-intelectual)
 
-**DIRPOLES-4** es el **Sistema de Gestión Administrativa para la Dirección de Políticas Estudiantiles (DIRPOLES)** de la Universidad Politécnica Territorial del Estado Lara "Andrés Eloy Blanco" (UPTAEB). Desarrollado como un **monolito modular híbrido en PHP 8+** con **MVC propio** (sin frameworks comerciales), sirve páginas HTML renderizadas en el servidor (Puerta HTML) y una API RESTful JSON estricta (Puerta JSON) desacoplada para consumo web y preparado para servicios de Inteligencia Artificial (FastAPI).
+**DIRPOLES-4** es el **Sistema de Gestión Administrativa para la Dirección de Políticas Estudiantiles (DIRPOLES)** de la Universidad Politécnica Territorial del Estado Lara "Andrés Eloy Blanco" (UPTAEB). Desarrollado como un **monolito modular híbrido en PHP 8.2+ / 8.3** con **MVC propio** (sin frameworks comerciales), sirve páginas HTML renderizadas en el servidor (Puerta HTML) y una API RESTful JSON estricta (Puerta JSON) desacoplada para consumo web y preparado para servicios de Inteligencia Artificial (FastAPI).
 
-Este repositorio constituye la versión final refactorizada, segura e inmutable del sistema, abarcando la automatización integral de **18 módulos funcionales, clínicos, logísticos y administrativos**.
+Este repositorio constituye la versión final refactorizada, segura e inmutable del sistema, abarcando la automatización integral de **18 módulos funcionales, clínicos, logísticos y administrativos**. Es **100% compatible tanto con Windows (XAMPP 8.2.12+) como con Linux (PHP 8.3+)**.
 
 > **Proyecto Socio-Integrador y Tecnológico (PSIT)** — Trabajo Especial de Grado para la obtención del título de **Ingeniero(a) en Informática** (Trayecto IV, PNF Informática, UPTAEB).
 
@@ -24,8 +24,10 @@ Este repositorio constituye la versión final refactorizada, segura e inmutable 
 - [🏛 Arquitectura del Sistema](#-arquitectura-del-sistema)
 - [📋 Requisitos de Infraestructura](#-requisitos-de-infraestructura)
 - [🚀 Instalación y Despliegue](#-instalación-y-despliegue)
-  - [Opción A — Script Automatizado (Linux)](#opción-a--script-automatizado-linux)
-  - [Opción B — Instalación Manual](#opción-b--instalación-manual)
+  - [Opción A — Script Automatizado para Windows / XAMPP (`setup_windows.bat`)](#opción-a--script-automatizado-para-windows--xampp-setup_windowsbat)
+  - [Opción B — Script Automatizado para Linux (`setup_linux.sh`)](#opción-b--script-automatizado-para-linux-setup_linuxsh)
+  - [Opción C — Guía Paso a Paso para Windows (XAMPP)](#opción-c--guía-paso-a-paso-para-windows-xampp)
+  - [Opción D — Instalación Manual Paso a Paso (Linux)](#opción-d--instalación-manual-paso-a-paso-linux)
 - [🔑 Gestión de Credenciales Iniciales](#-gestión-de-credenciales-iniciales)
 - [✅ Verificación del Despliegue](#-verificación-del-despliegue)
 - [⚙ Variables de Entorno (.env)](#-variables-de-entorno-env)
@@ -60,7 +62,7 @@ Este repositorio constituye la versión final refactorizada, segura e inmutable 
 
 | Capa / Componente | Tecnología / Estándar |
 |---|---|
-| **Lenguaje Backend** | **PHP 8.1+** (MVC propio modular nativo, sin frameworks comerciales) |
+| **Lenguaje Backend** | **PHP 8.2+ / 8.3** (Compatible con XAMPP 8.2.12+ en Windows y PHP 8.3+ en Linux; MVC propio modular nativo) |
 | **Bases de Datos** | **MySQL 8.0+ / MariaDB 10.4+** (Dos esquemas aislados: `dirpoles_security` y `dirpoles_business`) |
 | **Servidor Web** | **Apache 2.4+** con módulo `mod_rewrite` activo |
 | **Dependencias PHP** | [Composer 2.x](https://getcomposer.org/) · `firebase/php-jwt` · `vlucas/phpdotenv` |
@@ -96,21 +98,54 @@ Navegador ──▶ .htaccess ──▶ index.php (Front Controller)
 
 ## 📋 Requisitos de Infraestructura
 
-| Requisito | Versión Mínima | Extensión / Módulo Requerido |
+| Requisito | Versión Soportada | Extensión / Módulo Requerido |
 |---|---|---|
-| **Servidor PHP** | 8.1 o superior | `openssl`, `pdo_mysql`, `mbstring`, `fileinfo`, `json` |
+| **Servidor PHP** | **8.2+ o 8.3+** (ej. XAMPP 8.2.12+ en Windows o PHP 8.3+ en Linux) | `openssl`, `pdo_mysql`, `mbstring`, `fileinfo`, `json` |
 | **Motor MySQL / MariaDB** | 8.0+ / 10.4+ | Motor InnoDB con soporte de transacciones ACID y `FOR UPDATE` |
 | **Servidor Web** | Apache 2.4+ | `mod_rewrite` e `AllowOverride All` habilitados |
-| **Gestor de Paquetes** | Composer 2.x | Para autoloader PSR-4 y librerías base |
-| **Herramientas de Red** | OpenSSL CLI | Para generación de pares de claves RSA |
+| **Gestor de Paquetes** | Composer 2.x | Para autoloader PSR-4 y dependencias de producción |
+| **Herramientas de Criptografía**| PHP CLI / OpenSSL | Para generación de pares de claves RSA-2048 (script multiplataforma incluido) |
+
+> [!IMPORTANT]
+> **Compatibilidad Garantizada (Windows con XAMPP 8.2.12+ y Linux con PHP 8.3+):**  
+> El sistema fue concebido y desarrollado bajo estándares modernos de PHP 8. Toda la lógica de negocio, controladores, modelos, enrutador y componentes criptográficos son **100% compatibles con PHP 8.2.12** (versión estándar y común de XAMPP para Windows).  
+> La única consideración al desplegar en entornos PHP 8.2 radica en instalar las dependencias con:  
+> `composer install --no-dev`  
+> Esto instala de forma inmediata las librerías de producción (`firebase/php-jwt` y `vlucas/phpdotenv`, que solo exigen PHP 8.0+), omitiendo el framework de pruebas PHPUnit 12 que requiere CLI >= 8.3.
 
 ---
 
 ## 🚀 Instalación y Despliegue
 
-### Opción A — Script Automatizado (Linux)
+### Opción A — Script Automatizado para Windows / XAMPP (`setup_windows.bat`)
 
-El repositorio incluye el script ejecutable `setup_linux.sh` para entorno Linux (Debian, Ubuntu, Linux Mint):
+Si utilizas **Windows con XAMPP** (incluso con **PHP 8.2.12**), el repositorio cuenta con el script automatizado `setup_windows.bat`:
+
+1. Abre tu terminal (CMD, PowerShell o Git Bash) y clona el repositorio dentro de la carpeta `htdocs` de XAMPP:
+   ```cmd
+   cd C:\xampp\htdocs
+   git clone https://github.com/mroberth/DIRPOLES-4.git DIRPOLES-4
+   cd DIRPOLES-4
+   ```
+2. Ejecuta el archivo por lotes (o haz doble clic sobre él en el Explorador de Archivos):
+   ```cmd
+   setup_windows.bat
+   ```
+   El script se encargará automáticamente de:
+   - Crear el archivo `.env` configurado para XAMPP (`root` sin contraseña).
+   - Crear los directorios `logs/`, `uploads/` y `app/Config/Keys/`.
+   - Generar las 4 llaves RSA-2048 (`login` y `jwt`) mediante PHP CLI o OpenSSL.
+   - Instalar las dependencias de producción compatibles con PHP 8.2 (`composer install --no-dev`).
+   - Importar las bases de datos `dirpoles_security` y `dirpoles_business` en MySQL.
+
+3. Inicia **Apache** y **MySQL** desde el Panel de Control de XAMPP.
+4. Accede en tu navegador a: **`http://localhost/DIRPOLES-4`**
+
+---
+
+### Opción B — Script Automatizado para Linux (`setup_linux.sh`)
+
+Para distribuciones Linux (Debian, Ubuntu, Linux Mint) con Apache y PHP 8.3:
 
 ```bash
 git clone https://github.com/mroberth/DIRPOLES-4.git DIRPOLES-4
@@ -128,11 +163,89 @@ El script ejecuta automáticamente:
 6. Importación automática de los dos esquemas SQL desde `docs/bd/`.
 7. Reinicio del servicio Apache.
 
-Acceso inmediato en: `http://localhost/DIRPOLES-4`
+Acceso inmediato en: **`http://localhost/DIRPOLES-4`**
 
 ---
 
-### Opción B — Instalación Manual Paso a Paso
+### Opción C — Guía Paso a Paso para Windows (XAMPP)
+
+Si prefieres realizar la instalación manualmente en Windows con XAMPP:
+
+#### 1. Ubicación y Clonación
+Clona el repositorio dentro del directorio raíz web de XAMPP (`htdocs`):
+```cmd
+cd C:\xampp\htdocs
+git clone https://github.com/mroberth/DIRPOLES-4.git DIRPOLES-4
+cd DIRPOLES-4
+```
+
+#### 2. Habilitar Extensiones en `php.ini` (XAMPP)
+Abre el archivo de configuración `C:\xampp\php\php.ini` (o desde el Panel de XAMPP haz clic en el botón **Config** junto a Apache y selecciona **PHP (php.ini)**).
+
+Verifica y descomenta (elimina el punto y coma `;` inicial) las siguientes extensiones:
+```ini
+extension=fileinfo     ; <-- VITAL: viene desactivada por defecto en XAMPP y es requerida para validar uploads/fotos
+extension=openssl
+extension=pdo_mysql
+extension=mbstring
+```
+Guarda los cambios y reinicia Apache en XAMPP.
+
+#### 3. Configurar Variables de Entorno (`.env`)
+Copia la plantilla de entorno:
+```cmd
+copy .env.example .env
+```
+En XAMPP, el usuario por defecto de MySQL es `root` sin contraseña. Tu `.env` debe quedar con:
+```env
+DB_HOST=localhost
+DB_NAME=dirpoles_business
+DB_USER=root
+DB_PASS=
+DB_SECURITY_NAME=dirpoles_security
+DB_SECURITY_USER=root
+DB_SECURITY_PASS=
+```
+
+#### 4. Generar Llaves Criptográficas RSA (Multiplataforma)
+DIRPOLES-4 incluye un generador PHP nativo que no requiere instalar herramientas externas:
+```cmd
+php scripts/generar_llaves.php
+```
+*(Alternativamente, si usas Git Bash, puedes generarlas con OpenSSL CLI: `openssl genrsa -out app/Config/Keys/login_private.pem 2048`, etc.)*.
+
+#### 5. Instalar Dependencias con Composer (PHP 8.2 / 8.3)
+Dado que el entorno de desarrollo incluye PHPUnit 12 (que requiere PHP >= 8.3), **en PHP 8.2.12 debes instalar únicamente las librerías de producción**:
+```cmd
+composer install --no-dev
+```
+> [!TIP]
+> El flag `--no-dev` instala exclusivamente `firebase/php-jwt` y `vlucas/phpdotenv`. Ambas son compatibles desde PHP 8.0+, garantizando una instalación rápida, limpia y sin conflictos de versiones en Windows.
+
+#### 6. Importar Bases de Datos
+Puedes importarlas de dos formas:
+- **Vía phpMyAdmin:** Entra en `http://localhost/phpmyadmin`, crea o importa directamente los scripts:
+  1. `docs\bd\dirpoles_security.sql`
+  2. `docs\bd\dirpoles_business.sql`
+- **Vía Línea de Comandos (CMD):**
+  ```cmd
+  C:\xampp\mysql\bin\mysql.exe -u root < docs\bd\dirpoles_security.sql
+  C:\xampp\mysql\bin\mysql.exe -u root < docs\bd\dirpoles_business.sql
+  ```
+
+#### 7. Carpetas de Almacenamiento
+Asegúrate de que existan las carpetas para logs y subida de archivos:
+```cmd
+if not exist logs mkdir logs
+if not exist uploads mkdir uploads
+```
+
+Inicia **Apache** y **MySQL** desde el Panel de Control de XAMPP y visita:  
+**`http://localhost/DIRPOLES-4`**
+
+---
+
+### Opción D — Instalación Manual Paso a Paso (Linux)
 
 #### 1. Clonar el repositorio
 ```bash
@@ -148,22 +261,20 @@ Ajusta credenciales de base de datos en `.env`.
 
 #### 3. Instalar dependencias PHP
 ```bash
-composer install
+composer install --no-dev
 ```
 
 #### 4. Generar Llaves Criptográficas RSA
 ```bash
+php scripts/generar_llaves.php
+```
+*(O usando OpenSSL CLI)*:
+```bash
 mkdir -p app/Config/Keys
-
-# Llaves RSA para cifrado de login en cliente
 openssl genrsa -out app/Config/Keys/login_private.pem 2048
 openssl rsa -in app/Config/Keys/login_private.pem -pubout -out app/Config/Keys/login_public.pem
-
-# Llaves RSA para firma asimétrica de JWT (RS256)
 openssl genrsa -out app/Config/Keys/jwt_private.pem 2048
 openssl rsa -in app/Config/Keys/jwt_private.pem -pubout -out app/Config/Keys/jwt_public.pem
-
-# Permisos strictly de lectura por el servidor
 chmod 600 app/Config/Keys/*_private.pem
 chmod 644 app/Config/Keys/*_public.pem
 ```
@@ -314,6 +425,59 @@ Toda la arquitectura, especificaciones de base de datos, lógica de los 18 módu
 * **[Manual Técnico Maestro de DIRPOLES-4](docs/MANUAL_TECNICO_DIRPOLES4.md):** Documento oficial consolidado (Capítulos 1 al 6, Glosario y Estándares ISO/OWASP).
 * **[Guía de Construcción de Módulos](GUIA-MODULOS.md):** Guía paso a paso para la incorporación de nuevas funcionalidades.
 * **[Reglas de Desarrollo para IA / Agentes](AGENTS.md):** Estándares y convenciones de código del repositorio.
+
+---
+
+## 🛠 Solución de Problemas Frecuentes
+
+### 1. Error en Composer: `phpunit/phpunit requires php >=8.3` al usar PHP 8.2 en Windows
+- **Causa:** Por defecto, `composer install` intenta instalar las dependencias de desarrollo (`require-dev`), donde PHPUnit 12 exige CLI `>= 8.3`.
+- **Solución:** Ejecuta la instalación omitiendo los paquetes de desarrollo:
+  ```cmd
+  composer install --no-dev
+  ```
+  Esto instalará únicamente las dependencias necesarias para que el sistema funcione (`firebase/php-jwt` y `vlucas/phpdotenv`), las cuales son 100% compatibles con PHP 8.0+.
+
+### 2. Error al subir comprobantes o fotos: `Call to undefined function mime_content_type()`
+- **Causa:** En instalaciones estándar de XAMPP para Windows, la extensión nativa `fileinfo` viene deshabilitada por defecto.
+- **Solución:**
+  1. Abre el archivo `C:\xampp\php\php.ini` (o presiona el botón **Config** junto a Apache en el Panel de XAMPP y selecciona `PHP (php.ini)`).
+  2. Busca la línea `;extension=fileinfo` (usa `Ctrl + B` o `Ctrl + F`).
+  3. Elimina el punto y coma (`;`) al inicio para que quede:
+     ```ini
+     extension=fileinfo
+     ```
+  4. Guarda el archivo y reinicia el servicio Apache en XAMPP.
+
+### 3. Error en Login: `Llave privada de login no encontrada`
+- **Causa:** Por seguridad, las llaves criptográficas RSA (`*.pem`) no se incluyen en el repositorio Git y deben generarse en cada entorno.
+- **Solución:** Ejecuta el generador multiplataforma de llaves incluido en el sistema:
+  ```cmd
+  php scripts/generar_llaves.php
+  ```
+  Esto generará de inmediato los 4 archivos `.pem` necesarios en la carpeta `app/Config/Keys/`.
+
+### 4. Rutas dan error 404 (Not Found) al navegar
+- **Causa:** El módulo `mod_rewrite` de Apache no está procesando el archivo `.htaccess`.
+- **Solución:**
+  1. Verifica que el archivo `.htaccess` esté presente en la raíz del proyecto (`C:\xampp\htdocs\DIRPOLES-4\.htaccess`).
+  2. En `C:\xampp\apache\conf\httpd.conf`, comprueba que la línea:
+     ```apache
+     LoadModule rewrite_module modules/mod_rewrite.so
+     ```
+     no tenga `#` al inicio.
+  3. Asegúrate de que el bloque `<Directory "C:/xampp/htdocs">` tenga `AllowOverride All`.
+  4. Reinicia Apache.
+
+### 5. Error de conexión: `Access denied for user 'root'@'localhost'`
+- **Causa:** Las credenciales configuradas en `.env` no coinciden con las de tu gestor de base de datos.
+- **Solución:** En una instalación fresca de XAMPP, el usuario es `root` y la contraseña está completamente vacía. Ajusta tu `.env`:
+  ```env
+  DB_USER=root
+  DB_PASS=
+  DB_SECURITY_USER=root
+  DB_SECURITY_PASS=
+  ```
 
 ---
 
