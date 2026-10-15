@@ -81,21 +81,21 @@ if %errorlevel% equ 0 (
 :: 4. DEPENDENCIAS COMPOSER (PHP 8.2 y 8.3)
 :: ---------------------------------------------------------------
 echo.
-echo [4/6] Instalando dependencias de produccion con Composer...
+echo [4/6] Instalando dependencias con Composer...
 where composer >nul 2>nul
 if %errorlevel% equ 0 (
-    echo   - Ejecutando: composer install --no-dev --no-interaction
-    composer install --no-dev --no-interaction
-    if %errorlevel% equ 0 (
-        echo   - Dependencias de produccion instaladas correctamente.
+    echo   - Ejecutando: composer install --no-interaction
+    composer install --no-interaction
+    if !errorlevel! equ 0 (
+        echo   - Dependencias instaladas correctamente.
     ) else (
-        echo   [AVISO] Si recibiste un error de version, ejecuta:
-        echo   composer install --no-dev --ignore-platform-reqs
+        echo   - Reintentando instalacion ligera: composer install --no-dev --no-interaction
+        composer install --no-dev --no-interaction
     )
 ) else (
     echo   [AVISO] Composer CLI no detectado en el PATH de Windows.
     echo   Si ya instalaste Composer, abre una terminal en esta carpeta y corre:
-    echo   composer install --no-dev
+    echo   composer install
 )
 
 :: ---------------------------------------------------------------

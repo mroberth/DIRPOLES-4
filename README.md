@@ -107,11 +107,9 @@ Navegador ──▶ .htaccess ──▶ index.php (Front Controller)
 | **Herramientas de Criptografía**| PHP CLI / OpenSSL | Para generación de pares de claves RSA-2048 (script multiplataforma incluido) |
 
 > [!IMPORTANT]
-> **Compatibilidad Garantizada (Windows con XAMPP 8.2.12+ y Linux con PHP 8.3+):**  
-> El sistema fue concebido y desarrollado bajo estándares modernos de PHP 8. Toda la lógica de negocio, controladores, modelos, enrutador y componentes criptográficos son **100% compatibles con PHP 8.2.12** (versión estándar y común de XAMPP para Windows).  
-> La única consideración al desplegar en entornos PHP 8.2 radica en instalar las dependencias con:  
-> `composer install --no-dev`  
-> Esto instala de forma inmediata las librerías de producción (`firebase/php-jwt` y `vlucas/phpdotenv`, que solo exigen PHP 8.0+), omitiendo el framework de pruebas PHPUnit 12 que requiere CLI >= 8.3.
+> **Compatibilidad Nativa Total (Windows con XAMPP 8.2.12+ y Linux con PHP 8.3+):**  
+> El sistema fue concebido bajo estándares de PHP 8.2+ y las dependencias de desarrollo del repositorio fueron ajustadas a **PHPUnit 11** (compatible nativamente con `PHP >= 8.2`).  
+> De este modo, la instalación estándar mediante `composer install` (o `composer install --no-dev` para entornos de producción) funciona **directamente y sin advertencias ni bloqueos de versión** tanto en Windows (XAMPP 8.2.12+) como en Linux (PHP 8.3+).
 
 ---
 
@@ -215,12 +213,12 @@ php scripts/generar_llaves.php
 *(Alternativamente, si usas Git Bash, puedes generarlas con OpenSSL CLI: `openssl genrsa -out app/Config/Keys/login_private.pem 2048`, etc.)*.
 
 #### 5. Instalar Dependencias con Composer (PHP 8.2 / 8.3)
-Dado que el entorno de desarrollo incluye PHPUnit 12 (que requiere PHP >= 8.3), **en PHP 8.2.12 debes instalar únicamente las librerías de producción**:
+Gracias a que las dependencias de desarrollo están fijadas en **PHPUnit 11** (compatible con `PHP >= 8.2`), puedes ejecutar la instalación estándar directamente:
 ```cmd
-composer install --no-dev
+composer install
 ```
 > [!TIP]
-> El flag `--no-dev` instala exclusivamente `firebase/php-jwt` y `vlucas/phpdotenv`. Ambas son compatibles desde PHP 8.0+, garantizando una instalación rápida, limpia y sin conflictos de versiones en Windows.
+> Si vas a desplegar en un servidor de producción o deseas una instalación más ligera y rápida omitiendo librerías de pruebas, puedes usar `composer install --no-dev`. Ambas variantes funcionarán perfectamente en PHP 8.2 y 8.3.
 
 #### 6. Importar Bases de Datos
 Puedes importarlas de dos formas:
@@ -430,13 +428,12 @@ Toda la arquitectura, especificaciones de base de datos, lógica de los 18 módu
 
 ## 🛠 Solución de Problemas Frecuentes
 
-### 1. Error en Composer: `phpunit/phpunit requires php >=8.3` al usar PHP 8.2 en Windows
-- **Causa:** Por defecto, `composer install` intenta instalar las dependencias de desarrollo (`require-dev`), donde PHPUnit 12 exige CLI `>= 8.3`.
-- **Solución:** Ejecuta la instalación omitiendo los paquetes de desarrollo:
+### 1. Error de compatibilidad en Composer con versiones de PHP
+- **Estado en este repositorio:** El proyecto cuenta con **PHPUnit 11.5**, el cual es 100% compatible con **PHP >= 8.2** (tanto en Windows con XAMPP 8.2.12 como en Linux con PHP 8.3). Un simple `composer install` resolverá todas las dependencias sin conflictos.
+- **Instalación ligera / Producción:** Si estás en un servidor donde solo requieres la aplicación en ejecución (sin pruebas unitarias), puedes omitir las dependencias dev:
   ```cmd
   composer install --no-dev
   ```
-  Esto instalará únicamente las dependencias necesarias para que el sistema funcione (`firebase/php-jwt` y `vlucas/phpdotenv`), las cuales son 100% compatibles con PHP 8.0+.
 
 ### 2. Error al subir comprobantes o fotos: `Call to undefined function mime_content_type()`
 - **Causa:** En instalaciones estándar de XAMPP para Windows, la extensión nativa `fileinfo` viene deshabilitada por defecto.
