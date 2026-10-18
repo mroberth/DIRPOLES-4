@@ -116,17 +116,22 @@ class RateLimitMiddleware
     }
 
     /**
-     * Consulta el registro de rate limits de la IP y endpoint
+     * Consulta el registro de rate limits de la IP y endpoint, con soporte para bloqueo pesimista (FOR UPDATE).
      */
-    private static function queryRateLimit($pdo, $ip, $endpoint)
+    private static function queryRateLimit($pdo, string $ip, string $endpoint, bool $forUpdate = false): ?array
     {
-        $stmt = $pdo->prepare("SELECT tokens_actuales, ultima_peticion FROM rate_limits WHERE ip_address = :ip AND endpoint = :endpoint");
+        $sql = "SELECT tokens_actuales, ultima_peticion FROM rate_limits WHERE ip_address = :ip AND endpoint = :endpoint";
+        if ($forUpdate) {
+            $sql .= " FOR UPDATE";
+        }
+        $stmt = $pdo->prepare($sql);
         $stmt->execute(['ip' => $ip, 'endpoint' => $endpoint]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $record = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $record ?: null;
     }
 
     /**
-     * Maneja el rate limiting del Token Bucket
+     * Maneja el rate limiting del Token Bucket con transacción y bloqueo pesimista por fila (FOR UPDATE)
      */
     public static function handle()
     {
@@ -140,75 +145,91 @@ class RateLimitMiddleware
         $rate = (float) $policy['rate'];
 
         $pdo = self::getPdo();
-        $record = self::queryRateLimit($pdo, $ip, $endpoint);
-
         $currentTime = time();
 
-        if (!$record) {
-            // El cubo se inicializa lleno con la capacidad máxima, y restamos 1 para esta petición
-            $tokensCalculados = $capacity;
-            $ultimaPeticion = $currentTime;
+        try {
+            $pdo->beginTransaction();
 
-            $stmt = $pdo->prepare("INSERT INTO rate_limits (ip_address, endpoint, tokens_actuales, ultima_peticion) VALUES (:ip, :endpoint, :tokens, :time)");
+            // 1. Garantizar de forma atómica la existencia de la tupla (ip_address, endpoint)
+            $stmt = $pdo->prepare(
+                "INSERT IGNORE INTO rate_limits (ip_address, endpoint, tokens_actuales, ultima_peticion)
+                 VALUES (:ip, :endpoint, :capacity, :time)"
+            );
             $stmt->execute([
-                'ip' => $ip,
+                'ip'       => $ip,
                 'endpoint' => $endpoint,
-                'tokens' => $tokensCalculados - 1.0,
-                'time' => $ultimaPeticion
+                'capacity' => $capacity,
+                'time'     => $currentTime
             ]);
+
+            // 2. Bloquear exclusivamente la fila de esta IP y endpoint (Row-Level Locking anti-concurrencia)
+            $record = self::queryRateLimit($pdo, $ip, $endpoint, true);
+
+            $tokensActuales = (float) ($record['tokens_actuales'] ?? $capacity);
+            $ultimaPeticion = (int) ($record['ultima_peticion'] ?? $currentTime);
+
+            $tiempoTranscurrido = max(0, $currentTime - $ultimaPeticion);
+            $tokensRegenerados = $tiempoTranscurrido * $rate;
+            $tokensCalculados = min($capacity, $tokensActuales + $tokensRegenerados);
+
+            // 3. Si los tokens calculados son menores a 1, bloquear la petición
+            if ($tokensCalculados < 1.0) {
+                $pdo->commit(); // Liberar el bloqueo inmediatamente para no demorar otros hilos
+
+                $tokensNecesarios = 1.0 - $tokensCalculados;
+                $segundosEspera = (int) ceil($tokensNecesarios / $rate);
+                $mensaje = 'Demasiadas peticiones. Por favor, intente de nuevo en ' . $segundosEspera . ' segundos.';
+
+                if (!headers_sent()) {
+                    http_response_code(429);
+                    header('Retry-After: ' . $segundosEspera);
+                }
+
+                $expectsJson = (
+                    (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ||
+                    (isset($_SERVER['HTTP_ACCEPT']) && strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/json') !== false) ||
+                    (isset($_SERVER['CONTENT_TYPE']) && strpos(strtolower($_SERVER['CONTENT_TYPE']), 'application/json') !== false) ||
+                    preg_match('/(_ia|_data)$/', $endpoint)
+                );
+
+                if ($expectsJson) {
+                    // Contrato JSON único: {exito:false, error:{codigo, estado, mensaje}}.
+                    Respuesta::error(new ExcepcionApi(
+                        ErrorCodes::RATE_LIMIT_EXCEDIDO,
+                        429,
+                        $mensaje
+                    ));
+                }
+
+                // Responder con un template HTML premium
+                http_response_code(429);
+                self::renderBlockPage($segundosEspera);
+                exit();
+            }
+
+            // 4. Si tiene tokens, restamos 1 y actualizamos en la base de datos
+            $nuevosTokens = $tokensCalculados - 1.0;
+            $stmt = $pdo->prepare(
+                "UPDATE rate_limits 
+                 SET tokens_actuales = :tokens, ultima_peticion = :time 
+                 WHERE ip_address = :ip AND endpoint = :endpoint"
+            );
+            $stmt->execute([
+                'tokens'   => $nuevosTokens,
+                'time'     => $currentTime,
+                'ip'       => $ip,
+                'endpoint' => $endpoint
+            ]);
+
+            $pdo->commit();
+        } catch (Throwable $e) {
+            if ($pdo && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            error_log('RateLimitMiddleware error: ' . $e->getMessage());
+            // Fail-open: si ocurre un error inesperado de BD en el middleware perimétrico, no bloqueamos la petición
             return;
         }
-
-        // Si existe el registro, calculamos tokens regenerados basándonos en el tiempo transcurrido
-        $tokensActuales = (float) $record['tokens_actuales'];
-        $ultimaPeticion = (int) $record['ultima_peticion'];
-
-        $tiempoTranscurrido = max(0, $currentTime - $ultimaPeticion);
-        $tokensRegenerados = $tiempoTranscurrido * $rate;
-        $tokensCalculados = min($capacity, $tokensActuales + $tokensRegenerados);
-
-        // Si los tokens calculados son menores a 1, bloquear la petición
-        if ($tokensCalculados < 1.0) {
-            $tokensNecesarios = 1.0 - $tokensCalculados;
-            $segundosEspera = (int) ceil($tokensNecesarios / $rate);
-            $mensaje = 'Demasiadas peticiones. Por favor, intente de nuevo en ' . $segundosEspera . ' segundos.';
-
-            if (!headers_sent()) {
-                http_response_code(429);
-                header('Retry-After: ' . $segundosEspera);
-            }
-
-            $expectsJson = (
-                (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') ||
-                (isset($_SERVER['HTTP_ACCEPT']) && strpos(strtolower($_SERVER['HTTP_ACCEPT']), 'application/json') !== false) ||
-                (isset($_SERVER['CONTENT_TYPE']) && strpos(strtolower($_SERVER['CONTENT_TYPE']), 'application/json') !== false) ||
-                preg_match('/(_ia|_data)$/', $endpoint)
-            );
-
-            if ($expectsJson) {
-                // Contrato JSON único: {exito:false, error:{codigo, estado, mensaje}}.
-                Respuesta::error(new ExcepcionApi(
-                    ErrorCodes::RATE_LIMIT_EXCEDIDO,
-                    429,
-                    $mensaje
-                ));
-            }
-
-            // Responder con un template HTML premium
-            http_response_code(429);
-            self::renderBlockPage($segundosEspera);
-            exit();
-        }
-
-        // Si tiene tokens, restamos 1 y actualizamos en la base de datos
-        $nuevosTokens = $tokensCalculados - 1.0;
-        $stmt = $pdo->prepare("UPDATE rate_limits SET tokens_actuales = :tokens, ultima_peticion = :time WHERE ip_address = :ip AND endpoint = :endpoint");
-        $stmt->execute([
-            'tokens' => $nuevosTokens,
-            'time' => $currentTime,
-            'ip' => $ip,
-            'endpoint' => $endpoint
-        ]);
     }
 
     /**

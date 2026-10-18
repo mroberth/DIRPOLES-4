@@ -1140,30 +1140,64 @@ public static function handle()
     $rate = (float) $policy['rate'];
 
     $pdo = self::getPdo();
-    $record = self::queryRateLimit($pdo, $ip, $endpoint);
     $currentTime = time();
 
-    if (!$record) {
-        $stmt = $pdo->prepare("INSERT INTO rate_limits (ip_address, endpoint, tokens_actuales, ultima_peticion) VALUES (:ip, :endpoint, :tokens, :time)");
-        $stmt->execute(['ip' => $ip, 'endpoint' => $endpoint, 'tokens' => $capacity - 1.0, 'time' => $currentTime]);
+    try {
+        $pdo->beginTransaction();
+
+        // Garantiza de forma atómica la existencia de la tupla (ip_address, endpoint)
+        $stmt = $pdo->prepare(
+            "INSERT IGNORE INTO rate_limits (ip_address, endpoint, tokens_actuales, ultima_peticion)
+             VALUES (:ip, :endpoint, :capacity, :time)"
+        );
+        $stmt->execute(['ip' => $ip, 'endpoint' => $endpoint, 'capacity' => $capacity, 'time' => $currentTime]);
+
+        // Bloqueo pesimista por fila (Row-Level Locking anti-concurrencia)
+        $stmt = $pdo->prepare(
+            "SELECT tokens_actuales, ultima_peticion 
+             FROM rate_limits 
+             WHERE ip_address = :ip AND endpoint = :endpoint 
+             FOR UPDATE"
+        );
+        $stmt->execute(['ip' => $ip, 'endpoint' => $endpoint]);
+        $record = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $tokensActuales = (float) ($record['tokens_actuales'] ?? $capacity);
+        $ultimaPeticion = (int) ($record['ultima_peticion'] ?? $currentTime);
+
+        $tiempoTranscurrido = max(0, $currentTime - $ultimaPeticion);
+        $tokensRegenerados = $tiempoTranscurrido * $rate;
+        $tokensCalculados = min($capacity, $tokensActuales + $tokensRegenerados);
+
+        if ($tokensCalculados < 1.0) {
+            $pdo->commit(); // Liberar bloqueo inmediatamente
+            $segundosEspera = (int) ceil((1.0 - $tokensCalculados) / $rate);
+            if (!headers_sent()) {
+                http_response_code(429);
+                header('Retry-After: ' . $segundosEspera);
+            }
+            throw new ExcepcionApi(ErrorCodes::RATE_LIMIT_EXCEDIDO, 429, 'Demasiadas peticiones. Intente en ' . $segundosEspera . 's.');
+        }
+
+        $nuevosTokens = $tokensCalculados - 1.0;
+        $stmt = $pdo->prepare(
+            "UPDATE rate_limits 
+             SET tokens_actuales = :tokens, ultima_peticion = :time 
+             WHERE ip_address = :ip AND endpoint = :endpoint"
+        );
+        $stmt->execute(['tokens' => $nuevosTokens, 'time' => $currentTime, 'ip' => $ip, 'endpoint' => $endpoint]);
+
+        $pdo->commit();
+    } catch (Throwable $e) {
+        if ($pdo && $pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        if ($e instanceof ExcepcionApi) {
+            throw $e;
+        }
+        error_log('RateLimitMiddleware: ' . $e->getMessage());
         return;
     }
-
-    $tiempoTranscurrido = max(0, $currentTime - (int)$record['ultima_peticion']);
-    $tokensRegenerados = $tiempoTranscurrido * $rate;
-    $tokensCalculados = min($capacity, (float)$record['tokens_actuales'] + $tokensRegenerados);
-
-    if ($tokensCalculados < 1.0) {
-        $segundosEspera = (int) ceil((1.0 - $tokensCalculados) / $rate);
-        if (!headers_sent()) {
-            http_response_code(429);
-            header('Retry-After: ' . $segundosEspera);
-        }
-        throw new ExcepcionApi(ErrorCodes::RATE_LIMIT_EXCEDIDO, 429, 'Demasiadas peticiones. Intente en ' . $segundosEspera . 's.');
-    }
-
-    $stmt = $pdo->prepare("UPDATE rate_limits SET tokens_actuales = :tokens, ultima_peticion = :time WHERE ip_address = :ip AND endpoint = :endpoint");
-    $stmt->execute(['tokens' => $tokensCalculados - 1.0, 'time' => $currentTime, 'ip' => $ip, 'endpoint' => $endpoint]);
 }
 ```
 
