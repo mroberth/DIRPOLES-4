@@ -132,9 +132,23 @@ Si utilizas **Windows con XAMPP** (incluso con **PHP 8.2.12**), el repositorio c
    El script se encargará automáticamente de:
    - Crear el archivo `.env` configurado para XAMPP (`root` sin contraseña).
    - Crear los directorios `logs/`, `uploads/` y `app/Config/Keys/`.
-   - Generar las 4 llaves RSA-2048 (`login` y `jwt`) mediante PHP CLI o OpenSSL.
-   - Instalar las dependencias de producción compatibles con PHP 8.2 (`composer install --no-dev`).
-   - Importar las bases de datos `dirpoles_security` y `dirpoles_business` en MySQL.
+   - Generar las 4 llaves RSA-2048 (`login` y `jwt`) mediante el generador PHP incluido.
+   - Verificar PHP y las extensiones `openssl`, `pdo_mysql`, `mbstring` y `fileinfo`.
+   - Instalar las dependencias mediante Composer.
+   - Detectar los dumps SQL actualizados y mostrar los comandos de importación.
+
+   Por seguridad, el instalador **no importa automáticamente las bases de datos**:
+   los dumps contienen `DROP TABLE` y pueden reemplazar datos existentes. Después de
+   confirmar que MySQL está iniciado y revisar los archivos, importa en CMD:
+   ```cmd
+   C:\xampp\mysql\bin\mysql.exe -u root -p < docs\bd\dirpoles_security_actualizada.sql
+   C:\xampp\mysql\bin\mysql.exe -u root -p < docs\bd\dirpoles_business_actualizada.sql
+   ```
+   En una instalación XAMPP nueva, puedes omitir `-p` si `root` no tiene contraseña.
+   Como alternativa, puedes solicitar la importación explícita ejecutando:
+   ```cmd
+   setup_windows.bat --import-databases
+   ```
 
 3. Inicia **Apache** y **MySQL** desde el Panel de Control de XAMPP.
 4. Accede en tu navegador a: **`http://localhost/DIRPOLES-4`**
@@ -143,7 +157,7 @@ Si utilizas **Windows con XAMPP** (incluso con **PHP 8.2.12**), el repositorio c
 
 ### Opción B — Script Automatizado para Linux (`setup_linux.sh`)
 
-Para distribuciones Linux (Debian, Ubuntu, Linux Mint) con Apache y PHP 8.3:
+Para Debian, Ubuntu o Linux Mint con Apache, PHP 8.3+ y MariaDB/MySQL:
 
 ```bash
 git clone https://github.com/mroberth/DIRPOLES-4.git DIRPOLES-4
@@ -155,11 +169,28 @@ chmod +x setup_linux.sh
 El script ejecuta automáticamente:
 1. Creación del archivo de configuración Apache Alias (`/DIRPOLES-4`).
 2. Generación del archivo `.env` a partir de `.env.example`.
-3. Generación criptográfica de las llaves RSA de 2048 bits para Login y JWT en `app/Config/Keys/` con permisos `600`.
-4. Creación de directorios de almacenamiento (`logs/`, `uploads/`) con permisos requeridos.
-5. Instalación de dependencias de PHP vía Composer.
-6. Importación automática de los dos esquemas SQL desde `docs/bd/`.
-7. Reinicio del servicio Apache.
+3. Verificación de PHP, Composer, OpenSSL, MySQL y las extensiones requeridas.
+4. Generación criptográfica de las llaves RSA de 2048 bits para Login y JWT en `app/Config/Keys/`.
+5. Creación de directorios de almacenamiento (`logs/`, `uploads/`) con permisos restringidos.
+6. Instalación de dependencias de PHP vía Composer.
+7. Verificación de los dumps SQL actualizados.
+
+La importación SQL se ejecuta únicamente cuando se solicita explícitamente, porque
+los dumps contienen `DROP TABLE`:
+
+```bash
+MYSQL_USER=root MYSQL_PASSWORD='tu_clave' ./setup_linux.sh --import-databases
+```
+
+Si la cuenta no tiene contraseña, puede omitirse `MYSQL_PASSWORD`. También puedes
+ejecutar el instalador sin `--import-databases` y seguir el paso manual:
+
+```bash
+mysql -u root -p < docs/bd/dirpoles_security_actualizada.sql
+mysql -u root -p < docs/bd/dirpoles_business_actualizada.sql
+```
+
+8. Reinicio del servicio Apache.
 
 Acceso inmediato en: **`http://localhost/DIRPOLES-4`**
 
@@ -223,12 +254,12 @@ composer install
 #### 6. Importar Bases de Datos
 Puedes importarlas de dos formas:
 - **Vía phpMyAdmin:** Entra en `http://localhost/phpmyadmin`, crea o importa directamente los scripts:
-  1. `docs\bd\dirpoles_security.sql`
-  2. `docs\bd\dirpoles_business.sql`
+  1. `docs\bd\dirpoles_security_actualizada.sql`
+  2. `docs\bd\dirpoles_business_actualizada.sql`
 - **Vía Línea de Comandos (CMD):**
   ```cmd
-  C:\xampp\mysql\bin\mysql.exe -u root < docs\bd\dirpoles_security.sql
-  C:\xampp\mysql\bin\mysql.exe -u root < docs\bd\dirpoles_business.sql
+  C:\xampp\mysql\bin\mysql.exe -u root -p < docs\bd\dirpoles_security_actualizada.sql
+  C:\xampp\mysql\bin\mysql.exe -u root -p < docs\bd\dirpoles_business_actualizada.sql
   ```
 
 #### 7. Carpetas de Almacenamiento
@@ -279,14 +310,15 @@ chmod 644 app/Config/Keys/*_public.pem
 
 #### 5. Importar Bases de Datos
 ```bash
-mysql -u root -p < docs/bd/dirpoles_security.sql
-mysql -u root -p < docs/bd/dirpoles_business.sql
+mysql -u root -p < docs/bd/dirpoles_security_actualizada.sql
+mysql -u root -p < docs/bd/dirpoles_business_actualizada.sql
 ```
 
 #### 6. Permisos de Directorios
 ```bash
 mkdir -p logs uploads
-chmod 777 logs uploads
+sudo chown -R "$USER:www-data" logs uploads
+sudo chmod 750 logs uploads
 ```
 
 ---

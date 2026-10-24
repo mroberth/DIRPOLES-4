@@ -88,6 +88,7 @@ class TrabajoSocialModel extends BusinessModel
             case 'id_empleado':
             case 'id_usuario':
             case 'id_patologia':
+            case 'id_tipo_empleado':
                 if (filter_var($valor, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
                     throw ExcepcionApi::validacion("El {$nombre} no es válido.");
                 }
@@ -332,7 +333,7 @@ class TrabajoSocialModel extends BusinessModel
                 FROM becas b
                 INNER JOIN solicitud_de_servicio ss ON ss.id_solicitud_serv = b.id_solicitud_serv
                 INNER JOIN beneficiario ben ON ben.id_beneficiario = ss.id_beneficiario
-                INNER JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
+                LEFT JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
         return $this->ejecutarListado($sql, 'b.fecha_creacion DESC, b.id_becas DESC');
     }
 
@@ -349,7 +350,7 @@ class TrabajoSocialModel extends BusinessModel
                 FROM exoneracion ex
                 INNER JOIN solicitud_de_servicio ss ON ss.id_solicitud_serv = ex.id_solicitud_serv
                 INNER JOIN beneficiario ben ON ben.id_beneficiario = ss.id_beneficiario
-                INNER JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
+                LEFT JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
         return $this->ejecutarListado($sql, 'ex.fecha_creacion DESC, ex.id_exoneracion DESC');
     }
 
@@ -368,7 +369,7 @@ class TrabajoSocialModel extends BusinessModel
                 INNER JOIN patologia p ON p.id_patologia = dp.id_patologia
                 INNER JOIN solicitud_de_servicio ss ON ss.id_solicitud_serv = f.id_solicitud_serv
                 INNER JOIN beneficiario ben ON ben.id_beneficiario = ss.id_beneficiario
-                INNER JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
+                LEFT JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
         return $this->ejecutarListado($sql, 'f.fecha_creacion DESC, f.id_fames DESC');
     }
 
@@ -387,7 +388,7 @@ class TrabajoSocialModel extends BusinessModel
                 INNER JOIN patologia p ON p.id_patologia = dp.id_patologia
                 INNER JOIN solicitud_de_servicio ss ON ss.id_solicitud_serv = g.id_solicitud_serv
                 INNER JOIN beneficiario ben ON ben.id_beneficiario = ss.id_beneficiario
-                INNER JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
+                LEFT JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado';
         return $this->ejecutarListado($sql, 'g.fecha_creacion DESC, g.id_gestion DESC');
     }
 
@@ -1276,6 +1277,11 @@ class TrabajoSocialModel extends BusinessModel
 
     private function esAdministrativo(): bool
     {
-        return in_array($this->__get('tipo_empleado'), ['Administrador', 'Superusuario'], true);
+        $idTipo = (int) ($this->__get('id_tipo_empleado') ?? 0);
+        if ($idTipo === 6 || $idTipo === 10) {
+            return true;
+        }
+        $tipo = mb_strtolower(trim((string) $this->__get('tipo_empleado')));
+        return str_contains($tipo, 'administrador') || str_contains($tipo, 'superusuario');
     }
 }

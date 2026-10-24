@@ -53,6 +53,7 @@ class DiscapacidadModel extends BusinessModel
             case 'id_beneficiario':
             case 'id_empleado':
             case 'id_usuario':
+            case 'id_tipo_empleado':
                 if (filter_var($valor, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
                     throw ExcepcionApi::validacion("El {$nombre} no es válido.");
                 }
@@ -161,7 +162,7 @@ class DiscapacidadModel extends BusinessModel
                 FROM discapacidad d
                 INNER JOIN solicitud_de_servicio ss ON ss.id_solicitud_serv = d.id_solicitud_serv
                 INNER JOIN beneficiario b ON b.id_beneficiario = ss.id_beneficiario
-                INNER JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado";
+                LEFT JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado";
         if (!$this->esAdministrativo()) {
             $sql .= ' WHERE ss.id_empleado = :id_empleado';
         }
@@ -467,6 +468,11 @@ class DiscapacidadModel extends BusinessModel
 
     private function esAdministrativo(): bool
     {
-        return in_array($this->__get('tipo_empleado'), ['Administrador', 'Superusuario'], true);
+        $idTipo = (int) ($this->__get('id_tipo_empleado') ?? 0);
+        if ($idTipo === 6 || $idTipo === 10) {
+            return true;
+        }
+        $tipo = mb_strtolower(trim((string) $this->__get('tipo_empleado')));
+        return str_contains($tipo, 'administrador') || str_contains($tipo, 'superusuario');
     }
 }

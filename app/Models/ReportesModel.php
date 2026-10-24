@@ -268,9 +268,12 @@ class ReportesModel extends BusinessModel
 
     private function esAdmin(): bool
     {
-        $tipo = $_SESSION['tipo_empleado'] ?? '';
-        return strpos(strtolower($tipo), 'administrador') !== false
-            || strpos(strtolower($tipo), 'superusuario') !== false;
+        $idTipo = (int) ($_SESSION['id_tipo_empleado'] ?? 0);
+        if ($idTipo === 6 || $idTipo === 10) {
+            return true;
+        }
+        $tipo = mb_strtolower(trim((string) ($_SESSION['tipo_empleado'] ?? '')));
+        return str_contains($tipo, 'administrador') || str_contains($tipo, 'superusuario');
     }
 
     private function idEmpleadoSesion(): int

@@ -47,9 +47,9 @@ function verificarAccesoReporte(string $moduloEspecialidad = '', bool $soloAdmin
 {
     Autorizacion::verificar('reportes', 'leer');
 
-    $esAdmin = (isset($_SESSION['tipo_empleado']) &&
-        (strpos(strtolower($_SESSION['tipo_empleado']), 'administrador') !== false ||
-         strpos(strtolower($_SESSION['tipo_empleado']), 'superusuario') !== false));
+    $idTipo = (int) ($_SESSION['id_tipo_empleado'] ?? 0);
+    $tipo = mb_strtolower(trim((string) ($_SESSION['tipo_empleado'] ?? '')));
+    $esAdmin = ($idTipo === 6 || $idTipo === 10 || str_contains($tipo, 'administrador') || str_contains($tipo, 'superusuario'));
 
     if ($esAdmin) {
         return;
@@ -347,8 +347,11 @@ function reportesIaGenerar(string $modulo, string $intencion, array $filtros, ?s
         $msg = $detalle[0]['msg'] ?? 'Datos inválidos para el informe.';
         throw App\Core\ExcepcionApi::validacion('El informe no pudo generarse: ' . $msg);
     }
-    if ($codigo === 503 && isset($datos['error'])) {
-        throw App\Core\ExcepcionApi::errorInterno('Datos no disponibles temporalmente para el informe de IA.');
+    if ($codigo === 503) {
+        $msg503 = is_array($detalle)
+            ? ($detalle['detalle'] ?? ($detalle['error'] ?? 'Datos no disponibles temporalmente para el informe de IA.'))
+            : (is_string($detalle) && $detalle !== '' ? $detalle : 'Datos no disponibles temporalmente para el informe de IA.');
+        throw App\Core\ExcepcionApi::errorInterno((string) $msg503);
     }
     throw App\Core\ExcepcionApi::errorInterno('El servicio de IA respondió un error (' . $codigo . ').');
 }

@@ -15,6 +15,7 @@ function contextoTrabajoSocial(TrabajoSocialModel $modelo): void
 {
     $modelo->__set('id_usuario', (int) ($_SESSION['id_empleado'] ?? 0));
     $modelo->__set('tipo_empleado', $_SESSION['tipo_empleado'] ?? '');
+    $modelo->__set('id_tipo_empleado', (int) ($_SESSION['id_tipo_empleado'] ?? 0));
 }
 
 /** Lee el cuerpo JSON de una petición (puerta JSON). */

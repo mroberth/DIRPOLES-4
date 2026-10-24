@@ -207,16 +207,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: payload.toString()
             });
 
-            // comprobar status
-            if (!response.ok) {
-                throw new Error('Error en la petición: ' + response.status);
-            }
-
-            // parsear JSON
-            const data = await response.json();
+            // Parsear JSON del contrato único (el backend envía {exito, error} incluso con status 400/403/409/500)
+            const data = await response.json().catch(() => null);
 
             // Contrato JSON único: {exito:true, datos} | {exito:false, error:{codigo, estado, mensaje}}
-            if (data && data.exito === true) {
+            if (response.ok && data && data.exito === true) {
                 // Éxito: El servidor ya envió el JWT por cookie HttpOnly.
 
                 // Éxito: mostrar SweetAlert y redirigir a 'inicio'
@@ -236,11 +231,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             } else {
                 // Error del contrato. El frontend programa contra error.codigo (estable):
-                //   VALIDATION_ERROR  → credenciales inválidas
+                //   VALIDATION_ERROR  → credenciales inválidas o error de descifrado
                 //   ACCOUNT_LOCKED    → cuenta bloqueada tras 3 intentos
                 //   UNAUTHENTICATED   → token faltante/inválido
                 const error = (data && data.error) || {};
-                const msg = error.mensaje || 'Credenciales inválidas';
+                const msg = error.mensaje || (response.status === 400 ? 'Credenciales inválidas' : 'Error en la petición: ' + response.status);
                 const esBloqueo = error.codigo === 'ACCOUNT_LOCKED';
                 if (typeof Swal !== 'undefined' && Swal.fire) {
                     Swal.fire({

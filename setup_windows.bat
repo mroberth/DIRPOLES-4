@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableDelayedExpansion
+setlocal EnableExtensions EnableDelayedExpansion
 
 title DIRPOLES-4 - Instalador y Configurador para Windows (XAMPP)
 
@@ -10,6 +10,19 @@ echo.
 
 set "SCRIPT_DIR=%~dp0"
 cd /d "%SCRIPT_DIR%"
+set "SECURITY_SQL=docs\bd\dirpoles_security_actualizada.sql"
+set "BUSINESS_SQL=docs\bd\dirpoles_business_actualizada.sql"
+set "IMPORT_DATABASES=0"
+if /I "%~1"=="--import-databases" set "IMPORT_DATABASES=1"
+
+if not exist "%SECURITY_SQL%" (
+    echo [ERROR] No se encontro %SECURITY_SQL%.
+    exit /b 1
+)
+if not exist "%BUSINESS_SQL%" (
+    echo [ERROR] No se encontro %BUSINESS_SQL%.
+    exit /b 1
+)
 
 :: ---------------------------------------------------------------
 :: 1. VARIABLES DE ENTORNO (.env)
@@ -43,37 +56,35 @@ echo   - Directorios logs/, uploads/ y app/Config/Keys/ listos.
 echo.
 echo [3/6] Generando Llaves Criptograficas RSA (Login y JWT)...
 
+set "PHP_BIN="
 where php >nul 2>nul
-if %errorlevel% equ 0 (
-    php "scripts\generar_llaves.php"
+if !errorlevel! equ 0 (
+    set "PHP_BIN=php"
 ) else (
-    set "OPENSSL_BIN="
-    where openssl >nul 2>nul
-    if !errorlevel! equ 0 (
-        set "OPENSSL_BIN=openssl"
-    ) else (
-        if exist "C:\xampp\apache\bin\openssl.exe" (
-            set "OPENSSL_BIN=C:\xampp\apache\bin\openssl.exe"
-        )
+    if exist "C:\xampp\php\php.exe" (
+        set "PHP_BIN=C:\xampp\php\php.exe"
     )
-    if defined OPENSSL_BIN (
-        if not exist "app\Config\Keys\login_private.pem" (
-            "!OPENSSL_BIN!" genrsa -out "app\Config\Keys\login_private.pem" 2048 2>nul
-            "!OPENSSL_BIN!" rsa -in "app\Config\Keys\login_private.pem" -pubout -out "app\Config\Keys\login_public.pem" 2>nul
-            echo   - Llaves RSA de Login generadas con OpenSSL.
-        ) else (
-            echo   - Llaves de Login ya existen.
-        )
-        if not exist "app\Config\Keys\jwt_private.pem" (
-            "!OPENSSL_BIN!" genrsa -out "app\Config\Keys\jwt_private.pem" 2048 2>nul
-            "!OPENSSL_BIN!" rsa -in "app\Config\Keys\jwt_private.pem" -pubout -out "app\Config\Keys\jwt_public.pem" 2>nul
-            echo   - Llaves RSA de JWT (RS256) generadas con OpenSSL.
-        ) else (
-            echo   - Llaves de JWT ya existen.
-        )
-    ) else (
-        echo   [AVISO] No se encontro PHP ni OpenSSL en PATH.
-        echo   Ejecuta: php scripts\generar_llaves.php una vez configures PHP en tu PATH.
+)
+if not defined PHP_BIN (
+    echo   [ERROR] No se encontro PHP CLI. Agrega PHP al PATH o verifica C:\xampp\php.
+    exit /b 1
+)
+for %%E in (openssl pdo_mysql mbstring fileinfo) do (
+    "%PHP_BIN%" -m | findstr /I /R /C:"^%%E$" >nul
+    if !errorlevel! neq 0 (
+        echo   [ERROR] Falta la extension PHP: %%E
+        exit /b 1
+    )
+)
+"%PHP_BIN%" "scripts\generar_llaves.php"
+if !errorlevel! neq 0 (
+    echo   [ERROR] No se pudieron generar las llaves RSA.
+    exit /b 1
+)
+for %%K in (login_private login_public jwt_private jwt_public) do (
+    if not exist "app\Config\Keys\%%K.pem" (
+        echo   [ERROR] Falta la llave app\Config\Keys\%%K.pem
+        exit /b 1
     )
 )
 
@@ -83,7 +94,7 @@ if %errorlevel% equ 0 (
 echo.
 echo [4/6] Instalando dependencias con Composer...
 where composer >nul 2>nul
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     echo   - Ejecutando: composer install --no-interaction
     composer install --no-interaction
     if !errorlevel! equ 0 (
@@ -91,11 +102,15 @@ if %errorlevel% equ 0 (
     ) else (
         echo   - Reintentando instalacion ligera: composer install --no-dev --no-interaction
         composer install --no-dev --no-interaction
+        if !errorlevel! neq 0 (
+            echo   [ERROR] Composer no pudo instalar las dependencias.
+            exit /b 1
+        )
     )
 ) else (
-    echo   [AVISO] Composer CLI no detectado en el PATH de Windows.
-    echo   Si ya instalaste Composer, abre una terminal en esta carpeta y corre:
-    echo   composer install
+    echo   [ERROR] Composer CLI no detectado en el PATH de Windows.
+    echo   Instala Composer y vuelve a ejecutar setup_windows.bat.
+    exit /b 1
 )
 
 :: ---------------------------------------------------------------
@@ -105,7 +120,7 @@ echo.
 echo [5/6] Importando Bases de Datos en MariaDB / MySQL...
 set "MYSQL_BIN="
 where mysql >nul 2>nul
-if %errorlevel% equ 0 (
+if !errorlevel! equ 0 (
     set "MYSQL_BIN=mysql"
 ) else (
     if exist "C:\xampp\mysql\bin\mysql.exe" (
@@ -114,23 +129,30 @@ if %errorlevel% equ 0 (
 )
 
 if defined MYSQL_BIN (
-    echo   - Importando esquemas dirpoles_security y dirpoles_business...
-    "%MYSQL_BIN%" -u root < "docs\bd\dirpoles_security.sql" 2>nul
-    if %errorlevel% equ 0 (
-        echo   - Base de datos dirpoles_security importada.
+    if "!IMPORT_DATABASES!"=="1" (
+        echo   - ADVERTENCIA: los dumps contienen DROP TABLE.
+        echo   - La importacion puede reemplazar datos existentes.
+        "%MYSQL_BIN%" -u root -p < "%SECURITY_SQL%"
+        if !errorlevel! neq 0 (
+            echo   [ERROR] No se pudo importar dirpoles_security.
+            exit /b 1
+        )
+        "%MYSQL_BIN%" -u root -p < "%BUSINESS_SQL%"
+        if !errorlevel! neq 0 (
+            echo   [ERROR] No se pudo importar dirpoles_business.
+            exit /b 1
+        )
+        echo   - Bases de datos importadas correctamente.
     ) else (
-        echo   - [INFO] Si dirpoles_security ya existe o tiene contrasena, importala desde phpMyAdmin.
-    )
-    "%MYSQL_BIN%" -u root < "docs\bd\dirpoles_business.sql" 2>nul
-    if %errorlevel% equ 0 (
-        echo   - Base de datos dirpoles_business importada.
-    ) else (
-        echo   - [INFO] Si dirpoles_business ya existe o tiene contrasena, importala desde phpMyAdmin.
+        echo   - La importacion automatica se omite por seguridad.
+        echo   - Los dumps contienen DROP TABLE y pueden reemplazar datos.
+        echo   - Para importar explicitamente, ejecuta:
+        echo       setup_windows.bat --import-databases
     )
 ) else (
     echo   [INFO] MySQL CLI no detectado. Puedes importar facilmente los archivos:
-    echo     - docs\bd\dirpoles_security.sql
-    echo     - docs\bd\dirpoles_business.sql
+    echo     - %SECURITY_SQL%
+    echo     - %BUSINESS_SQL%
     echo   desde phpMyAdmin: http://localhost/phpmyadmin
 )
 
@@ -151,13 +173,14 @@ echo   ---------------------------------------------------------------------
 
 echo.
 echo =====================================================================
-echo   INSTALACION COMPLETADA
+echo   CONFIGURACION COMPLETADA
 echo =====================================================================
 echo   1. Inicia los modulos Apache y MySQL en el Panel de Control de XAMPP.
 echo   2. Abre tu navegador web en:
 echo      http://localhost/DIRPOLES-4
 echo.
-echo   Credenciales maestras: admin@gmail.com
+echo   Verifica las credenciales iniciales en la documentacion y cambia la contrasena.
+if "!IMPORT_DATABASES!"=="0" echo   3. Importa las bases de datos con: setup_windows.bat --import-databases
 echo =====================================================================
 echo.
 pause

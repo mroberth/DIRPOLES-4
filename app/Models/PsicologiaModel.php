@@ -35,6 +35,7 @@ class PsicologiaModel extends BusinessModel
             case 'id_empleado':
             case 'id_usuario':
             case 'id_patologia':
+            case 'id_tipo_empleado':
                 if (filter_var($valor, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
                     throw ExcepcionApi::validacion("El {$nombre} no es válido.");
                 }
@@ -108,7 +109,12 @@ class PsicologiaModel extends BusinessModel
 
     private function esAdministrativo(): bool
     {
-        return in_array($this->__get('tipo_empleado'), ['Administrador', 'Superusuario'], true);
+        $idTipo = (int) ($this->__get('id_tipo_empleado') ?? 0);
+        if ($idTipo === 6 || $idTipo === 10) {
+            return true;
+        }
+        $tipo = mb_strtolower(trim((string) $this->__get('tipo_empleado')));
+        return str_contains($tipo, 'administrador') || str_contains($tipo, 'superusuario');
     }
 
     private function validarTipo(): void
@@ -221,7 +227,7 @@ class PsicologiaModel extends BusinessModel
                 FROM consulta_psicologica cp
                 INNER JOIN solicitud_de_servicio ss ON ss.id_solicitud_serv = cp.id_solicitud_serv
                 INNER JOIN beneficiario b ON b.id_beneficiario = ss.id_beneficiario
-                INNER JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado
+                LEFT JOIN dirpoles_security.empleado e ON e.id_empleado = ss.id_empleado
                 LEFT JOIN detalle_patologia dp ON dp.id_detalle_patologia = cp.id_detalle_patologia
                 LEFT JOIN patologia p ON p.id_patologia = dp.id_patologia";
         if (!$this->esAdministrativo()) {
