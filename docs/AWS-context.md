@@ -1,1 +1,411 @@
-CONTEXTO DE INFRAESTRUCTURA Y DESPLIEGUE EN AWS — ECOSISTEMA DIRPOLES1. Resumen del Rol y Propósito del ContextoEste documento define el estado actual de producción en Amazon Web Services (AWS) del ecosistema informático DIRPOLES (Dirección de Políticas Estudiantiles - UPTAEB). Cualquier agente de IA, desarrollador o auditor que lea este contexto debe asumir que el sistema ya no opera únicamente en entorno local, sino que se encuentra desplegado y operativo en la nube bajo una arquitectura concentrada en un servidor virtual privado (VPS/EC2) con dominio público y certificado SSL activo.   2. Especificaciones del Servidor (AWS EC2)Proveedor y Región: AWS EC2 en la región us-east-2 (Estados Unidos - Ohio), zona de disponibilidad us-east-2c.   Identificador de Instancia: DIRPOLES-Server (i-0f53fc4d203448304).   Hardware Virtual (Tipo de Instancia): t3.micro (2 vCPUs, ~1 GB de RAM física).   Optimización de Memoria (Anti OOM-Kill): Se configuró un archivo de memoria de intercambio (Swap) permanente de 2.0 GB en /swapfile (registrado en /etc/fstab) para evitar que el kernel de Linux detenga el motor MySQL por picos de consumo de RAM.Sistema Operativo: Ubuntu 26.04.1 LTS (GNU/Linux 7.0.0-1012-aws x86_64).Red y Direccionamiento:IPv4 Pública: 3.19.72.82.   IPv4 Privada: 172.31.34.181.   Dominio Público (DDNS): [https://dirpoles.duckdns.org](https://dirpoles.duckdns.org).   Seguridad de Transporte: Certificado SSL/TLS activo (HTTPS mediante Let's Encrypt / Certbot) sobre Apache.   Acceso Administrativo: Conexión remota vía SSH con llave privada (dirpoles-key.pem) usando el usuario ubuntu.3. Arquitectura de los Sistemas DesplegadosDentro de la misma instancia EC2 conviven el monolito principal, el microservicio de IA y el motor de base de datos, mientras que la aplicación móvil actúa como cliente externo consumiendo la API por HTTPS:A. Sistema Principal: DIRPOLES-4 (Monolito Híbrido MVC)Ubicación en el servidor: /var/www/html.   Stack Tecnológico: PHP 8.5.4 puro (sin frameworks pesados), arquitectura MVC propia, servidor web Apache, gestión de paquetes con Composer (--no-dev --optimize-autoloader).Alcance Funcional: Contiene los 18 módulos del sistema administrativo y expone los endpoints REST bajo el prefijo /api para clientes externos.Mecanismos de Seguridad Activos:Cifrado Asimétrico y JWT: Uso de llaves RSA (.pem) alojadas en /var/www/html/app/Config/Keys/ (login_private.pem, login_public.pem, jwt_private.pem, jwt_public.pem) para desencriptar contraseñas de inicio de sesión y firmar tokens JWT con algoritmo RS256.   Protección de Archivos: Permisos de propietario asignados a www-data:www-data (755 general) y blindaje estricto (chmod 600) sobre /var/www/html/.env y /var/www/html/app/Config/Keys/*.pem.   Defensa de Red: RateLimitMiddleware conectado a la base de datos de seguridad para bloqueo de ráfagas de peticiones por IP.Método de Despliegue: Clonado vía Git desde el repositorio oficial ([https://github.com/mroberth/DIRPOLES-4.git](https://github.com/mroberth/DIRPOLES-4.git)). Las llaves criptográficas .pem y las variables de entorno (.env con APP_ENV=production y APP_DEBUG=false) se inyectaron directamente en el servidor fuera del control de versiones por seguridad.   B. Microservicio de Inteligencia Artificial: DIRPOLES-IAUbicación en el servidor: /var/www/dirpoles-ia.Stack Tecnológico: Python 3, FastAPI, Uvicorn (aislado en entorno virtual /var/www/dirpoles-ia/.venv), integrado con la API de Google AI Studio (gemini-3.5-flash).Modo de Ejecución (Daemon): Configurado como un servicio nativo de Linux en /etc/systemd/system/dirpoles-ia.service (Restart=always), ejecutándose de forma permanente en segundo plano.Aislamiento y Comunicación B2B:Escucha exclusivamente en la interfaz local 127.0.0.1:8000 (HOST=127.0.0.1, DEBUG=False). No está expuesto al tráfico público de internet.El monolito DIRPOLES-4 se comunica internamente con él mediante peticiones cURL a [http://127.0.0.1:8000](http://127.0.0.1:8000), autenticándose con una cabecera compartida X-API-Key (DIRPOLES_IA_API_KEY).Tiempo de respuesta medido en producción en AWS: ~20.13s para el procesamiento analítico de 114 registros históricos.   C. Capa de Datos: Base de Datos Dual en MySQLMotor: MySQL Community Server corriendo localmente en la instancia (127.0.0.1:3306).Esquemas Desplegados:dirpoles_business: Almacena los datos operativos y de atención estudiantil de los 18 módulos.dirpoles_security: Almacena bitácoras de auditoría, control de sesiones, intentos fallidos y bloqueos del RateLimitMiddleware.Segregación de Usuarios (Principio de Mínimo Privilegio):dirpoles_user: Usuario operativo utilizado por el monolito PHP (DIRPOLES-4) con permisos de lectura y escritura sobre ambos esquemas.dirpoles_ia_reader: Usuario restringido exclusivamente a permisos de lectura (GRANT SELECT) sobre dirpoles_business y dirpoles_security, utilizado únicamente por el microservicio DIRPOLES-IA.Método de Despliegue: Exportación íntegra desde el entorno de desarrollo con mysqldump --routines --triggers, transferencia segura vía scp hacia AWS e importación directa en los esquemas con codificación utf8mb4_unicode_ci.
+# Contexto de infraestructura y despliegue en AWS
+
+> **Propósito:** este documento describe el entorno de producción actual de
+> DIRPOLES y sirve como referencia para desarrolladores, administradores,
+> auditores y agentes de IA.
+>
+> **Regla importante:** los valores de este documento describen el entorno
+> existente. Antes de modificar infraestructura, confirmar que los nombres,
+> rutas, versiones y direcciones continúan vigentes.
+
+## 1. Resumen ejecutivo
+
+DIRPOLES está desplegado en una instancia **AWS EC2** que concentra:
+
+1. El monolito web **DIRPOLES-4**.
+2. El microservicio de inteligencia artificial **DIRPOLES-IA**.
+3. Los dos esquemas MySQL utilizados por el sistema.
+
+La aplicación móvil y otros clientes externos consumen la API del monolito
+mediante HTTPS. El microservicio de IA no está expuesto públicamente: solo
+acepta conexiones locales desde el propio servidor.
+
+### Flujo general
+
+```text
+Cliente web o móvil
+        │
+        │ HTTPS
+        ▼
+Apache + Certbot
+        │
+        ▼
+DIRPOLES-4 (PHP/MVC)
+        ├── MySQL local
+        │     ├── dirpoles_business
+        │     └── dirpoles_security
+        │
+        └── HTTP local + X-API-Key
+              ▼
+        DIRPOLES-IA (FastAPI/Uvicorn)
+```
+
+## 2. Servidor AWS EC2
+
+| Elemento | Configuración actual |
+|---|---|
+| Proveedor | Amazon Web Services (AWS) |
+| Servicio | EC2 |
+| Región | `us-east-2` — Ohio |
+| Zona de disponibilidad | `us-east-2c` |
+| Identificador lógico | `DIRPOLES-Server` |
+| Instance ID | `i-0f53fc4d203448304` |
+| Tipo de instancia | `t3.micro` |
+| CPU | 2 vCPU |
+| Memoria | Aproximadamente 1 GB de RAM |
+| Sistema operativo | Ubuntu 26.04.1 LTS |
+| Kernel registrado | `7.0.0-1012-aws` |
+| Arquitectura | `x86_64` |
+| Usuario SSH | `ubuntu` |
+| Acceso SSH | Llave privada `dirpoles-key.pem` |
+
+### Direccionamiento y dominio
+
+| Elemento | Valor |
+|---|---|
+| IPv4 pública | `3.19.72.82` |
+| IPv4 privada | `172.31.34.181` |
+| Dominio público | [https://dirpoles.duckdns.org](https://dirpoles.duckdns.org) |
+| Transporte público | HTTPS |
+| Certificado | Let's Encrypt administrado con Certbot |
+
+> Las direcciones IP pueden cambiar si la instancia se detiene y no utiliza una
+> Elastic IP. Verificar siempre la dirección actual en AWS antes de actualizar
+> DNS, reglas de firewall o documentación operativa.
+
+### Memoria de intercambio
+
+Debido al límite de memoria de `t3.micro`, el servidor tiene un archivo Swap
+permanente:
+
+```text
+/swapfile
+```
+
+Características registradas:
+
+- Tamaño: 2.0 GB.
+- Persistencia: configurado en `/etc/fstab`.
+- Propósito: reducir el riesgo de que el kernel termine MySQL durante picos
+  de consumo de memoria.
+
+El Swap es una medida de estabilidad, no un sustituto de memoria RAM. Si el
+servidor empieza a utilizarlo de forma constante, se debe revisar el consumo o
+escalar la instancia.
+
+## 3. Componentes desplegados
+
+### 3.1. Monolito DIRPOLES-4
+
+| Elemento | Configuración |
+|---|---|
+| Ruta | `/var/www/html` |
+| Lenguaje | PHP 8.5.4 |
+| Arquitectura | MVC propio, sin framework pesado |
+| Servidor web | Apache |
+| Dependencias | Composer |
+| Instalación de producción | `composer install --no-dev --optimize-autoloader` |
+| API | Endpoints bajo el prefijo `/api` |
+| Dominio público | `https://dirpoles.duckdns.org` |
+
+El monolito contiene los 18 módulos funcionales, administrativos, clínicos y
+logísticos del sistema.
+
+#### Seguridad del monolito
+
+- Llaves RSA almacenadas en:
+
+  ```text
+  /var/www/html/app/Config/Keys/
+  ```
+
+- Archivos esperados:
+
+  ```text
+  login_private.pem
+  login_public.pem
+  jwt_private.pem
+  jwt_public.pem
+  ```
+
+- Las llaves se utilizan para:
+  - Descifrar la contraseña enviada durante el login.
+  - Firmar y validar tokens JWT con RS256.
+- El archivo `.env` y las llaves privadas no se versionan en Git.
+- `APP_ENV=production`.
+- `APP_DEBUG=false`.
+- El propietario operativo registrado es `www-data:www-data`.
+- La aplicación utiliza permisos generales restringidos y permisos `600` para:
+  - `/var/www/html/.env`
+  - `/var/www/html/app/Config/Keys/*_private.pem`
+- `RateLimitMiddleware` utiliza la base de datos de seguridad para controlar
+  ráfagas de peticiones por IP y endpoint.
+
+#### Método de despliegue
+
+El código se obtiene desde el repositorio oficial:
+
+```text
+https://github.com/mroberth/DIRPOLES-4.git
+```
+
+Las llaves RSA y el archivo `.env` se crean o copian directamente en el
+servidor y permanecen fuera del control de versiones.
+
+### 3.2. Microservicio DIRPOLES-IA
+
+| Elemento | Configuración |
+|---|---|
+| Ruta | `/var/www/dirpoles-ia` |
+| Tecnología | Python 3 + FastAPI |
+| Servidor ASGI | Uvicorn |
+| Entorno virtual | `/var/www/dirpoles-ia/.venv` |
+| Proveedor de IA | Google AI Studio |
+| Modelo registrado | `gemini-3.5-flash` |
+| Host de escucha | `127.0.0.1` |
+| Puerto | `8000` |
+| Modo | Servicio persistente de systemd |
+| Unidad | `/etc/systemd/system/dirpoles-ia.service` |
+| Reinicio | `Restart=always` |
+
+#### Comunicación con DIRPOLES-4
+
+El microservicio solo escucha en `127.0.0.1:8000`. Por tanto, no debe
+publicarse directamente en Internet ni abrirse su puerto en el Security Group
+de AWS.
+
+El monolito lo consume mediante HTTP local:
+
+```text
+http://127.0.0.1:8000
+```
+
+La autenticación entre ambos componentes se realiza con la cabecera:
+
+```text
+X-API-Key: <valor configurado>
+```
+
+La clave compartida se configura mediante `DIRPOLES_IA_API_KEY` y debe
+permanecer únicamente en los archivos `.env` de los servicios correspondientes.
+Nunca debe exponerse al navegador, al código JavaScript ni al repositorio.
+
+#### Rendimiento registrado
+
+Tiempo medido en producción:
+
+- Aproximadamente 20.13 segundos para analizar 114 registros históricos.
+
+Este dato es una referencia histórica, no un SLA. Debe volver a medirse si
+cambian el modelo, la cantidad de registros, la instancia EC2 o el proveedor.
+
+### 3.3. MySQL y separación de datos
+
+MySQL Community Server se ejecuta localmente en:
+
+```text
+127.0.0.1:3306
+```
+
+#### Esquemas
+
+| Esquema | Responsabilidad |
+|---|---|
+| `dirpoles_business` | Beneficiarios, atención estudiantil, módulos operativos, inventarios, transporte y demás datos de negocio |
+| `dirpoles_security` | Autenticación, sesiones, RBAC, bitácora, notificaciones, intentos de login y límites de solicitudes |
+
+#### Usuarios de base de datos
+
+| Usuario | Uso | Permisos |
+|---|---|---|
+| `dirpoles_user` | Conexión del monolito PHP | Lectura y escritura sobre ambos esquemas |
+| `dirpoles_ia_reader` | Conexión del microservicio de IA | Solo `SELECT` sobre ambos esquemas |
+
+El microservicio de IA debe conservar permisos de solo lectura. No se le deben
+conceder permisos de inserción, actualización, eliminación, DDL o administración.
+
+## 4. Despliegue y actualización
+
+### 4.1. Requisitos previos
+
+Antes de desplegar, confirmar:
+
+- Acceso SSH funcional con la llave autorizada.
+- Instancia EC2 en ejecución.
+- Security Group con los puertos estrictamente necesarios:
+  - `22` para SSH, idealmente restringido a IPs administrativas.
+  - `80` para HTTP y redirección o validación de Certbot.
+  - `443` para HTTPS.
+- El puerto `3306` no debe exponerse públicamente.
+- El puerto `8000` no debe exponerse públicamente.
+- Existe una copia de seguridad reciente de ambas bases de datos.
+- Se conocen los valores de producción de `.env` y `DIRPOLES_IA_API_KEY`.
+
+### 4.2. Despliegue del monolito
+
+El flujo general es:
+
+```bash
+cd /var/www/html
+git pull origin main
+composer install --no-dev --optimize-autoloader
+```
+
+Después de actualizar:
+
+1. Confirmar que `.env` conserva `APP_ENV=production`.
+2. Confirmar que `APP_DEBUG=false`.
+3. Confirmar la existencia de las cuatro llaves RSA.
+4. Confirmar propietario y permisos:
+
+   ```bash
+   sudo chown -R www-data:www-data /var/www/html
+   sudo chmod 600 /var/www/html/.env
+   sudo chmod 600 /var/www/html/app/Config/Keys/*_private.pem
+   ```
+
+5. Validar la configuración de Apache.
+6. Recargar Apache:
+
+   ```bash
+   sudo systemctl reload apache2
+   ```
+
+No se deben reemplazar `.env`, llaves RSA, uploads ni logs con una copia del
+repositorio.
+
+### 4.3. Despliegue del microservicio
+
+La actualización debe conservar el entorno virtual y la configuración de
+producción:
+
+```bash
+cd /var/www/dirpoles-ia
+git pull origin main
+.venv/bin/pip install -r requirements.txt
+sudo systemctl restart dirpoles-ia
+sudo systemctl status dirpoles-ia --no-pager
+```
+
+Comprobar que el servicio siga escuchando solamente de forma local:
+
+```bash
+ss -lntp | grep ':8000'
+```
+
+La salida esperada debe indicar `127.0.0.1:8000`, no `0.0.0.0:8000`.
+
+### 4.4. Actualización del certificado HTTPS
+
+Certbot/Let's Encrypt administra el certificado del dominio. Después de una
+renovación o modificación de Apache, comprobar:
+
+```bash
+sudo apache2ctl configtest
+sudo systemctl reload apache2
+sudo certbot renew --dry-run
+```
+
+## 5. Copias de seguridad y base de datos
+
+Antes de importar un dump, ejecutar una copia de seguridad de ambos esquemas.
+Los dumps del proyecto pueden contener instrucciones destructivas como
+`DROP TABLE`; no deben importarse sobre producción sin una decisión explícita y
+una copia recuperable.
+
+Ejemplo conceptual de respaldo:
+
+```bash
+mysqldump -u dirpoles_user -p \
+  --routines --triggers dirpoles_security > security-backup.sql
+
+mysqldump -u dirpoles_user -p \
+  --routines --triggers dirpoles_business > business-backup.sql
+```
+
+Los archivos de respaldo contienen información sensible. Deben almacenarse con
+permisos restringidos y eliminarse según la política institucional de
+retención.
+
+## 6. Comprobaciones operativas
+
+### Estado de servicios
+
+```bash
+sudo systemctl status apache2 --no-pager
+sudo systemctl status mysql --no-pager
+sudo systemctl status dirpoles-ia --no-pager
+```
+
+### Puertos locales
+
+```bash
+ss -lntp | grep -E ':(3306|8000)'
+```
+
+La configuración esperada es:
+
+- MySQL: accesible localmente, no desde Internet.
+- DIRPOLES-IA: `127.0.0.1:8000`, no desde Internet.
+
+### Logs
+
+```bash
+sudo journalctl -u apache2 -n 100 --no-pager
+sudo journalctl -u mysql -n 100 --no-pager
+sudo journalctl -u dirpoles-ia -n 100 --no-pager
+```
+
+Los logs de aplicación se encuentran dentro de:
+
+```text
+/var/www/html/logs/
+```
+
+No se deben publicar logs, `.env`, llaves privadas ni dumps SQL mediante
+Apache.
+
+### Verificación funcional mínima
+
+Después de un despliegue:
+
+1. Abrir `https://dirpoles.duckdns.org/login`.
+2. Comprobar que el login funciona.
+3. Comprobar que se cargue `/inicio`.
+4. Consultar una operación de lectura.
+5. Ejecutar una operación de escritura controlada y verificar la bitácora.
+6. Comprobar que el endpoint de reportes/IA puede comunicarse con
+   `127.0.0.1:8000`.
+7. Confirmar que no se muestran errores de depuración al usuario.
+
+## 7. Reglas de seguridad que deben conservarse
+
+- No subir `.env`, llaves RSA, contraseñas, tokens, API keys ni dumps con datos
+  reales al repositorio.
+- No exponer públicamente MySQL (`3306`) ni DIRPOLES-IA (`8000`).
+- Mantener `APP_DEBUG=false` en producción.
+- Usar HTTPS para todo tráfico externo.
+- Mantener `dirpoles_ia_reader` con permisos exclusivamente de lectura.
+- Respaldar antes de actualizar esquemas o importar dumps.
+- Revisar los permisos después de cada despliegue.
+- No sustituir las llaves RSA durante una actualización normal: cambiarlas
+  invalida tokens y requiere un procedimiento de rotación controlado.
+- Restringir SSH por IP cuando sea posible y proteger la llave privada local.
+
+## 8. Información que debe actualizarse cuando cambie el entorno
+
+Actualizar este documento si cambia cualquiera de los siguientes elementos:
+
+- Región, zona o tipo de instancia EC2.
+- Instance ID, IP pública, IP privada o dominio.
+- Sistema operativo, versión de PHP, MySQL o Python.
+- Ruta del monolito o del microservicio.
+- Puerto o dirección de escucha del microservicio.
+- Nombre de la unidad systemd.
+- Modelo o proveedor de IA.
+- Usuarios, permisos o esquemas de base de datos.
+- Método de despliegue, respaldo o renovación de certificados.
+
+No escribir valores secretos en este archivo. Documentar únicamente el nombre
+de la variable, la ruta o el procedimiento; conservar el valor real en el
+gestor de secretos o en los archivos de configuración protegidos del servidor.
