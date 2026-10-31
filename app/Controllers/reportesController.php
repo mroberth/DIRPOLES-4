@@ -282,10 +282,27 @@ function reportesIaGenerar(string $modulo, string $intencion, array $filtros, ?s
     }
 
 
-    // Visibilidad: admin ve todo; el resto solo SUS registros (espejo de filtroEmpleado).
-    $esAdmin = isset($_SESSION['tipo_empleado']) &&
-        (stripos($_SESSION['tipo_empleado'], 'administrador') !== false ||
-         stripos($_SESSION['tipo_empleado'], 'superusuario') !== false);
+    // Visibilidad y autorización estricta:
+    // 1) Si es administrador o superusuario: ve todo -> id_empleado = null
+    // 2) Si es especialista autenticado con id_empleado >= 1: ve solo sus registros -> id_empleado = (int)
+    // 3) Si no está autenticado o es especialista con id inválido (< 1): NUNCA otorgar acceso global (null).
+    //    Se rechaza inmediatamente mediante ExcepcionApi sin realizar petición a DIRPOLES-IA.
+    $idTipo = (int) ($_SESSION['id_tipo_empleado'] ?? 0);
+    $tipo = mb_strtolower(trim((string) ($_SESSION['tipo_empleado'] ?? '')));
+    $esAdmin = ($idTipo === 6 || $idTipo === 10 || str_contains($tipo, 'administrador') || str_contains($tipo, 'superusuario'));
+
+    if ($esAdmin) {
+        $idEmpleadoPayload = null;
+    } else {
+        $idEmpleadoSesion = (int) ($_SESSION['id_empleado'] ?? 0);
+        if ($idEmpleadoSesion < 1) {
+            if ($idTipo === 0) {
+                throw new App\Core\ExcepcionApi(App\Core\ErrorCodes::NO_AUTENTICADO, 401, 'Sesión no válida. Inicia sesión de nuevo.');
+            }
+            throw App\Core\ExcepcionApi::accesoDenegado('Identificador de empleado no válido para la generación del informe.');
+        }
+        $idEmpleadoPayload = $idEmpleadoSesion;
+    }
 
     $filtrosLimpios = [];
     foreach ($filtros as $k => $v) {
@@ -303,7 +320,7 @@ function reportesIaGenerar(string $modulo, string $intencion, array $filtros, ?s
         'intencion' => $intencion,
         'filtros' => empty($filtrosLimpios) ? (object) [] : $filtrosLimpios,
         'observacion_usuario' => $observacion ?: null,
-        'id_empleado' => $esAdmin ? null : (int) ($_SESSION['id_empleado'] ?? 0),
+        'id_empleado' => $idEmpleadoPayload,
     ];
 
 
