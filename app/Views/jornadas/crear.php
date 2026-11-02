@@ -30,7 +30,7 @@ include 'app/Views/template/head.php';
 
                     <div class="card shadow mb-4">
                         <div class="card-body">
-                            <form id="form-jornada" novalidate>
+                            <form id="form-jornada" data-maxlength-feedback novalidate>
                                 <div class="row g-4">
                                     <!-- Identidad de la jornada -->
                                     <div class="col-12">
@@ -126,6 +126,7 @@ include 'app/Views/template/head.php';
 
     <?php include 'app/Views/template/script.php'; ?>
 
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <!-- Módulo Jornadas: stats, validaciones reutilizables, tour y envío -->
     <script src="<?= BASE_URL ?>dist/js/modulos/jornadas/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/jornadas/validaciones.js" defer></script>

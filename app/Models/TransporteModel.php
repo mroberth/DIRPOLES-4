@@ -21,6 +21,12 @@ use App\Core\ExcepcionApi;
  */
 class TransporteModel extends BusinessModel
 {
+    /** Límite operativo para evitar cantidades irreales y desbordamientos de stock. */
+    private const MAX_CANTIDAD_REPUESTO = 1000000;
+    private const MAX_CANTIDAD_ENTRADA = 2000;
+    private const MAX_TRAYECTORIA = 2000;
+    private const TIPOS_RUTA = ['Urbana', 'Inter-Urbana', 'Extraurbana', 'Institucional', 'Especial'];
+
     /** Motivos permitidos para una ENTRADA manual de stock (kardex). */
     private const MOTIVOS_ENTRADA = ['Compra', 'Devolución', 'Donación', 'Ajuste de inventario'];
 
@@ -35,6 +41,9 @@ class TransporteModel extends BusinessModel
     {
         switch ($nombre) {
             // ----- IDs (enteros; la existencia se valida en cada método) -----
+            case 'id_excluir':
+                $valor = $this->entero($valor, $nombre, false);
+                break;
             case 'id_ruta':
             case 'id_vehiculo':
             case 'id_proveedor':
@@ -42,8 +51,7 @@ class TransporteModel extends BusinessModel
             case 'id_asignacion':
             case 'id_mantenimiento':
             case 'id_empleado':
-            case 'id_excluir':
-                $valor = (int) $valor;
+                $valor = $this->entero($valor, $nombre, true);
                 break;
 
             // ----- RUTAS -----
@@ -56,12 +64,15 @@ class TransporteModel extends BusinessModel
 
             case 'trayectoria':
                 $valor = $this->texto($valor);
+                if (mb_strlen($valor) > self::MAX_TRAYECTORIA) {
+                    throw ExcepcionApi::validacion('La trayectoria no puede superar 2000 caracteres.');
+                }
                 break;
 
             case 'tipo_ruta':
                 $valor = $this->texto($valor);
-                if ($valor === '' || mb_strlen($valor) > 100) {
-                    throw ExcepcionApi::validacion('El tipo de ruta es obligatorio.');
+                if (!in_array($valor, self::TIPOS_RUTA, true)) {
+                    throw ExcepcionApi::validacion('El tipo de ruta no es válido.');
                 }
                 break;
 
@@ -88,8 +99,8 @@ class TransporteModel extends BusinessModel
             // ----- VEHÍCULOS -----
             case 'placa':
                 $valor = strtoupper(trim((string) $valor));
-                if ($valor === '' || mb_strlen($valor) > 20) {
-                    throw ExcepcionApi::validacion('La placa es obligatoria (máx. 20 caracteres).');
+                if ($valor === '' || mb_strlen($valor) > 20 || !preg_match('/^[A-Z0-9][A-Z0-9 -]*$/', $valor)) {
+                    throw ExcepcionApi::validacion('La placa es obligatoria y solo puede contener letras, números, espacios o guiones.');
                 }
                 break;
 
@@ -154,7 +165,7 @@ class TransporteModel extends BusinessModel
 
             case 'correo_proveedor':
                 $valor = trim((string) $valor);
-                if ($valor === '' || mb_strlen($valor) > 100 || !filter_var($valor, FILTER_VALIDATE_EMAIL)) {
+                if ($valor === '' || mb_strlen($valor) > 50 || !filter_var($valor, FILTER_VALIDATE_EMAIL)) {
                     throw ExcepcionApi::validacion('El correo electrónico no es válido.');
                 }
                 break;
@@ -189,8 +200,14 @@ class TransporteModel extends BusinessModel
                 break;
 
             case 'cantidad_repuesto':
-                if (filter_var($valor, FILTER_VALIDATE_INT) === false || (int) $valor < 0) {
-                    throw ExcepcionApi::validacion('La cantidad de repuestos debe ser un entero >= 0.');
+                if (
+                    filter_var($valor, FILTER_VALIDATE_INT) === false
+                    || (int) $valor < 0
+                    || (int) $valor > self::MAX_CANTIDAD_REPUESTO
+                ) {
+                    throw ExcepcionApi::validacion(
+                        'La cantidad de repuestos debe ser un entero entre 0 y ' . self::MAX_CANTIDAD_REPUESTO . '.'
+                    );
                 }
                 $valor = (int) $valor;
                 break;
@@ -239,6 +256,21 @@ class TransporteModel extends BusinessModel
                 if (!is_array($valor)) {
                     throw ExcepcionApi::validacion('Los repuestos usados deben enviarse como una lista.');
                 }
+                $ids = [];
+                foreach ($valor as $item) {
+                    if (!is_array($item) || array_diff(array_keys($item), ['id_repuesto', 'cantidad']) !== []) {
+                        throw ExcepcionApi::validacion('Cada repuesto usado debe contener únicamente ID y cantidad.');
+                    }
+                    $id = $this->entero($item['id_repuesto'] ?? null, 'id_repuesto', true);
+                    $cantidad = $this->entero($item['cantidad'] ?? null, 'cantidad', true);
+                    if ($cantidad > self::MAX_CANTIDAD_REPUESTO) {
+                        throw ExcepcionApi::validacion('La cantidad de cada repuesto no puede superar ' . self::MAX_CANTIDAD_REPUESTO . '.');
+                    }
+                    if (isset($ids[$id])) {
+                        throw ExcepcionApi::validacion('No se puede repetir un repuesto en el mantenimiento.');
+                    }
+                    $ids[$id] = true;
+                }
                 break;
 
             // ----- PAGINACIÓN (listados) -----
@@ -269,6 +301,15 @@ class TransporteModel extends BusinessModel
     {
         $valor = str_replace(['<', '>'], '', (string) $valor);
         return trim($valor);
+    }
+
+    private function entero(mixed $valor, string $campo, bool $positivo): int
+    {
+        $resultado = filter_var($valor, FILTER_VALIDATE_INT);
+        if ($resultado === false || ($positivo && $resultado <= 0) || (!$positivo && $resultado < 0)) {
+            throw ExcepcionApi::validacion("El campo '{$campo}' debe ser un entero válido.");
+        }
+        return (int) $resultado;
     }
 
     /** Valida una fecha 'Y-m-d'; devuelve null si es opcional y está vacía. */
@@ -309,6 +350,33 @@ class TransporteModel extends BusinessModel
             throw ExcepcionApi::accesoDenegado('Debes iniciar sesión para registrar movimientos de inventario.');
         }
         return $id;
+    }
+
+    private function validarProveedor(int $id): void
+    {
+        $stmt = $this->conn->prepare('SELECT 1 FROM proveedores WHERE id_proveedor = :id LIMIT 1');
+        $stmt->execute([':id' => $id]);
+        if (!$stmt->fetchColumn()) {
+            throw ExcepcionApi::noEncontrado('El proveedor seleccionado no existe.');
+        }
+    }
+
+    private function validarRutaActiva(int $id): void
+    {
+        $stmt = $this->conn->prepare("SELECT 1 FROM rutas WHERE id_ruta = :id AND estatus = 'Activa' LIMIT 1");
+        $stmt->execute([':id' => $id]);
+        if (!$stmt->fetchColumn()) {
+            throw ExcepcionApi::validacion('La ruta seleccionada no existe o no está activa.');
+        }
+    }
+
+    private function validarVehiculoActivo(int $id): void
+    {
+        $stmt = $this->conn->prepare("SELECT 1 FROM vehiculos WHERE id_vehiculo = :id AND estado = 'Activo' LIMIT 1");
+        $stmt->execute([':id' => $id]);
+        if (!$stmt->fetchColumn()) {
+            throw ExcepcionApi::validacion('El vehículo seleccionado no existe o no está activo.');
+        }
     }
 
     // ==================== DESPACHADOR PÚBLICO ====================
@@ -956,6 +1024,9 @@ class TransporteModel extends BusinessModel
     {
         $nombre = $this->__get('nombre_repuesto');
         $provId = (int) ($this->__get('id_proveedor') ?? 0);
+        if ($provId > 0) {
+            $this->validarProveedor($provId);
+        }
 
         try {
             $stmt = $this->conn->prepare("
@@ -1016,6 +1087,9 @@ class TransporteModel extends BusinessModel
         $rep = $this->obtenerRepuestoPorId($id);
 
         $provId = (int) ($this->__get('id_proveedor') ?? 0);
+        if ($provId > 0) {
+            $this->validarProveedor($provId);
+        }
 
         try {
             $stmt = $this->conn->prepare("
@@ -1095,6 +1169,11 @@ class TransporteModel extends BusinessModel
         if ($cant <= 0) {
             throw ExcepcionApi::validacion('La cantidad a ingresar debe ser un entero mayor a 0.');
         }
+        if ($cant > self::MAX_CANTIDAD_ENTRADA) {
+            throw ExcepcionApi::validacion(
+                'La cantidad de entrada no puede superar ' . self::MAX_CANTIDAD_ENTRADA . ' unidades.'
+            );
+        }
         if (!in_array($razon, self::MOTIVOS_ENTRADA, true)) {
             throw ExcepcionApi::validacion('El motivo de la entrada debe ser: Compra, Devolución, Donación o Ajuste de inventario.');
         }
@@ -1110,6 +1189,11 @@ class TransporteModel extends BusinessModel
             }
 
             $nuevoStock = ((int) $curr) + $cant;
+            if ($nuevoStock > self::MAX_CANTIDAD_REPUESTO) {
+                throw ExcepcionApi::validacion(
+                    'La entrada excede el límite máximo de stock: ' . self::MAX_CANTIDAD_REPUESTO . ' unidades.'
+                );
+            }
             $nuevoEstatus = $nuevoStock > 0 ? 'Disponible' : 'Agotado';
 
             $stmtUp = $this->conn->prepare("
@@ -1293,6 +1377,8 @@ class TransporteModel extends BusinessModel
         if ($idRuta <= 0 || $idVeh <= 0 || $idEmp <= 0) {
             throw ExcepcionApi::validacion('Debes seleccionar una ruta, un vehículo y un chofer válidos.');
         }
+        $this->validarRutaActiva($idRuta);
+        $this->validarVehiculoActivo($idVeh);
         $this->validarChofer($idEmp);
 
         // Regla del usuario: un vehículo o un chofer no pueden tener dos
@@ -1386,6 +1472,8 @@ class TransporteModel extends BusinessModel
         if ($idRuta <= 0 || $idVeh <= 0 || $idEmp <= 0) {
             throw ExcepcionApi::validacion('Debes seleccionar una ruta, un vehículo y un chofer válidos.');
         }
+        $this->validarRutaActiva($idRuta);
+        $this->validarVehiculoActivo($idVeh);
         $this->validarChofer($idEmp);
 
         // Misma regla de solapamiento por día, excluyendo esta asignación.
@@ -1480,6 +1568,7 @@ class TransporteModel extends BusinessModel
         if ($idVeh <= 0) {
             throw ExcepcionApi::validacion('Debes seleccionar un vehículo para registrar el mantenimiento.');
         }
+        $this->validarVehiculoActivo($idVeh);
 
         $this->conn->beginTransaction();
         try {

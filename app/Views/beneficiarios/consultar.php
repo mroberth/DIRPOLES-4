@@ -75,7 +75,7 @@ include 'app/Views/template/head.php';
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <form id="form-editar" novalidate>
+                <form id="form-editar" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_beneficiario" id="id_beneficiario">
 
                     <div class="modal-body p-0">
@@ -93,7 +93,7 @@ include 'app/Views/template/head.php';
                                             <label for="nombres" class="form-label text-muted small mb-1">
                                                 <i class="fas fa-user text-primary me-1"></i> Nombres *
                                             </label>
-                                            <input type="text" class="form-control" name="nombres" id="nombres" maxlength="100" required>
+                                            <input type="text" class="form-control" name="nombres" id="nombres" maxlength="20" required>
                                             <div id="nombresError" class="form-text text-danger"></div>
                                         </div>
 
@@ -101,7 +101,7 @@ include 'app/Views/template/head.php';
                                             <label for="apellidos" class="form-label text-muted small mb-1">
                                                 <i class="fas fa-user text-primary me-1"></i> Apellidos *
                                             </label>
-                                            <input type="text" class="form-control" name="apellidos" id="apellidos" maxlength="100">
+                                            <input type="text" class="form-control" name="apellidos" id="apellidos" maxlength="20">
                                             <div id="apellidosError" class="form-text text-danger"></div>
                                         </div>
 
@@ -132,7 +132,7 @@ include 'app/Views/template/head.php';
                                             <label for="correo" class="form-label text-muted small mb-1">
                                                 <i class="fas fa-envelope text-primary me-1"></i> Correo Electrónico *
                                             </label>
-                                            <input type="email" class="form-control" name="correo" id="correo" maxlength="100" required>
+                                            <input type="email" class="form-control" name="correo" id="correo" maxlength="50" required>
                                             <div id="correoError" class="form-text text-danger"></div>
                                         </div>
 
@@ -248,6 +248,7 @@ include 'app/Views/template/head.php';
     <?php include 'app/Views/template/script.php'; ?>
 
     <!-- Módulo Beneficiarios: stats + validaciones + edición (modal) + tabla -->
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/beneficiario/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/beneficiario/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/beneficiario/editar.js" defer></script>

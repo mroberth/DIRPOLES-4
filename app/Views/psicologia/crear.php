@@ -40,7 +40,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                       solo uno de los dos se envíe en el submit. Nunca los dos activos a la vez.
                     -->
 
-                    <form id="form-psicologia" novalidate>
+                    <form id="form-psicologia" data-maxlength-feedback novalidate>
 
                         <!-- ============ Beneficiario + Tipo ============ -->
                         <div class="row g-3">
@@ -85,7 +85,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                             <div class="col-md-6">
                                 <label for="diagnostico" class="form-label">Diagnóstico *</label>
                                 <textarea id="diagnostico" name="diagnostico"
-                                          class="form-control" rows="3"></textarea>
+                                          class="form-control" rows="3" maxlength="5000"></textarea>
                                 <div id="diagnosticoError" class="form-text text-danger"></div>
                                 <input type="hidden" id="diagnostico_na" name="diagnostico"
                                        value="No aplica" disabled>
@@ -94,7 +94,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                             <div class="col-12">
                                 <label for="tratamiento_gen" class="form-label">Tratamiento general</label>
                                 <textarea id="tratamiento_gen" name="tratamiento_gen"
-                                          class="form-control" rows="3"></textarea>
+                                          class="form-control" rows="3" maxlength="5000"></textarea>
                                 <div id="tratamiento_genError" class="form-text text-danger"></div>
                                 <input type="hidden" id="tratamiento_gen_na" name="tratamiento_gen"
                                        value="No aplica" disabled>
@@ -108,7 +108,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                             <div class="col-md-8">
                                 <label for="motivo_retiro" class="form-label">Motivo del retiro *</label>
                                 <textarea id="motivo_retiro" name="motivo_retiro"
-                                          class="form-control" rows="3"></textarea>
+                                          class="form-control" rows="3" maxlength="5000"></textarea>
                                 <div id="motivo_retiroError" class="form-text text-danger"></div>
                                 <input type="hidden" id="motivo_retiro_na" name="motivo_retiro"
                                        value="No aplica" disabled>
@@ -165,6 +165,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 </div>
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
 <script src="<?= BASE_URL ?>dist/js/modulos/psicologia/tour.js" defer></script>
+<script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/psicologia/validaciones.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/psicologia/stats.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/psicologia/crear.js" defer></script>

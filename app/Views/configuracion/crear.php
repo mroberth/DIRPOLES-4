@@ -40,6 +40,7 @@ include 'app/Views/template/head.php';
                                     </div>
                                     <div class="card-body d-flex flex-column">
                                         <form class="form-config d-flex flex-column h-100"
+                                              data-maxlength-feedback
                                               data-tipo="<?= htmlspecialchars($tipo) ?>"
                                               data-unico="<?= htmlspecialchars(implode(',', $cfg['unico'] ?? [])) ?>"
                                               novalidate>
@@ -67,7 +68,9 @@ include 'app/Views/template/head.php';
     <?php include 'app/Views/template/script.php'; ?>
 
     <!-- Módulo Configuración: tour + validaciones + envío -->
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/configuracion/tour.js" defer></script>
+    <script src="<?= BASE_URL ?>dist/js/modulos/configuracion/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/configuracion/crear.js" defer></script>
 </body>
 

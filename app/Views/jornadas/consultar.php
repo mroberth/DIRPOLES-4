@@ -80,7 +80,7 @@ include 'app/Views/template/head.php';
                     </div>
                 </div>
 
-                <form id="form-jornada" novalidate>
+                <form id="form-jornada" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_jornada" id="id_jornada">
 
                     <div class="modal-body p-4 bg-light">
@@ -164,6 +164,7 @@ include 'app/Views/template/head.php';
         window.JORNADAS_PUEDE_ELIMINAR = <?= $puedeEliminar ? 'true' : 'false' ?>;
     </script>
 
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <!-- Módulo Jornadas: stats + edición modal + tabla -->
     <script src="<?= BASE_URL ?>dist/js/modulos/jornadas/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/jornadas/validaciones.js" defer></script>

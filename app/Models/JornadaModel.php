@@ -170,9 +170,9 @@ class JornadaModel extends BusinessModel
                 break;
 
             case 'cedula':
-                $valor = preg_replace('/\D+/', '', (string) $valor);
-                if ($valor === '' || strlen($valor) < 5 || strlen($valor) > 12) {
-                    throw ExcepcionApi::validacion('La cédula debe tener entre 5 y 12 dígitos.');
+                $valor = trim((string) $valor);
+                if (!preg_match('/^\d{6,10}$/', $valor)) {
+                    throw ExcepcionApi::validacion('La cédula debe tener entre 6 y 10 dígitos.');
                 }
                 $this->atributos[$nombre] = $valor;
                 break;
@@ -183,8 +183,8 @@ class JornadaModel extends BusinessModel
                 if ($valor === '') {
                     throw ExcepcionApi::validacion('El campo ' . $nombre . ' es obligatorio.');
                 }
-                if (mb_strlen($valor) < 2 || mb_strlen($valor) > 100) {
-                    throw ExcepcionApi::validacion('El campo ' . $nombre . ' debe tener entre 2 y 100 caracteres.');
+                if (mb_strlen($valor) < 2 || mb_strlen($valor) > 20) {
+                    throw ExcepcionApi::validacion('El campo ' . $nombre . ' debe tener entre 2 y 20 caracteres.');
                 }
                 $this->atributos[$nombre] = $valor;
                 break;
@@ -220,9 +220,11 @@ class JornadaModel extends BusinessModel
                 break;
 
             case 'telefono':
-                $valor = preg_replace('/\D+/', '', (string) $valor);
-                if ($valor === '' || strlen($valor) < 7 || strlen($valor) > 12) {
-                    throw ExcepcionApi::validacion('El teléfono debe tener entre 7 y 12 dígitos.');
+                $valor = trim((string) $valor);
+                if (!preg_match('/^(0412|0414|0416|0422|0424|0426)\d{7}$/', $valor)) {
+                    throw ExcepcionApi::validacion(
+                        'El teléfono debe empezar por 0412, 0414, 0416, 0422, 0424 o 0426 y tener 11 dígitos.'
+                    );
                 }
                 $this->atributos[$nombre] = $valor;
                 break;
@@ -233,8 +235,8 @@ class JornadaModel extends BusinessModel
                     if (!filter_var($valor, FILTER_VALIDATE_EMAIL)) {
                         throw ExcepcionApi::validacion('El correo no tiene un formato válido.');
                     }
-                    if (mb_strlen($valor) > 100) {
-                        throw ExcepcionApi::validacion('El correo no puede superar 100 caracteres.');
+                    if (mb_strlen($valor) > 50) {
+                        throw ExcepcionApi::validacion('El correo no puede superar 50 caracteres.');
                     }
                 }
                 $this->atributos[$nombre] = $valor;

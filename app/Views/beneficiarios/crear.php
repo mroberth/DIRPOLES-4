@@ -30,7 +30,7 @@ include 'app/Views/template/head.php';
 
                     <div class="card shadow mb-4">
                         <div class="card-body">
-                            <form id="form-beneficiario" novalidate>
+                            <form id="form-beneficiario" data-maxlength-feedback novalidate>
                                 <div class="row g-3">
                                     <div class="col-md-3">
                                         <label class="form-label">Tipo de cédula *</label>
@@ -51,18 +51,18 @@ include 'app/Views/template/head.php';
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Nombres *</label>
-                                        <input type="text" name="nombres" id="nombres" class="form-control" maxlength="100" required>
+                                        <input type="text" name="nombres" id="nombres" class="form-control" maxlength="20" required>
                                         <div id="nombresError" class="form-text text-danger"></div>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Apellidos *</label>
-                                        <input type="text" name="apellidos" id="apellidos" class="form-control" maxlength="100">
+                                        <input type="text" name="apellidos" id="apellidos" class="form-control" maxlength="20">
                                         <div id="apellidosError" class="form-text text-danger"></div>
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Correo electrónico *</label>
-                                        <input type="email" name="correo" id="correo" class="form-control" maxlength="100" required>
+                                        <input type="email" name="correo" id="correo" class="form-control" maxlength="50" required>
                                         <div id="correoError" class="form-text text-danger"></div>
                                     </div>
                                     <div class="col-md-4">
@@ -150,6 +150,7 @@ include 'app/Views/template/head.php';
     <?php include 'app/Views/template/script.php'; ?>
 
     <!-- Módulo Beneficiarios: stats, validaciones reutilizables, tour y envío -->
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/beneficiario/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/beneficiario/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/beneficiario/tour.js" defer></script>

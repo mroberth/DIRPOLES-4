@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const vEmbarazada = (formEmbarazadas && window.TrabajoSocialValidaciones)
         ? window.TrabajoSocialValidaciones.configurarEmbarazada(formEmbarazadas)
         : null;
+    [formBecas, formExoneracion, formFames, formEmbarazadas]
+        .filter(Boolean)
+        .forEach((formulario) => {
+            if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(formulario);
+        });
 
     // -----------------------------------------------------------------
     // 1) Catálogo GLOBAL en UNA llamada: beneficiarios (con genero,

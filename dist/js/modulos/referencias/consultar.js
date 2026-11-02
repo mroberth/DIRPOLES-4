@@ -265,6 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const formRechazo = document.getElementById('form-rechazo');
     if (formRechazo) {
         const motivo = document.getElementById('rechazo_motivo');
+        if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(formRechazo);
         motivo.addEventListener('input', () => validarMotivoRechazo(motivo));
 
         formRechazo.addEventListener('submit', async function (ev) {

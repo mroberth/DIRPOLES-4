@@ -88,6 +88,7 @@ $encabezado = static function (string $label): string {
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <form id="form-edit-<?= htmlspecialchars($tipo) ?>"
+                          data-maxlength-feedback
                           data-tipo="<?= htmlspecialchars($tipo) ?>"
                           data-unico="<?= htmlspecialchars(implode(',', $cfg['unico'] ?? [])) ?>"
                           novalidate>
@@ -114,6 +115,7 @@ $encabezado = static function (string $label): string {
 
     <?php include 'app/Views/template/script.php'; ?>
 
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script>window.CONFIG_CATALOGOS = <?= json_encode($catalogos, JSON_UNESCAPED_UNICODE) ?>;</script>
     <script src="<?= BASE_URL ?>dist/js/modulos/configuracion/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/configuracion/consultar.js" defer></script>

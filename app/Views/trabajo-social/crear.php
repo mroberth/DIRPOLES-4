@@ -96,7 +96,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                              aria-labelledby="becas-tab">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
-                                    <form id="form-becas" novalidate>
+                                    <form id="form-becas" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label for="tipo_banco" class="form-label">Tipo de Banco *</label>
@@ -170,7 +170,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                              aria-labelledby="exoneracion-tab">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
-                                    <form id="form-exoneracion" novalidate>
+                                    <form id="form-exoneracion" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label for="motivo" class="form-label">Motivo *</label>
@@ -229,7 +229,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                              aria-labelledby="fames-tab">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
-                                    <form id="form-fames" novalidate>
+                                    <form id="form-fames" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label for="patologia_fames" class="form-label">Patología *</label>
@@ -282,7 +282,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                              aria-labelledby="embarazadas-tab">
                             <div class="row justify-content-center">
                                 <div class="col-lg-8">
-                                    <form id="form-embarazadas" novalidate>
+                                    <form id="form-embarazadas" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label for="patologia_embarazada" class="form-label">Patología (Embarazo) *</label>
@@ -393,6 +393,7 @@ include BASE_PATH . '/app/Views/template/head.php';
     </div><?php include BASE_PATH . '/app/Views/template/footer.php'; ?></div>
 </div>
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
+<script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/trabajo-social/tour.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/trabajo-social/validaciones.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/trabajo-social/stats.js" defer></script>

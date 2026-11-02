@@ -27,7 +27,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
-            <form id="form-editar-discapacidad" novalidate>
+            <form id="form-editar-discapacidad" data-maxlength-feedback novalidate>
                 <input type="hidden" id="editar_id_discapacidad" name="id_discapacidad">
 
                 <div class="modal-body">
@@ -141,6 +141,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
 <script src="<?= BASE_URL ?>dist/js/core/documentos.js" defer></script>
+<script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/discapacidad/stats.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/discapacidad/consultar.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/discapacidad/editar.js" defer></script>

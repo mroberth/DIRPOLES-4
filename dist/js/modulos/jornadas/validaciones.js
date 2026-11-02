@@ -10,9 +10,8 @@
 // Opción { prefijo } para formularios con ids con prefijo (det. de detalle):
 //   configurar(formAsistente, { tipo: 'asistente', prefijo: 'asis_' })
 //
-// REGLA FRONTAL 10 (GUIA-FRONTEND): la validación EN VIVO NUNCA reescribe
-// el valor del campo (se permite escribir espacios); el saneado (trim +
-// quitar '<'/'>') ocurre SOLO dentro de validarTodo(), es decir, al enviar.
+// La validación en vivo conserva los textos libres, pero los campos numéricos
+// de identificación y teléfono filtran caracteres no numéricos inmediatamente.
 // Si un campo no existe en el formulario, su validación se omite.
 // ------------------------------------------------------------------
 window.JornadasValidaciones = (function () {
@@ -42,12 +41,12 @@ window.JornadasValidaciones = (function () {
         asistente: [
             { campo: 'tipo_cedula', tipo: 'select', obligatorio: true,
               msg: 'Selecciona el tipo de documento' },
-            { campo: 'cedula', tipo: 'digitos', min: 5, max: 12, obligatorio: true,
-              msg: 'La cédula debe tener entre 5 y 12 dígitos.' },
-            { campo: 'nombres', tipo: 'texto', min: 2, max: 100, obligatorio: true,
-              msg: 'Los nombres deben tener entre 2 y 100 caracteres.' },
-            { campo: 'apellidos', tipo: 'texto', min: 2, max: 100, obligatorio: true,
-              msg: 'Los apellidos deben tener entre 2 y 100 caracteres.' },
+            { campo: 'cedula', tipo: 'digitos', min: 6, max: 10, obligatorio: true,
+              msg: 'La cédula debe tener entre 6 y 10 dígitos.' },
+            { campo: 'nombres', tipo: 'texto', min: 2, max: 20, obligatorio: true,
+              msg: 'Los nombres deben tener entre 2 y 20 caracteres.' },
+            { campo: 'apellidos', tipo: 'texto', min: 2, max: 20, obligatorio: true,
+              msg: 'Los apellidos deben tener entre 2 y 20 caracteres.' },
             { campo: 'fecha_nacimiento', tipo: 'fecha', obligatorio: true, soloFecha: true,
               futuraProhibida: true, desde: '1900-01-01',
               msg: 'Indica la fecha de nacimiento.',
@@ -56,8 +55,8 @@ window.JornadasValidaciones = (function () {
               msg: 'Indica el género' },
             { campo: 'tipo_paciente', tipo: 'select', obligatorio: true,
               msg: 'Selecciona el tipo de paciente' },
-            { campo: 'telefono', tipo: 'digitos', min: 7, max: 12, obligatorio: true,
-              msg: 'El teléfono debe tener entre 7 y 12 dígitos.' },
+            { campo: 'telefono', tipo: 'telefono', obligatorio: true,
+              msg: 'Debe ser un teléfono válido: 0412, 0414, 0416, 0422, 0424 o 0426 + 7 dígitos.' },
             { campo: 'correo', tipo: 'correo', obligatorio: false,
               msg: 'El correo no tiene un formato válido.' },
             { campo: 'direccion', tipo: 'texto', max: 255, obligatorio: false,
@@ -173,12 +172,16 @@ window.JornadasValidaciones = (function () {
                     return '';
                 }
                 case 'digitos': {
-                    const soloDigitos = valor.replace(/\D+/g, '');
-                    if (soloDigitos.length < (regla.min || 1) || soloDigitos.length > (regla.max || 999)) {
+                    if (!/^\d+$/.test(valor)
+                        || valor.length < (regla.min || 1)
+                        || valor.length > (regla.max || 999)) {
                         return regla.msg;
                     }
                     return '';
                 }
+                case 'telefono':
+                    return /^(0412|0414|0416|0422|0424|0426)\d{7}$/.test(valor)
+                        ? '' : regla.msg;
                 case 'correo': {
                     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor)) return regla.msg;
                     if (valor.length > 100) return regla.msg;
@@ -261,6 +264,11 @@ window.JornadasValidaciones = (function () {
                     $(c).on('change select2:select select2:clear', evaluar);
                 }
             } else {
+                if (regla.tipo === 'digitos' || regla.tipo === 'telefono') {
+                    c.addEventListener('input', () => {
+                        c.value = c.value.replace(/\D/g, '');
+                    });
+                }
                 c.addEventListener('input', evaluar);
                 c.addEventListener('change', evaluar);
             }

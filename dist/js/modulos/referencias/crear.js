@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const validador = V.configurar(form);
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     const selBeneficiario = document.getElementById('id_beneficiario');
     const selServOrigen  = document.getElementById('id_servicio_origen');

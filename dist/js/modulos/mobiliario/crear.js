@@ -72,6 +72,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const validadorMob   = formMob ? V.configurar(formMob, { prefijo: '' }) : null;
     const validadorEq    = formEq ? V.configurar(formEq, { prefijo: 'eq_' }) : null;
     const validadorFicha = formFicha ? V.configurar(formFicha, { prefijo: 'f_', idExcluir: 0 }) : null;
+    [formMob, formEq, formFicha].filter(Boolean).forEach((formulario) => {
+        if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(formulario);
+    });
 
     // ---------------- filas de detalle de la ficha ----------------
 

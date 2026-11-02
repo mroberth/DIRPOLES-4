@@ -79,7 +79,7 @@ function apiCrearRuta(): void
 function apiObtenerRuta(): void
 {
     Autorizacion::verificar('transporte', 'leer');
-    $id = (int) ($_GET['id'] ?? 0);
+    $id = $_GET['id'] ?? null;
 
     $modelo = new TransporteModel();
     $modelo->__set('id_ruta', $id);
@@ -92,7 +92,7 @@ function apiActualizarRuta(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_ruta',         (int) ($input['id_ruta'] ?? 0));
+    $modelo->__set('id_ruta',         $input['id_ruta'] ?? null);
     $modelo->__set('nombre_ruta',     $input['nombre_ruta'] ?? '');
     $modelo->__set('trayectoria',     $input['trayectoria'] ?? '');
     $modelo->__set('tipo_ruta',       $input['tipo_ruta'] ?? '');
@@ -114,7 +114,7 @@ function apiEliminarRuta(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_ruta', (int) ($input['id_ruta'] ?? 0));
+    $modelo->__set('id_ruta', $input['id_ruta'] ?? null);
 
     $res = $modelo->manejarAccion('eliminar_ruta');
 
@@ -158,7 +158,7 @@ function apiCrearVehiculo(): void
 function apiObtenerVehiculo(): void
 {
     Autorizacion::verificar('transporte', 'leer');
-    $id = (int) ($_GET['id'] ?? 0);
+    $id = $_GET['id'] ?? null;
 
     $modelo = new TransporteModel();
     $modelo->__set('id_vehiculo', $id);
@@ -171,7 +171,7 @@ function apiActualizarVehiculo(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_vehiculo',       (int) ($input['id_vehiculo'] ?? 0));
+    $modelo->__set('id_vehiculo',       $input['id_vehiculo'] ?? null);
     $modelo->__set('placa',             $input['placa'] ?? '');
     $modelo->__set('modelo',            $input['modelo'] ?? '');
     $modelo->__set('tipo_vehiculo',     $input['tipo'] ?? '');
@@ -190,7 +190,7 @@ function apiEliminarVehiculo(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_vehiculo', (int) ($input['id_vehiculo'] ?? 0));
+    $modelo->__set('id_vehiculo', $input['id_vehiculo'] ?? null);
 
     $res = $modelo->manejarAccion('eliminar_vehiculo');
 
@@ -205,7 +205,7 @@ function apiValidarPlacaVehiculo(): void
 
     $modelo = new TransporteModel();
     $modelo->__set('placa',      $input['placa'] ?? '');
-    $modelo->__set('id_excluir', (int) ($input['id_excluir'] ?? 0));
+    $modelo->__set('id_excluir', $input['id_excluir'] ?? 0);
 
     Respuesta::exito($modelo->manejarAccion('validar_placa'));
 }
@@ -248,7 +248,7 @@ function apiCrearProveedor(): void
 function apiObtenerProveedor(): void
 {
     Autorizacion::verificar('transporte', 'leer');
-    $id = (int) ($_GET['id'] ?? 0);
+    $id = $_GET['id'] ?? null;
 
     $modelo = new TransporteModel();
     $modelo->__set('id_proveedor', $id);
@@ -261,7 +261,7 @@ function apiActualizarProveedor(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_proveedor',       (int) ($input['id_proveedor'] ?? 0));
+    $modelo->__set('id_proveedor',       $input['id_proveedor'] ?? null);
     $modelo->__set('tipo_documento',     $input['tipo_documento'] ?? '');
     $modelo->__set('num_documento',      $input['num_documento'] ?? '');
     $modelo->__set('nombre_proveedor',   $input['nombre'] ?? '');
@@ -282,7 +282,7 @@ function apiEliminarProveedor(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_proveedor', (int) ($input['id_proveedor'] ?? 0));
+    $modelo->__set('id_proveedor', $input['id_proveedor'] ?? null);
 
     $res = $modelo->manejarAccion('eliminar_proveedor');
 
@@ -298,7 +298,7 @@ function apiValidarDocumentoProveedor(): void
     $modelo = new TransporteModel();
     $modelo->__set('tipo_documento', $input['tipo_documento'] ?? '');
     $modelo->__set('num_documento',  $input['num_documento'] ?? '');
-    $modelo->__set('id_excluir',     (int) ($input['id_excluir'] ?? 0));
+    $modelo->__set('id_excluir', $input['id_excluir'] ?? 0);
 
     Respuesta::exito($modelo->manejarAccion('validar_documento_proveedor'));
 }
@@ -310,7 +310,7 @@ function apiValidarCorreoProveedor(): void
 
     $modelo = new TransporteModel();
     $modelo->__set('correo_proveedor', $input['correo'] ?? '');
-    $modelo->__set('id_excluir',       (int) ($input['id_excluir'] ?? 0));
+    $modelo->__set('id_excluir',     $input['id_excluir'] ?? 0);
 
     Respuesta::exito($modelo->manejarAccion('validar_correo_proveedor'));
 }
@@ -322,7 +322,7 @@ function apiValidarTelefonoProveedor(): void
 
     $modelo = new TransporteModel();
     $modelo->__set('telefono_proveedor', $input['telefono'] ?? '');
-    $modelo->__set('id_excluir',         (int) ($input['id_excluir'] ?? 0));
+    $modelo->__set('id_excluir',       $input['id_excluir'] ?? 0);
 
     Respuesta::exito($modelo->manejarAccion('validar_telefono_proveedor'));
 }
@@ -350,7 +350,7 @@ function apiCrearRepuesto(): void
     $modelo = new TransporteModel();
     $modelo->__set('nombre_repuesto',      $input['nombre'] ?? '');
     $modelo->__set('descripcion_repuesto', $input['descripcion'] ?? '');
-    $modelo->__set('id_proveedor',         (int) ($input['id_proveedor'] ?? 0));
+    $modelo->__set('id_proveedor',         $input['id_proveedor'] ?? null);
 
     $nuevo = $modelo->manejarAccion('crear_repuesto');
 
@@ -361,7 +361,7 @@ function apiCrearRepuesto(): void
 function apiObtenerRepuesto(): void
 {
     Autorizacion::verificar('transporte', 'leer');
-    $id = (int) ($_GET['id'] ?? 0);
+    $id = $_GET['id'] ?? null;
 
     $modelo = new TransporteModel();
     $modelo->__set('id_repuesto', $id);
@@ -374,10 +374,10 @@ function apiActualizarRepuesto(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_repuesto',           (int) ($input['id_repuesto'] ?? 0));
+    $modelo->__set('id_repuesto',           $input['id_repuesto'] ?? null);
     $modelo->__set('nombre_repuesto',      $input['nombre'] ?? '');
     $modelo->__set('descripcion_repuesto', $input['descripcion'] ?? '');
-    $modelo->__set('id_proveedor',         (int) ($input['id_proveedor'] ?? 0));
+    $modelo->__set('id_proveedor',         $input['id_proveedor'] ?? null);
 
     $act = $modelo->manejarAccion('actualizar_repuesto');
 
@@ -391,7 +391,7 @@ function apiEliminarRepuesto(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_repuesto', (int) ($input['id_repuesto'] ?? 0));
+    $modelo->__set('id_repuesto', $input['id_repuesto'] ?? null);
 
     $res = $modelo->manejarAccion('eliminar_repuesto');
 
@@ -405,8 +405,8 @@ function apiEntradaRepuesto(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_repuesto',       (int) ($input['id_repuesto'] ?? 0));
-    $modelo->__set('cantidad_repuesto', (int) ($input['cantidad'] ?? 0));
+    $modelo->__set('id_repuesto',       $input['id_repuesto'] ?? null);
+    $modelo->__set('cantidad_repuesto', $input['cantidad'] ?? null);
     $modelo->__set('razon_movimiento',  $input['razon'] ?? '');
 
     $res = $modelo->manejarAccion('entrada_repuesto');
@@ -421,8 +421,8 @@ function apiSalidaRepuesto(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_repuesto',       (int) ($input['id_repuesto'] ?? 0));
-    $modelo->__set('cantidad_repuesto', (int) ($input['cantidad'] ?? 0));
+    $modelo->__set('id_repuesto',       $input['id_repuesto'] ?? null);
+    $modelo->__set('cantidad_repuesto', $input['cantidad'] ?? null);
     $modelo->__set('razon_movimiento',  $input['razon'] ?? '');
 
     $res = $modelo->manejarAccion('salida_repuesto');
@@ -466,9 +466,9 @@ function apiCrearAsignacion(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_ruta',            (int) ($input['id_ruta'] ?? 0));
-    $modelo->__set('id_vehiculo',        (int) ($input['id_vehiculo'] ?? 0));
-    $modelo->__set('id_empleado',        (int) ($input['id_empleado'] ?? 0));
+    $modelo->__set('id_ruta',            $input['id_ruta'] ?? null);
+    $modelo->__set('id_vehiculo',        $input['id_vehiculo'] ?? null);
+    $modelo->__set('id_empleado',        $input['id_empleado'] ?? null);
     $modelo->__set('fecha_asignacion',   $input['fecha_asignacion'] ?? '');
     $modelo->__set('estatus_asignacion', $input['estatus'] ?? '');
 
@@ -481,7 +481,7 @@ function apiCrearAsignacion(): void
 function apiObtenerAsignacion(): void
 {
     Autorizacion::verificar('transporte', 'leer');
-    $id = (int) ($_GET['id'] ?? 0);
+    $id = $_GET['id'] ?? null;
 
     $modelo = new TransporteModel();
     $modelo->__set('id_asignacion', $id);
@@ -494,10 +494,10 @@ function apiActualizarAsignacion(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_asignacion',      (int) ($input['id_asignacion'] ?? 0));
-    $modelo->__set('id_ruta',            (int) ($input['id_ruta'] ?? 0));
-    $modelo->__set('id_vehiculo',        (int) ($input['id_vehiculo'] ?? 0));
-    $modelo->__set('id_empleado',        (int) ($input['id_empleado'] ?? 0));
+    $modelo->__set('id_asignacion',      $input['id_asignacion'] ?? null);
+    $modelo->__set('id_ruta',            $input['id_ruta'] ?? null);
+    $modelo->__set('id_vehiculo',        $input['id_vehiculo'] ?? null);
+    $modelo->__set('id_empleado',        $input['id_empleado'] ?? null);
     $modelo->__set('fecha_asignacion',   $input['fecha_asignacion'] ?? '');
     $modelo->__set('estatus_asignacion', $input['estatus'] ?? '');
 
@@ -513,7 +513,7 @@ function apiEliminarAsignacion(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_asignacion', (int) ($input['id_asignacion'] ?? 0));
+    $modelo->__set('id_asignacion', $input['id_asignacion'] ?? null);
 
     $res = $modelo->manejarAccion('eliminar_asignacion');
 
@@ -542,7 +542,7 @@ function apiCrearMantenimiento(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_vehiculo',               (int) ($input['id_vehiculo'] ?? 0));
+    $modelo->__set('id_vehiculo',               $input['id_vehiculo'] ?? null);
     $modelo->__set('tipo_mantenimiento',        $input['tipo'] ?? '');
     $modelo->__set('fecha_mantenimiento',       $input['fecha'] ?? '');
     $modelo->__set('descripcion_mantenimiento', $input['descripcion'] ?? '');
@@ -557,7 +557,7 @@ function apiCrearMantenimiento(): void
 function apiObtenerMantenimiento(): void
 {
     Autorizacion::verificar('transporte', 'leer');
-    $id = (int) ($_GET['id'] ?? 0);
+    $id = $_GET['id'] ?? null;
 
     $modelo = new TransporteModel();
     $modelo->__set('id_mantenimiento', $id);
@@ -570,7 +570,7 @@ function apiEliminarMantenimiento(): void
     $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
     $modelo = new TransporteModel();
-    $modelo->__set('id_mantenimiento', (int) ($input['id_mantenimiento'] ?? 0));
+    $modelo->__set('id_mantenimiento', $input['id_mantenimiento'] ?? null);
 
     $res = $modelo->manejarAccion('eliminar_mantenimiento');
 

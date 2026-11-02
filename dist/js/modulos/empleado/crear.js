@@ -7,6 +7,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('form-empleado');
     if (!form) return;
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     // Tour guiado (Driver.js).
     const btnAyuda = document.getElementById('btn-ayuda');

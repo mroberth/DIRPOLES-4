@@ -6,6 +6,9 @@
 window.TransporteEditar = (function () {
     'use strict';
 
+    const MAX_CANTIDAD_REPUESTO = 1000000;
+    const MAX_CANTIDAD_ENTRADA = 2000;
+
     function escapar(txt) {
         if (txt === null || txt === undefined) return '';
         const div = document.createElement('div');
@@ -19,6 +22,24 @@ window.TransporteEditar = (function () {
     // Opciones mutables: idExcluir cambia en cada apertura (patrón empleado/editar.js).
     const opcionesVehiculo = { idExcluir: 0 };
     const opcionesProveedor = { idExcluir: 0 };
+
+    function validarCantidad(campo, maximo, mensaje) {
+        const valor = campo.value.trim();
+        const cantidad = Number(valor);
+        const error = document.getElementById(campo.id + 'Error');
+
+        campo.classList.remove('is-invalid', 'is-valid');
+        if (error) error.textContent = '';
+
+        if (valor === '' || !Number.isInteger(cantidad) || cantidad < 1 || cantidad > maximo) {
+            campo.classList.add('is-invalid');
+            if (error) error.textContent = mensaje;
+            return false;
+        }
+
+        campo.classList.add('is-valid');
+        return true;
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
         const elR = document.getElementById('modalEditarRuta');
@@ -268,6 +289,7 @@ window.TransporteEditar = (function () {
         const fRuta = document.getElementById('form-editar-ruta');
         if (fRuta) {
             const val = window.TransporteValidaciones.configurar(fRuta);
+            window.MaxlengthFeedback.configurar(fRuta);
             fRuta.addEventListener('submit', async function (ev) {
                 ev.preventDefault();
                 if (!(await val.validarTodo())) return;
@@ -290,6 +312,7 @@ window.TransporteEditar = (function () {
         const fVeh = document.getElementById('form-editar-vehiculo');
         if (fVeh) {
             const val = window.TransporteValidaciones.configurar(fVeh, opcionesVehiculo);
+            window.MaxlengthFeedback.configurar(fVeh);
             fVeh.addEventListener('submit', async function (ev) {
                 ev.preventDefault();
                 if (!(await val.validarTodo())) return;
@@ -312,6 +335,7 @@ window.TransporteEditar = (function () {
         const fProv = document.getElementById('form-editar-proveedor');
         if (fProv) {
             const val = window.TransporteValidaciones.configurar(fProv, opcionesProveedor);
+            window.MaxlengthFeedback.configurar(fProv);
             fProv.addEventListener('submit', async function (ev) {
                 ev.preventDefault();
                 if (!(await val.validarTodo())) return;
@@ -334,6 +358,7 @@ window.TransporteEditar = (function () {
         const fRep = document.getElementById('form-editar-repuesto');
         if (fRep) {
             const val = window.TransporteValidaciones.configurar(fRep);
+            window.MaxlengthFeedback.configurar(fRep);
             fRep.addEventListener('submit', async function (ev) {
                 ev.preventDefault();
                 if (!(await val.validarTodo())) return;
@@ -356,6 +381,16 @@ window.TransporteEditar = (function () {
         // Entrada Stock
         const fEnt = document.getElementById('form-entrada-repuesto');
         if (fEnt) {
+            window.MaxlengthFeedback.configurar(fEnt);
+            const cantidadEntrada = document.getElementById('entrada_cantidad');
+            const validarEntrada = () => validarCantidad(
+                cantidadEntrada,
+                MAX_CANTIDAD_ENTRADA,
+                `La cantidad debe ser un entero entre 1 y ${MAX_CANTIDAD_ENTRADA}.`
+            );
+            cantidadEntrada.addEventListener('input', validarEntrada);
+            cantidadEntrada.addEventListener('blur', validarEntrada);
+
             fEnt.addEventListener('submit', async function (ev) {
                 ev.preventDefault();
                 const payload = {
@@ -363,8 +398,10 @@ window.TransporteEditar = (function () {
                     cantidad: parseInt(document.getElementById('entrada_cantidad').value, 10),
                     razon: document.getElementById('entrada_razon').value.trim(),
                 };
-                if (!payload.cantidad || payload.cantidad <= 0 || !payload.razon) {
-                    AlertManager.warning('Atención', 'Ingresa una cantidad mayor a 0 y la razón de entrada.');
+                if (!validarEntrada() || !payload.razon) {
+                    if (!payload.razon) {
+                        AlertManager.warning('Atención', 'Selecciona la razón de entrada.');
+                    }
                     return;
                 }
                 try {
@@ -384,6 +421,7 @@ window.TransporteEditar = (function () {
         // Salida Stock
         const fSal = document.getElementById('form-salida-repuesto');
         if (fSal) {
+            window.MaxlengthFeedback.configurar(fSal);
             fSal.addEventListener('submit', async function (ev) {
                 ev.preventDefault();
                 const payload = {
@@ -391,8 +429,16 @@ window.TransporteEditar = (function () {
                     cantidad: parseInt(document.getElementById('salida_cantidad').value, 10),
                     razon: document.getElementById('salida_razon').value.trim(),
                 };
-                if (!payload.cantidad || payload.cantidad <= 0 || !payload.razon) {
-                    AlertManager.warning('Atención', 'Ingresa una cantidad mayor a 0 y la razón de salida.');
+                if (
+                    !Number.isInteger(payload.cantidad)
+                    || payload.cantidad <= 0
+                    || payload.cantidad > MAX_CANTIDAD_REPUESTO
+                    || !payload.razon
+                ) {
+                    AlertManager.warning(
+                        'Atención',
+                        `Ingresa una cantidad entera entre 1 y ${MAX_CANTIDAD_REPUESTO} y la razón de salida.`
+                    );
                     return;
                 }
                 try {
@@ -413,6 +459,7 @@ window.TransporteEditar = (function () {
         const fAsig = document.getElementById('form-editar-asignacion');
         if (fAsig) {
             const val = window.TransporteValidaciones.configurar(fAsig);
+            window.MaxlengthFeedback.configurar(fAsig);
             fAsig.addEventListener('submit', async function (ev) {
                 ev.preventDefault();
                 if (!(await val.validarTodo())) return;

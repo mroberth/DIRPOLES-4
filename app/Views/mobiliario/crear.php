@@ -66,7 +66,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                                 <!-- ==================== MOBILIARIO ==================== -->
                                 <div class="tab-pane fade show active py-3" id="panelMobiliario"
                                      role="tabpanel" aria-labelledby="tabMobiliario">
-                                    <form id="form-mobiliario" novalidate>
+                                    <form id="form-mobiliario" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-4">
                                                 <label class="form-label">Tipo de mobiliario *</label>
@@ -163,7 +163,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                                 <!-- ==================== EQUIPO ==================== -->
                                 <div class="tab-pane fade py-3" id="panelEquipo"
                                      role="tabpanel" aria-labelledby="tabEquipo">
-                                    <form id="form-equipo" novalidate>
+                                    <form id="form-equipo" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-4">
                                                 <label class="form-label">Tipo de equipo *</label>
@@ -260,7 +260,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                                 <!-- ==================== FICHA TÉCNICA ==================== -->
                                 <div class="tab-pane fade py-3" id="panelFicha"
                                      role="tabpanel" aria-labelledby="tabFicha">
-                                    <form id="form-ficha" novalidate>
+                                    <form id="form-ficha" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-4">
                                                 <label class="form-label">Nombre de la ficha *</label>
@@ -371,6 +371,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
     <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
 
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <!-- Módulo Mobiliario: stats, validaciones (incluye filas de detalle), tour y envío -->
     <script src="<?= BASE_URL ?>dist/js/modulos/mobiliario/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/mobiliario/validaciones.js" defer></script>

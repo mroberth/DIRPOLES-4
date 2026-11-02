@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const validador = window.DiscapacidadValidaciones
         ? window.DiscapacidadValidaciones.configurar(form)
         : null;
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     // -----------------------------------------------------------------
     // 1) Catálogo (beneficiarios) en UNA llamada.

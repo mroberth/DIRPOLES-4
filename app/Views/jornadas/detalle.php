@@ -129,7 +129,7 @@ $badgeEstatus = $jornada['estatus'] === 'Activa' ? 'success'
                             <!-- Formulario de alta de asistente -->
                             <div class="collapse" id="colapsoAsistente">
                                 <div class="card-body border-bottom bg-light">
-                                    <form id="form-asistente" novalidate>
+                                    <form id="form-asistente" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-3">
                                                 <label class="form-label">Tipo de documento *</label>
@@ -146,7 +146,8 @@ $badgeEstatus = $jornada['estatus'] === 'Activa' ? 'success'
                                                 <label class="form-label">Cédula / documento *</label>
                                                 <div class="input-group">
                                                     <input type="text" name="cedula" id="asis_cedula" class="form-control"
-                                                           inputmode="numeric" maxlength="12" placeholder="Ej: 12345678" required>
+                                                           inputmode="numeric" maxlength="10" pattern="[0-9]*"
+                                                           placeholder="Ej: 12345678" required>
                                                     <button class="btn btn-outline-secondary" type="button" id="btn-buscar-persona"
                                                             title="Buscar y autocompletar los datos">
                                                         <i class="fas fa-magnifying-glass"></i>
@@ -157,13 +158,13 @@ $badgeEstatus = $jornada['estatus'] === 'Activa' ? 'success'
                                             <div class="col-md-3">
                                                 <label class="form-label">Nombres *</label>
                                                 <input type="text" name="nombres" id="asis_nombres" class="form-control"
-                                                       maxlength="100" required>
+                                                       maxlength="20" required>
                                                 <div id="asis_nombresError" class="form-text text-danger"></div>
                                             </div>
                                             <div class="col-md-3">
                                                 <label class="form-label">Apellidos *</label>
                                                 <input type="text" name="apellidos" id="asis_apellidos" class="form-control"
-                                                       maxlength="100" required>
+                                                       maxlength="20" required>
                                                 <div id="asis_apellidosError" class="form-text text-danger"></div>
                                             </div>
 
@@ -194,14 +195,15 @@ $badgeEstatus = $jornada['estatus'] === 'Activa' ? 'success'
                                             <div class="col-md-3">
                                                 <label class="form-label">Teléfono *</label>
                                                 <input type="text" name="telefono" id="asis_telefono" class="form-control"
-                                                       inputmode="numeric" maxlength="12" placeholder="Ej: 04121234567" required>
+                                                       inputmode="numeric" maxlength="11" pattern="[0-9]*"
+                                                       placeholder="Ej: 04121234567" required>
                                                 <div id="asis_telefonoError" class="form-text text-danger"></div>
                                             </div>
 
                                             <div class="col-md-4">
                                                 <label class="form-label">Correo</label>
                                                 <input type="email" name="correo" id="asis_correo" class="form-control"
-                                                       maxlength="100" placeholder="opcional@ejemplo.com">
+                                                       maxlength="50" placeholder="opcional@ejemplo.com">
                                                 <div id="asis_correoError" class="form-text text-danger"></div>
                                             </div>
                                             <div class="col-md-5">
@@ -292,7 +294,7 @@ $badgeEstatus = $jornada['estatus'] === 'Activa' ? 'success'
                             <h6 class="fw-bold text-primary mb-3">
                                 <i class="fas fa-plus-circle me-1"></i> Nuevo diagnóstico
                             </h6>
-                            <form id="form-diagnostico" novalidate>
+                            <form id="form-diagnostico" data-maxlength-feedback novalidate>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Diagnóstico *</label>
@@ -373,7 +375,7 @@ $badgeEstatus = $jornada['estatus'] === 'Activa' ? 'success'
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <form id="form-editar-diagnostico" novalidate>
+                <form id="form-editar-diagnostico" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_jornada_diagnostico" id="edit_id_jornada_diagnostico">
 
                     <div class="modal-body p-4 bg-light">
@@ -429,6 +431,7 @@ $badgeEstatus = $jornada['estatus'] === 'Activa' ? 'success'
     </script>
 
     <!-- Módulo Jornadas: validaciones, tour, asistentes y diagnósticos -->
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/jornadas/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/jornadas/tour.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/jornadas/detalle.js" defer></script>

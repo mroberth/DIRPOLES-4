@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('form.form-config').forEach((form) => {
         const validador = window.ConfiguracionValidaciones.configurar(form, {});
+        window.MaxlengthFeedback.configurar(form);
 
         form.addEventListener('submit', async (ev) => {
             ev.preventDefault();

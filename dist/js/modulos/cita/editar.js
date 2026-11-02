@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form-editar-cita');
     const modalElemento = document.getElementById('modal-editar-cita');
     if (!form || !modalElemento) return;
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     const modal = new bootstrap.Modal(modalElemento);
     const opciones = { idCita: 0 };

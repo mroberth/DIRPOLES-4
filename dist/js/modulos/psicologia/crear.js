@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const validador = window.PsicologiaValidaciones
         ? window.PsicologiaValidaciones.configurar(form)
         : null;
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     // -----------------------------------------------------------------
     // 1) Catálogos (beneficiarios + patologías) en UNA sola llamada.

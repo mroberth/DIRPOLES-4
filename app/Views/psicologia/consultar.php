@@ -27,7 +27,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
 
-            <form id="form-editar-psicologia" novalidate>
+            <form id="form-editar-psicologia" data-maxlength-feedback novalidate>
                 <input type="hidden" id="editar_id_psicologia" name="id_psicologia">
                 <input type="hidden" id="editar_tipo_consulta" name="tipo_consulta">
 
@@ -65,12 +65,12 @@ include BASE_PATH . '/app/Views/template/head.php';
                         </div>
                         <div class="col-md-6">
                             <label for="edit_diagnostico" class="form-label">Diagnóstico *</label>
-                            <textarea id="edit_diagnostico" name="diagnostico" class="form-control" rows="3"></textarea>
+                            <textarea id="edit_diagnostico" name="diagnostico" class="form-control" rows="3" maxlength="5000"></textarea>
                             <div id="edit_diagnosticoError" class="form-text text-danger"></div>
                         </div>
                         <div class="col-12">
                             <label for="edit_tratamiento_gen" class="form-label">Tratamiento general</label>
-                            <textarea id="edit_tratamiento_gen" name="tratamiento_gen" class="form-control" rows="3"></textarea>
+                            <textarea id="edit_tratamiento_gen" name="tratamiento_gen" class="form-control" rows="3" maxlength="5000"></textarea>
                             <div id="edit_tratamiento_genError" class="form-text text-danger"></div>
                         </div>
                     </div>
@@ -79,7 +79,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <div id="edit-campos-retiro" class="row g-3 d-none">
                         <div class="col-md-8">
                             <label for="edit_motivo_retiro" class="form-label">Motivo del retiro *</label>
-                            <textarea id="edit_motivo_retiro" name="motivo_retiro" class="form-control" rows="3"></textarea>
+                            <textarea id="edit_motivo_retiro" name="motivo_retiro" class="form-control" rows="3" maxlength="5000"></textarea>
                             <div id="edit_motivo_retiroError" class="form-text text-danger"></div>
                         </div>
                         <div class="col-md-4">
@@ -122,6 +122,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
 <script src="<?= BASE_URL ?>dist/js/core/documentos.js" defer></script>
+<script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/psicologia/stats.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/psicologia/consultar.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/psicologia/editar.js" defer></script>

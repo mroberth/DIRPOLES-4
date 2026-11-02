@@ -76,7 +76,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
                                 <!-- PESTAÑA 1: RUTAS -->
                                 <div class="tab-pane fade show active" id="tab-rutas" role="tabpanel">
-                                    <form id="form-ruta" novalidate>
+                                    <form id="form-ruta" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label font-weight-bold">Nombre de la Ruta *</label>
@@ -132,7 +132,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
                                 <!-- PESTAÑA 2: VEHÍCULOS -->
                                 <div class="tab-pane fade" id="tab-vehiculos" role="tabpanel">
-                                    <form id="form-vehiculo" novalidate>
+                                    <form id="form-vehiculo" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-4">
                                                 <label class="form-label font-weight-bold">Placa *</label>
@@ -174,7 +174,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
                                 <!-- PESTAÑA 3: PROVEEDORES -->
                                 <div class="tab-pane fade" id="tab-proveedores" role="tabpanel">
-                                    <form id="form-proveedor" novalidate>
+                                    <form id="form-proveedor" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-2">
                                                 <label class="form-label font-weight-bold">Documento *</label>
@@ -202,7 +202,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label font-weight-bold">Correo Electrónico *</label>
-                                                <input type="email" name="correo" id="correo_proveedor" class="form-control" maxlength="100" placeholder="proveedor@ejemplo.com" required>
+                                                <input type="email" name="correo" id="correo_proveedor" class="form-control" maxlength="50" placeholder="proveedor@ejemplo.com" required>
                                                 <div id="correo_proveedorError" class="form-text text-danger"></div>
                                             </div>
                                             <div class="col-md-4">
@@ -227,7 +227,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
                                 <!-- PESTAÑA 4: REPUESTOS -->
                                 <div class="tab-pane fade" id="tab-repuestos" role="tabpanel">
-                                    <form id="form-repuesto" novalidate>
+                                    <form id="form-repuesto" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label font-weight-bold">Nombre del Repuesto *</label>
@@ -259,7 +259,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
                                 <!-- PESTAÑA 5: ASIGNACIONES -->
                                 <div class="tab-pane fade" id="tab-asignaciones" role="tabpanel">
-                                    <form id="form-asignacion" novalidate>
+                                    <form id="form-asignacion" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-4">
                                                 <label class="form-label font-weight-bold">Ruta *</label>
@@ -304,7 +304,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
                                 <!-- PESTAÑA 6: MANTENIMIENTO -->
                                 <div class="tab-pane fade" id="tab-mantenimiento" role="tabpanel">
-                                    <form id="form-mantenimiento" novalidate>
+                                    <form id="form-mantenimiento" data-maxlength-feedback novalidate>
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label font-weight-bold">Vehículo *</label>
@@ -328,7 +328,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                                             </div>
                                             <div class="col-12">
                                                 <label class="form-label font-weight-bold">Descripción del Servicio / Falla</label>
-                                                <textarea name="descripcion" id="descripcion_mantenimiento" class="form-control" rows="2" placeholder="Detalle de trabajos realizados, lubricantes, revisión..."></textarea>
+                                                <textarea name="descripcion" id="descripcion_mantenimiento" class="form-control" rows="2" maxlength="1000" placeholder="Detalle de trabajos realizados, lubricantes, revisión..."></textarea>
                                             </div>
 
                                             <!-- Consumo de repuestos -->
@@ -366,6 +366,7 @@ include BASE_PATH . '/app/Views/template/head.php';
     </div>
 
     <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 
     <script src="<?= BASE_URL ?>dist/js/modulos/transporte/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/transporte/validaciones.js" defer></script>

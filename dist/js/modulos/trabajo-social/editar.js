@@ -362,6 +362,7 @@ window.TrabajoSocialEditar = (function () {
             if (!modalEl || !form) return;
             modales[tipo] = new bootstrap.Modal(modalEl);
             formularios[tipo] = form;
+            if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
             form.addEventListener('submit', function (evento) {
                 evento.preventDefault();
                 enviar(tipo);

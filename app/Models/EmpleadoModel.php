@@ -19,8 +19,8 @@ Class EmpleadoModel extends SecurityModel{
                         $nombre === 'nombre' ? 'El nombre es obligatorio.' : 'El apellido es obligatorio.'
                     );
                 }
-                if (mb_strlen($valor) > 100) {
-                    throw ExcepcionApi::validacion(ucfirst($nombre) . ' no puede superar 100 caracteres.');
+                if (mb_strlen($valor) > 20) {
+                    throw ExcepcionApi::validacion(ucfirst($nombre) . ' no puede superar 20 caracteres.');
                 }
                 $this->atributos[$nombre] = $valor;
                 break;

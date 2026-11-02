@@ -50,7 +50,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                             <h6 class="m-0 font-weight-bold text-primary">Registrar nueva cita</h6>
                         </div>
                         <div class="card-body">
-                            <form id="form-cita" novalidate>
+                            <form id="form-cita" data-maxlength-feedback novalidate>
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label for="id_beneficiario" class="form-label">Beneficiario *</label>
@@ -94,6 +94,7 @@ include BASE_PATH . '/app/Views/template/head.php';
     </div>
     <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
     <script>window.CITAS_ES_ADMIN = <?= $esAdmin ? 'true' : 'false' ?>;</script>
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/cita/tour.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/cita/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/cita/stats.js" defer></script>

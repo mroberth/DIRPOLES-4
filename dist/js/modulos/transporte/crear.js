@@ -86,6 +86,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const formRuta = document.getElementById('form-ruta');
     if (formRuta) {
         const valRuta = window.TransporteValidaciones.configurar(formRuta);
+        window.MaxlengthFeedback.configurar(formRuta);
         formRuta.addEventListener('submit', async function (ev) {
             ev.preventDefault();
             if (!(await valRuta.validarTodo())) {
@@ -114,6 +115,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const formVeh = document.getElementById('form-vehiculo');
     if (formVeh) {
         const valVeh = window.TransporteValidaciones.configurar(formVeh);
+        window.MaxlengthFeedback.configurar(formVeh);
         formVeh.addEventListener('submit', async function (ev) {
             ev.preventDefault();
             if (!(await valVeh.validarTodo())) {
@@ -142,6 +144,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const formProv = document.getElementById('form-proveedor');
     if (formProv) {
         const valProv = window.TransporteValidaciones.configurar(formProv);
+        window.MaxlengthFeedback.configurar(formProv);
         formProv.addEventListener('submit', async function (ev) {
             ev.preventDefault();
             if (!(await valProv.validarTodo())) {
@@ -169,6 +172,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const formRep = document.getElementById('form-repuesto');
     if (formRep) {
         const valRep = window.TransporteValidaciones.configurar(formRep);
+        window.MaxlengthFeedback.configurar(formRep);
         formRep.addEventListener('submit', async function (ev) {
             ev.preventDefault();
             if (!(await valRep.validarTodo())) {
@@ -199,6 +203,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const formAsig = document.getElementById('form-asignacion');
     if (formAsig) {
         const valAsig = window.TransporteValidaciones.configurar(formAsig);
+        window.MaxlengthFeedback.configurar(formAsig);
         formAsig.addEventListener('submit', async function (ev) {
             ev.preventDefault();
             if (!(await valAsig.validarTodo())) {
@@ -272,6 +277,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     if (formMant) {
         const valMant = window.TransporteValidaciones.configurar(formMant);
+        window.MaxlengthFeedback.configurar(formMant);
         formMant.addEventListener('submit', async function (ev) {
             ev.preventDefault();
             if (!(await valMant.validarTodo())) {

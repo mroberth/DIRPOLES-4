@@ -81,7 +81,7 @@ include 'app/Views/template/head.php';
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <form id="form-editar" novalidate>
+                <form id="form-editar" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_empleado" id="id_empleado">
 
                     <div class="modal-body p-0">
@@ -99,7 +99,7 @@ include 'app/Views/template/head.php';
                                             <label for="nombre" class="form-label text-muted small mb-1">
                                                 <i class="fas fa-user text-primary me-1"></i> Nombre *
                                             </label>
-                                            <input type="text" class="form-control" name="nombre" id="nombre" maxlength="100" required>
+                                            <input type="text" class="form-control" name="nombre" id="nombre" maxlength="20" required>
                                             <div id="nombreError" class="form-text text-danger"></div>
                                         </div>
 
@@ -107,7 +107,7 @@ include 'app/Views/template/head.php';
                                             <label for="apellido" class="form-label text-muted small mb-1">
                                                 <i class="fas fa-user text-primary me-1"></i> Apellido *
                                             </label>
-                                            <input type="text" class="form-control" name="apellido" id="apellido" maxlength="100">
+                                            <input type="text" class="form-control" name="apellido" id="apellido" maxlength="20">
                                             <div id="apellidoError" class="form-text text-danger"></div>
                                         </div>
 
@@ -232,6 +232,7 @@ include 'app/Views/template/head.php';
     <?php include 'app/Views/template/script.php'; ?>
 
     <!-- Módulo Empleados: stats + validaciones + edición (modal) + tabla -->
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/empleado/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/empleado/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/empleado/editar.js" defer></script>

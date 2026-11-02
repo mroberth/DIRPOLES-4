@@ -31,7 +31,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                 </div>
                 <div class="card-body">
 
-                    <form id="form-discapacidad" novalidate>
+                    <form id="form-discapacidad" data-maxlength-feedback novalidate>
 
                         <!-- ============ Beneficiario ============ -->
                         <div class="row g-3">
@@ -170,6 +170,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 </div>
 <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
 <script src="<?= BASE_URL ?>dist/js/modulos/discapacidad/tour.js" defer></script>
+<script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/discapacidad/validaciones.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/discapacidad/stats.js" defer></script>
 <script src="<?= BASE_URL ?>dist/js/modulos/discapacidad/crear.js" defer></script>

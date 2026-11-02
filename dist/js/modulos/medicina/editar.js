@@ -178,7 +178,6 @@ window.MedicinaEditar = (function () {
         form = document.getElementById('form-editar-medicina');
         const modalEl = document.getElementById('modal-editar-medicina');
         if (!form || !modalEl) return;
-
         modal = new bootstrap.Modal(modalEl);
 
         const enVivo = [
@@ -197,6 +196,7 @@ window.MedicinaEditar = (function () {
             el.addEventListener('input', par[1]);
             el.addEventListener('change', par[1]);
         });
+        if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
         modalEl.addEventListener('shown.bs.modal', function () {
             if (window.initSelect2) window.initSelect2(form);

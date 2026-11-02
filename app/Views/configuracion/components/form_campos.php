@@ -42,7 +42,7 @@ foreach ($cfg['campos'] as $campo):
         <?php if (($campo['tipo'] ?? 'text') === 'textarea'): ?>
             <textarea class="form-control" id="<?= htmlspecialchars($idCampo) ?>"
                       name="<?= htmlspecialchars($campo['name']) ?>"
-                      maxlength="<?= (int) ($campo['max'] ?? 255) ?>" rows="2"
+                      <?= isset($campo['max']) ? 'maxlength="' . (int) $campo['max'] . '"' : '' ?> rows="2"
                       <?= $attrs ?>></textarea>
 
         <?php elseif (($campo['tipo'] ?? '') === 'select'): ?>
@@ -69,7 +69,7 @@ foreach ($cfg['campos'] as $campo):
             <input type="<?= htmlspecialchars($campo['tipo'] ?? 'text') ?>"
                    class="form-control" id="<?= htmlspecialchars($idCampo) ?>"
                    name="<?= htmlspecialchars($campo['name']) ?>"
-                   maxlength="<?= (int) ($campo['max'] ?? 255) ?>"
+                   <?= isset($campo['max']) ? 'maxlength="' . (int) $campo['max'] . '"' : '' ?>
                    placeholder="<?= htmlspecialchars($campo['placeholder'] ?? '') ?>"
                    <?= $attrs ?>>
             <?php if ($prefijo !== ''): ?></div><?php endif; ?>

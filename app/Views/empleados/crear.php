@@ -30,7 +30,7 @@ include 'app/Views/template/head.php';
 
                     <div class="card shadow mb-4">
                         <div class="card-body">
-                            <form id="form-empleado" novalidate>
+                            <form id="form-empleado" data-maxlength-feedback novalidate>
                                 <div class="row g-3">
                                     <div class="col-md-3">
                                         <label class="form-label">Tipo de cédula *</label>
@@ -51,12 +51,12 @@ include 'app/Views/template/head.php';
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Nombre *</label>
-                                        <input type="text" name="nombre" id="nombre" class="form-control" maxlength="100" required>
+                                        <input type="text" name="nombre" id="nombre" class="form-control" maxlength="20" required>
                                         <div id="nombreError" class="form-text text-danger"></div>
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Apellido *</label>
-                                        <input type="text" name="apellido" id="apellido" class="form-control" maxlength="100">
+                                        <input type="text" name="apellido" id="apellido" class="form-control" maxlength="20">
                                         <div id="apellidoError" class="form-text text-danger"></div>
                                     </div>
 
@@ -130,6 +130,7 @@ include 'app/Views/template/head.php';
     <?php include 'app/Views/template/script.php'; ?>
 
     <!-- Módulo Empleados: stats, validaciones reutilizables, tour y envío -->
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/empleado/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/empleado/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/empleado/tour.js" defer></script>

@@ -218,7 +218,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title font-weight-bold"><i class="fas fa-edit me-2"></i>Editar Ruta <small id="lblEditRutaId"></small></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="form-editar-ruta" novalidate>
+                <form id="form-editar-ruta" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_ruta" id="edit_id_ruta">
                     <div class="modal-body">
                         <div class="row g-3">
@@ -284,7 +284,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title font-weight-bold"><i class="fas fa-bus me-2"></i>Editar Vehículo <small id="lblEditVehiculoId"></small></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="form-editar-vehiculo" novalidate>
+                <form id="form-editar-vehiculo" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_vehiculo" id="edit_id_vehiculo">
                     <div class="modal-body">
                         <div class="row g-3">
@@ -336,7 +336,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title font-weight-bold"><i class="fas fa-truck-field me-2"></i>Editar Proveedor <small id="lblEditProveedorId"></small></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="form-editar-proveedor" novalidate>
+                <form id="form-editar-proveedor" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_proveedor" id="edit_id_proveedor">
                     <div class="modal-body">
                         <div class="row g-3">
@@ -366,7 +366,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label font-weight-bold">Correo *</label>
-                                <input type="email" name="correo" id="edit_correo_proveedor" class="form-control" maxlength="100" required>
+                                <input type="email" name="correo" id="edit_correo_proveedor" class="form-control" maxlength="50" required>
                                 <div id="edit_correo_proveedorError" class="form-text text-danger"></div>
                             </div>
                             <div class="col-md-4">
@@ -399,7 +399,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title font-weight-bold"><i class="fas fa-gears me-2"></i>Editar Repuesto <small id="lblEditRepuestoId"></small></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="form-editar-repuesto" novalidate>
+                <form id="form-editar-repuesto" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_repuesto" id="edit_id_repuesto">
                     <div class="modal-body">
                         <div class="row g-3">
@@ -437,7 +437,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title font-weight-bold"><i class="fas fa-plus-circle me-2"></i>Entrada de Stock de Repuesto</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="form-entrada-repuesto" novalidate>
+                <form id="form-entrada-repuesto" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_repuesto" id="entrada_id_repuesto">
                     <div class="modal-body">
                         <div class="mb-3">
@@ -446,7 +446,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                         </div>
                         <div class="mb-3">
                             <label class="form-label font-weight-bold">Cantidad a Ingresar *</label>
-                            <input type="number" name="cantidad" id="entrada_cantidad" class="form-control" min="1" required>
+                            <input type="number" name="cantidad" id="entrada_cantidad" class="form-control" min="1" max="2000" required>
                             <div id="entrada_cantidadError" class="form-text text-danger"></div>
                         </div>
                         <div class="mb-3">
@@ -477,7 +477,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title font-weight-bold"><i class="fas fa-minus-circle me-2"></i>Salida de Stock de Repuesto</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="form-salida-repuesto" novalidate>
+                <form id="form-salida-repuesto" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_repuesto" id="salida_id_repuesto">
                     <div class="modal-body">
                         <div class="mb-3">
@@ -486,7 +486,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                         </div>
                         <div class="mb-3">
                             <label class="form-label font-weight-bold">Cantidad a Retirar *</label>
-                            <input type="number" name="cantidad" id="salida_cantidad" class="form-control" min="1" required>
+                            <input type="number" name="cantidad" id="salida_cantidad" class="form-control" min="1" max="1000000" required>
                             <div id="salida_cantidadError" class="form-text text-danger"></div>
                         </div>
                         <div class="mb-3">
@@ -550,7 +550,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title font-weight-bold"><i class="fas fa-id-card-clip me-2"></i>Editar Asignación <small id="lblEditAsigId"></small></h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form id="form-editar-asignacion" novalidate>
+                <form id="form-editar-asignacion" data-maxlength-feedback novalidate>
                     <input type="hidden" name="id_asignacion" id="edit_id_asignacion">
                     <div class="modal-body">
                         <div class="row g-3">
@@ -614,6 +614,7 @@ include BASE_PATH . '/app/Views/template/head.php';
     </div>
 
     <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 
     <script>
         window.TRANSPORTE_PUEDE_CREAR    = <?= $puedeCrear ? 'true' : 'false' ?>;

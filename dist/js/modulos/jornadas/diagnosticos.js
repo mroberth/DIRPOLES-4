@@ -36,11 +36,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const validadorNuevo = formDiagnostico
         ? V.configurar(formDiagnostico, { tipo: 'diagnostico', prefijo: 'diag_' })
         : null;
+    if (formDiagnostico && window.MaxlengthFeedback) {
+        window.MaxlengthFeedback.configurar(formDiagnostico);
+    }
 
     const formEditar = document.getElementById('form-editar-diagnostico');
     const validadorEditar = formEditar
         ? V.configurar(formEditar, { tipo: 'diagnostico', prefijo: 'edit_' })
         : null;
+    if (formEditar && window.MaxlengthFeedback) {
+        window.MaxlengthFeedback.configurar(formEditar);
+    }
 
     // ---------------- Catálogo de insumos ----------------
     function llenarInsumos() {

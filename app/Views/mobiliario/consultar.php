@@ -161,7 +161,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <form id="form-editar-mobiliario" novalidate>
+                <form id="form-editar-mobiliario" data-maxlength-feedback novalidate>
                     <input type="hidden" name="em_id_mobiliario" id="em_id_mobiliario">
 
                     <div class="modal-body p-0">
@@ -296,7 +296,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <form id="form-editar-equipo" novalidate>
+                <form id="form-editar-equipo" data-maxlength-feedback novalidate>
                     <input type="hidden" name="ee_id_equipo" id="ee_id_equipo">
 
                     <div class="modal-body p-0">
@@ -429,7 +429,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <form id="form-editar-ficha" novalidate>
+                <form id="form-editar-ficha" data-maxlength-feedback novalidate>
                     <input type="hidden" name="ef_id_ficha" id="ef_id_ficha">
 
                     <div class="modal-body p-4 bg-light">
@@ -619,6 +619,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
     <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
 
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <!-- Módulo Mobiliario: stats + validaciones + edición/reubicación + tablas -->
     <script src="<?= BASE_URL ?>dist/js/modulos/mobiliario/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/mobiliario/validaciones.js" defer></script>

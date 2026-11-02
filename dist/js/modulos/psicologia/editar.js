@@ -207,6 +207,7 @@ window.PsicologiaEditar = (function () {
             el.addEventListener('input', par[1]);
             el.addEventListener('change', par[1]);
         });
+        if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
         modalEl.addEventListener('shown.bs.modal', function () {
             if (window.initSelect2) window.initSelect2(form);

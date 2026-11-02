@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const validador = V.configurar(form, { tipo: 'jornada' });
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     const selTipo = document.getElementById('tipo_jornada');
 

@@ -33,8 +33,8 @@ class BeneficiarioModel extends BusinessModel
                 if ($valor === '') {
                     throw ExcepcionApi::validacion('El nombre es obligatorio.');
                 }
-                if (mb_strlen($valor) > 100) {
-                    throw ExcepcionApi::validacion('El nombre no puede superar 100 caracteres.');
+                if (mb_strlen($valor) > 20) {
+                    throw ExcepcionApi::validacion('El nombre no puede superar 20 caracteres.');
                 }
                 $this->atributos['nombres'] = $valor;
                 break;
@@ -44,8 +44,8 @@ class BeneficiarioModel extends BusinessModel
                 if ($valor === '') {
                     throw ExcepcionApi::validacion('El apellido es obligatorio.');
                 }
-                if (mb_strlen($valor) > 100) {
-                    throw ExcepcionApi::validacion('El apellido no puede superar 100 caracteres.');
+                if (mb_strlen($valor) > 20) {
+                    throw ExcepcionApi::validacion('El apellido no puede superar 20 caracteres.');
                 }
                 $this->atributos['apellidos'] = $valor;
                 break;
@@ -71,8 +71,8 @@ class BeneficiarioModel extends BusinessModel
                 if ($valor === '' || !filter_var($valor, FILTER_VALIDATE_EMAIL)) {
                     throw ExcepcionApi::validacion('El correo electrónico no es válido.');
                 }
-                if (mb_strlen($valor) > 100) {
-                    throw ExcepcionApi::validacion('El correo no puede superar 100 caracteres.');
+                if (mb_strlen($valor) > 50) {
+                    throw ExcepcionApi::validacion('El correo no puede superar 50 caracteres.');
                 }
                 $this->atributos['correo'] = $valor;
                 break;

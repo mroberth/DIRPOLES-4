@@ -42,7 +42,7 @@ $nombreSesion = trim(($_SESSION['nombre'] ?? '') . ' ' . ($_SESSION['apellido'] 
                                 </div>
                             <?php endif; ?>
 
-                            <form id="form-referencia" novalidate>
+                            <form id="form-referencia" data-maxlength-feedback novalidate>
                                 <div class="row g-4">
                                     <!-- Beneficiario -->
                                     <div class="col-12">
@@ -155,6 +155,7 @@ $nombreSesion = trim(($_SESSION['nombre'] ?? '') . ' ' . ($_SESSION['apellido'] 
     </div>
 
     <?php include 'app/Views/template/script.php'; ?>
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 
     <script>
         window.REFERENCIAS_ES_ADMIN = <?= $esAdmin ? 'true' : 'false' ?>;

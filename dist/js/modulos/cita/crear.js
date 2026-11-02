@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('form-cita');
     if (!form) return;
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     document.getElementById('btn-ayuda')?.addEventListener('click', () => {
         if (window.CitaTour) window.CitaTour.iniciar();

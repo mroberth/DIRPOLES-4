@@ -97,6 +97,7 @@ window.OrientacionEditar = (function () {
             el.addEventListener('input', par[1]);
             el.addEventListener('change', par[1]);
         });
+        if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
         form.addEventListener('submit', async function (ev) {
             ev.preventDefault();

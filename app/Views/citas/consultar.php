@@ -65,7 +65,7 @@ include BASE_PATH . '/app/Views/template/head.php';
                     <h5 class="modal-title">Editar cita</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <form id="form-editar-cita" novalidate>
+                <form id="form-editar-cita" data-maxlength-feedback novalidate>
                     <div class="modal-body">
                         <input type="hidden" id="editar_id_cita" name="id_cita">
                         <div class="row g-3">
@@ -107,6 +107,7 @@ include BASE_PATH . '/app/Views/template/head.php';
 
     <?php include BASE_PATH . '/app/Views/template/script.php'; ?>
     <script>window.CITAS_ES_ADMIN = <?= $esAdmin ? 'true' : 'false' ?>;</script>
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/cita/validaciones.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/cita/stats.js" defer></script>
     <script src="<?= BASE_URL ?>dist/js/modulos/cita/editar.js" defer></script>

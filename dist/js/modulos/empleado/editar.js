@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const form = document.getElementById('form-editar');
     const modalEl = document.getElementById('modalEditar');
     if (!form || !modalEl) return;
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     const modal = (typeof bootstrap !== 'undefined') ? new bootstrap.Modal(modalEl) : null;
 

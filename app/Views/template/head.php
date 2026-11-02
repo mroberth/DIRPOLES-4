@@ -41,6 +41,7 @@
     <link href="<?= BASE_URL ?>dist/css/dashboard/sb-admin-2.min.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>dist/css/etc/sidebar.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>dist/css/dashboard/dashboard.css" rel="stylesheet">
+    <link href="<?= BASE_URL ?>dist/css/etc/modal-responsive.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>plugins/driver.js/driver.css" rel="stylesheet">
     <link href="<?= BASE_URL ?>dist/css/driver.js-personalizado/temaDriverPersonalizado.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>plugins/sweetalert2/dist/sweetalert2.min.css">

@@ -119,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const op = { idExcluir: 0 };
         form._op = op;
         form._validador = window.ConfiguracionValidaciones.configurar(form, op);
+        window.MaxlengthFeedback.configurar(form);
 
         form.addEventListener('submit', async function (ev) {
             ev.preventDefault();

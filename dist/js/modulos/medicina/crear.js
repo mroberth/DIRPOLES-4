@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const validador = window.MedicinaValidaciones
         ? window.MedicinaValidaciones.configurar(form)
         : null;
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     const tbodyInsumos = document.getElementById('lista_insumos');
     const btnAgregarInsumo = document.getElementById('btnAgregarInsumo');

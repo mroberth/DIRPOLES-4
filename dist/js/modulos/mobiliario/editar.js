@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const valMob   = formMob ? V.configurar(formMob, opMob) : null;
     const valEq    = formEq ? V.configurar(formEq, opEq) : null;
     const valFicha = formFicha ? V.configurar(formFicha, opFicha) : null;
+    [formMob, formEq, formFicha].filter(Boolean).forEach((formulario) => {
+        if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(formulario);
+    });
 
     const setValor = (id, valor) => {
         const el = document.getElementById(id);

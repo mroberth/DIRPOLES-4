@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const V = window.JornadasValidaciones;
     const validador = V.configurar(form, { tipo: 'jornada' });
+    if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
     const modalEl = document.getElementById('modalJornada');
 

@@ -158,6 +158,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const validadorAsistente = formAsistente
         ? V.configurar(formAsistente, { tipo: 'asistente', prefijo: 'asis_' })
         : null;
+    if (formAsistente && window.MaxlengthFeedback) {
+        window.MaxlengthFeedback.configurar(formAsistente);
+    }
 
     // Catálogo de tipos de paciente.
     if (formAsistente) {

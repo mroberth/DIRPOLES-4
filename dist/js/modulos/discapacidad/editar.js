@@ -147,6 +147,7 @@ window.DiscapacidadEditar = (function () {
             if (!el) return;
             el.addEventListener(par[1], par[2]);
         });
+        if (window.MaxlengthFeedback) window.MaxlengthFeedback.configurar(form);
 
         form.addEventListener('submit', async function (ev) {
             ev.preventDefault();

@@ -75,7 +75,7 @@ include 'app/Views/template/head.php';
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
-                <form id="form-rechazo" novalidate>
+                <form id="form-rechazo" data-maxlength-feedback novalidate>
                     <input type="hidden" name="rechazo_id_referencia" id="rechazo_id_referencia">
 
                     <div class="modal-body p-4 bg-light">
@@ -112,6 +112,7 @@ include 'app/Views/template/head.php';
     </div>
 
     <?php include 'app/Views/template/script.php'; ?>
+    <script src="<?= BASE_URL ?>dist/js/core/maxlength-feedback.js" defer></script>
 
     <script>
         window.REFERENCIAS_ES_ADMIN = <?= $esAdmin ? 'true' : 'false' ?>;
