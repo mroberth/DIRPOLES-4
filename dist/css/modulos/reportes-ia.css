@@ -1,13 +1,38 @@
 /**
  * dist/css/modulos/reportes-ia.css
  * ---------------------------------------------------------------
- * Estilos ejecutivos y elegantes para los informes de IA, diagramas Mermaid
- * y reglas de impresión limpia (@media print).
+ * Estilos ejecutivos y de alta definición para los informes de IA (DIRPOLES-IA),
+ * membrete institucional formal de la UPTAEB y DIRPOLES, distintivo de IA,
+ * diagramas Mermaid.js y reglas de impresión limpia (@media print).
  */
 
+/* ==================== CONTROL ESTRICTO DE ICONOS FONTAWESOME (SVG / FUENTE) ==================== */
+/* FontAwesome con JS reemplaza <i> con <svg class="svg-inline--fa">.
+   Forzar dimensiones de 1em para evitar que SVGs con viewBox 512x512 exploten en pantalla o impresión. */
+.svg-inline--fa,
+svg.svg-inline--fa,
+i.fas, i.far, i.fa, i.fa-solid, i.fa-regular {
+    width: 1em !important;
+    height: 1em !important;
+    max-width: 1em !important;
+    max-height: 1em !important;
+    vertical-align: -0.125em !important;
+    display: inline-block !important;
+}
+
+/* ==================== CONTENEDOR DEL RESULTADO ==================== */
+.informe-ia-resultado-card {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    overflow: hidden;
+}
+
+/* ==================== CUERPO MARKDOWN ==================== */
 .markdown-body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: #2c3e50;
+    color: #1e293b;
     line-height: 1.7;
     font-size: 0.95rem;
 }
@@ -16,36 +41,39 @@
 .markdown-body h2,
 .markdown-body h3,
 .markdown-body h4 {
-    color: #1e293b;
+    color: #0f172a;
     font-weight: 700;
-    margin-top: 1.5rem;
+    margin-top: 1.6rem;
     margin-bottom: 0.75rem;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.35rem;
 }
 
 .markdown-body h1 {
-    font-size: 1.4rem;
-    border-bottom: 2px solid #e2e8f0;
-    color: #0f172a;
+    font-size: 1.35rem;
+    border-bottom: 2px solid #004a99;
+    color: #003366;
+    letter-spacing: -0.01em;
 }
 
 .markdown-body h2 {
-    font-size: 1.25rem;
-    border-bottom: 1px solid #f1f5f9;
+    font-size: 1.2rem;
+    border-bottom: 1px solid #e2e8f0;
+    color: #1e293b;
 }
 
 .markdown-body h3 {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+    color: #334155;
 }
 
 .markdown-body h4 {
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #475569;
 }
 
-/* Tablas Markdown */
+/* ==================== TABLAS MARKDOWN ==================== */
 .markdown-body table {
     width: 100%;
     margin-top: 1rem;
@@ -54,23 +82,27 @@
     border-spacing: 0;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    border: 1px solid #cbd5e1;
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 
 .markdown-body table th {
-    background-color: #f8fafc;
-    color: #334155;
-    font-weight: 600;
-    padding: 0.65rem 0.9rem;
-    border-bottom: 2px solid #cbd5e1;
-    font-size: 0.875rem;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 2px solid #94a3b8;
+    font-size: 0.86rem;
+    text-align: left;
 }
 
 .markdown-body table td {
-    padding: 0.6rem 0.9rem;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 0.875rem;
+    padding: 0.65rem 0.9rem;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.86rem;
+    color: #334155;
 }
 
 .markdown-body table tr:last-child td {
@@ -78,14 +110,14 @@
 }
 
 .markdown-body table tr:nth-child(even) {
-    background-color: #fafafa;
+    background-color: #f8fafc;
 }
 
 .markdown-body table tr:hover {
     background-color: #f1f5f9;
 }
 
-/* Listas */
+/* ==================== LISTAS Y BLOQUES ==================== */
 .markdown-body ul,
 .markdown-body ol {
     padding-left: 1.4rem;
@@ -96,53 +128,311 @@
     margin-bottom: 0.4rem;
 }
 
-/* Bloques de citas / Alertas */
 .markdown-body blockquote {
     padding: 0.75rem 1.25rem;
-    margin: 1rem 0;
-    color: #475569;
+    margin: 1.2rem 0;
+    color: #334155;
     background-color: #f8fafc;
-    border-left: 4px solid #3b82f6;
+    border-left: 4px solid #004a99;
     border-radius: 0 8px 8px 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 
-/* Diagramas Mermaid: Tamaño controlado y elegante */
-.mermaid {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.markdown-body code:not(pre code) {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+/* ==================== DIAGRAMAS MERMAID.JS ==================== */
+.mermaid,
+div.mermaid {
+    display: block !important;
+    text-align: center;
     background: #ffffff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cbd5e1;
     border-radius: 10px;
-    padding: 1rem;
-    margin: 1.25rem auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    max-width: 480px !important;
-    overflow: hidden;
+    padding: 1.25rem;
+    margin: 1.5rem auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    max-width: 580px !important;
+    overflow-x: auto;
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 
-.mermaid svg {
+.mermaid svg,
+div.mermaid svg,
+.mermaid > svg {
     max-width: 100% !important;
-    max-height: 280px !important;
+    max-height: 320px !important;
     height: auto !important;
     width: auto !important;
+    display: inline-block !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 
-/* ==================== MEDIOS DE IMPRESIÓN (@media print) ==================== */
+/* ==================== MEMBRETE INSTITUCIONAL (UPTAEB - DIRPOLES) ==================== */
+.informe-ia-membrete {
+    display: block;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.membrete-cintillo-superior {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.membrete-logo-box {
+    flex: 0 0 auto;
+}
+
+.membrete-logo {
+    height: 64px;
+    width: auto;
+    object-fit: contain;
+}
+
+.membrete-textos-institucionales {
+    line-height: 1.25;
+}
+
+.institucion-pais {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #334155;
+    text-transform: uppercase;
+}
+
+.institucion-ministerio {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #475569;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.institucion-universidad {
+    font-size: 0.88rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    color: #0f172a;
+    text-transform: uppercase;
+    margin-top: 3px;
+}
+
+.institucion-direccion {
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #004a99;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.institucion-sistema {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    margin-top: 2px;
+}
+
+.membrete-sello-box {
+    flex: 0 0 auto;
+}
+
+.sello-tecnologico {
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    border-radius: 8px;
+    padding: 6px 10px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.sello-tecnologico-texto {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #004a99;
+    letter-spacing: 0.05em;
+}
+
+.sello-subtexto {
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+}
+
+.membrete-linea-gradiente {
+    height: 3px;
+    background: linear-gradient(90deg, #004a99 0%, #0284c7 35%, #f59e0b 50%, #0284c7 65%, #004a99 100%);
+    border-radius: 2px;
+    margin: 10px 0 14px 0;
+}
+
+/* ==================== DISTINTIVO VISUAL EXCLUSIVO DE IA (ALTA LEGIBILIDAD) ==================== */
+.distintivo-ia-wrapper {
+    text-align: center;
+    margin: 12px 0 16px 0;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.distintivo-ia-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #f0f7ff !important;
+    background-image: none !important;
+    border: 1.5px solid #004a99 !important;
+    color: #003366 !important;
+    padding: 6px 18px !important;
+    border-radius: 30px !important;
+    box-shadow: 0 2px 8px rgba(0, 74, 153, 0.1) !important;
+    font-size: 0.82rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.04em !important;
+    text-transform: uppercase !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.distintivo-ia-icono {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    max-width: 22px !important;
+    background: #004a99 !important;
+    color: #ffffff !important;
+    border-radius: 50% !important;
+    font-size: 10px !important;
+    flex-shrink: 0 !important;
+}
+
+.distintivo-ia-icono i,
+.distintivo-ia-icono svg,
+.distintivo-ia-icono .svg-inline--fa {
+    width: 11px !important;
+    height: 11px !important;
+    font-size: 11px !important;
+    color: #ffffff !important;
+}
+
+.distintivo-ia-texto {
+    font-weight: 800 !important;
+    letter-spacing: 0.04em !important;
+    color: #003366 !important;
+    font-size: 0.82rem !important;
+}
+
+.distintivo-ia-tech {
+    display: inline-flex !important;
+    align-items: center !important;
+    background: #ffffff !important;
+    color: #0284c7 !important;
+    font-size: 0.68rem !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 12px !important;
+    border: 1px solid #bae6fd !important;
+    letter-spacing: 0.03em !important;
+    flex-shrink: 0 !important;
+}
+
+/* ==================== CINTILLO DE METADATOS ==================== */
+.membrete-meta-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    color: #334155;
+    gap: 8px;
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+.meta-item {
+    display: inline-flex;
+    align-items: center;
+}
+
+.meta-item i,
+.meta-item svg,
+.meta-item .svg-inline--fa {
+    width: 12px !important;
+    height: 12px !important;
+    max-width: 12px !important;
+    max-height: 12px !important;
+    font-size: 11px !important;
+    margin-right: 5px !important;
+    flex-shrink: 0 !important;
+}
+
+.meta-item strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.meta-item code {
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.membrete-separador-cuerpo {
+    border: 0;
+    border-top: 1px solid #cbd5e1;
+    margin: 12px 0 16px 0;
+}
+
+/* ==================== MEDIOS DE IMPRESIÓN RIGUROSOS (@media print) ==================== */
 @media print {
-    /* Ocultar navegación, barra lateral, topbar, formularios y elementos irrelevantes */
+    /* Configuración de página estándar formato Carta */
+    @page {
+        size: letter portrait;
+        margin: 10mm 14mm 14mm 14mm;
+    }
+
+    /* Ocultar elementos de navegación y formularios de la interfaz web */
     #accordionSidebar,
     .sidebar,
     #content > nav,
-    header,
-    footer,
+    .topbar,
+    header:not(.informe-ia-membrete),
+    footer:not(.informe-ia-footer),
     .d-sm-flex.align-items-center,
-    .row.mb-4,
+    .row.mb-4:not(.print-visible),
     .card.border-start.border-primary,
     .card.border-start.border-4:not(.card-informe-ia),
     #form-reporte,
     #form-informe-ia,
-    .card-header,
+    .card-informe-ia > .card-header,
     #contenedor_general,
     #contenedor_medicina,
     #contenedor_psicologia,
@@ -155,81 +445,430 @@
     #contenedor_transporte,
     .btn,
     button,
-    .badge {
+    .informe-ia-acciones,
+    .badge:not(.distintivo-ia-badge):not(.distintivo-ia-tech):not(.distintivo-ia):not(.sello-tecnologico) {
         display: none !important;
     }
 
-    /* Restablecer cuerpo y contenedores para aprovechar 100% el papel */
-    html, body, #wrapper, #content-wrapper, #content, .container-fluid {
+    /* Control riguroso de iconos FontAwesome en impresión: JAMÁS permitir que excedan su tamaño relativo */
+    .svg-inline--fa,
+    svg.svg-inline--fa,
+    i.fas, i.far, i.fa, i.fa-solid, i.fa-regular {
+        width: 1em !important;
+        height: 1em !important;
+        max-width: 1em !important;
+        max-height: 1em !important;
+        display: inline-block !important;
+        vertical-align: -0.125em !important;
+        font-size: inherit !important;
+    }
+
+    /* Romper cualquier contexto flex/grid en contenedores padre que impida saltos de página limpios */
+    html, body, #wrapper, #content-wrapper, #content, .container-fluid,
+    .card, .card-body, .card-informe-ia, .informe-ia-resultado-card,
+    .informe-ia-resultado-card > .card-body, .markdown-body {
+        display: block !important;
+        flex: none !important;
+        float: none !important;
+        position: static !important;
         background: #ffffff !important;
+        color: #000000 !important;
         margin: 0 !important;
         padding: 0 !important;
         width: 100% !important;
         max-width: 100% !important;
         box-shadow: none !important;
-    }
-
-    .card-informe-ia {
         border: none !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        overflow: visible !important;
     }
 
     #zona-informe-ia {
+        display: block !important;
         margin: 0 !important;
         padding: 0 !important;
         width: 100% !important;
     }
 
-    #zona-informe-ia .card {
-        border: none !important;
+    /* ==================== MEMBRETE INSTITUCIONAL EN IMPRESIÓN ==================== */
+    .informe-ia-membrete {
+        display: block !important;
+        visibility: visible !important;
+        width: 100% !important;
+        margin-bottom: 8pt !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .membrete-cintillo-superior {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 10pt !important;
+    }
+
+    .membrete-logo {
+        height: 44pt !important;
+        width: auto !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .institucion-pais {
+        font-size: 7pt !important;
+        font-weight: 700 !important;
+        color: #1e293b !important;
+    }
+
+    .institucion-ministerio {
+        font-size: 6.5pt !important;
+        font-weight: 600 !important;
+        color: #334155 !important;
+    }
+
+    .institucion-universidad {
+        font-size: 8.5pt !important;
+        font-weight: 800 !important;
+        color: #000000 !important;
+    }
+
+    .institucion-direccion {
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        color: #004a99 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .institucion-sistema {
+        font-size: 6.5pt !important;
+        color: #475569 !important;
+    }
+
+    .sello-tecnologico {
+        border: 0.75pt solid #94a3b8 !important;
+        background-color: #f8fafc !important;
+        padding: 3pt 6pt !important;
+        border-radius: 4pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .sello-tecnologico-texto {
+        font-size: 6.5pt !important;
+        color: #004a99 !important;
+    }
+
+    .sello-subtexto {
+        font-size: 5.5pt !important;
+        color: #475569 !important;
+    }
+
+    .membrete-linea-gradiente {
+        height: 2pt !important;
+        background: #004a99 !important;
+        margin: 6pt 0 8pt 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ==================== BADGE/DISTINTIVO IA EN IMPRESIÓN (NÍTIDO Y LEGIBLE) ==================== */
+    .distintivo-ia-wrapper {
+        display: block !important;
+        visibility: visible !important;
+        text-align: center !important;
+        margin: 6pt 0 8pt 0 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .distintivo-ia-badge {
+        display: inline-flex !important;
+        visibility: visible !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6pt !important;
+        background: #f0f7ff !important;
+        background-color: #f0f7ff !important;
+        background-image: none !important;
+        color: #003366 !important;
+        border: 1.5pt solid #004a99 !important;
+        padding: 3pt 12pt !important;
+        border-radius: 16pt !important;
         box-shadow: none !important;
-        background: transparent !important;
-        padding: 0 !important;
+        font-size: 7.5pt !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.04em !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
-    #zona-informe-ia .card-body {
-        padding: 0 !important;
+    .distintivo-ia-icono {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 14pt !important;
+        height: 14pt !important;
+        min-width: 14pt !important;
+        max-width: 14pt !important;
+        background: #004a99 !important;
+        background-color: #004a99 !important;
+        color: #ffffff !important;
+        border-radius: 50% !important;
+        font-size: 6.5pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
+    .distintivo-ia-icono i,
+    .distintivo-ia-icono svg,
+    .distintivo-ia-icono .svg-inline--fa {
+        width: 7pt !important;
+        height: 7pt !important;
+        max-width: 7pt !important;
+        max-height: 7pt !important;
+        color: #ffffff !important;
+    }
+
+    .distintivo-ia-texto {
+        color: #003366 !important;
+        font-weight: 800 !important;
+        font-size: 7.5pt !important;
+        letter-spacing: 0.03em !important;
+    }
+
+    .distintivo-ia-tech {
+        display: inline-flex !important;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #0284c7 !important;
+        border: 0.5pt solid #0284c7 !important;
+        padding: 1pt 5pt !important;
+        border-radius: 8pt !important;
+        font-size: 6pt !important;
+        font-weight: 700 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* ==================== CINTILLO DE METADATOS EN IMPRESIÓN ==================== */
+    .membrete-meta-strip {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 6pt !important;
+        font-size: 7pt !important;
+        line-height: 1.2 !important;
+        background-color: #f8fafc !important;
+        border: 0.5pt solid #cbd5e1 !important;
+        padding: 3.5pt 8pt !important;
+        border-radius: 4pt !important;
+        margin-bottom: 6pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .meta-item {
+        display: inline-flex !important;
+        align-items: center !important;
+        white-space: nowrap !important;
+    }
+
+    .meta-item i,
+    .meta-item svg,
+    .meta-item .svg-inline--fa {
+        width: 8pt !important;
+        height: 8pt !important;
+        max-width: 8pt !important;
+        max-height: 8pt !important;
+        font-size: 7pt !important;
+        margin-right: 3pt !important;
+        flex-shrink: 0 !important;
+    }
+
+    .membrete-separador-cuerpo {
+        border-top: 0.75pt solid #cbd5e1 !important;
+        margin: 6pt 0 10pt 0 !important;
+    }
+
+    /* ==================== CUERPO MARKDOWN EN IMPRESIÓN ==================== */
     .markdown-body {
-        font-size: 10pt !important;
+        font-size: 9.5pt !important;
         color: #000000 !important;
         line-height: 1.5 !important;
     }
 
+    /* Evitar que encabezados queden huérfanos al pie de una página */
     .markdown-body h1,
     .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+        color: #0f172a !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .markdown-body h1 {
+        font-size: 12.5pt !important;
+        border-bottom: 1.5pt solid #004a99 !important;
+        margin-top: 10pt !important;
+        margin-bottom: 6pt !important;
+        padding-bottom: 2pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .markdown-body h2 {
+        font-size: 11pt !important;
+        border-bottom: 0.75pt solid #cbd5e1 !important;
+        margin-top: 9pt !important;
+        margin-bottom: 5pt !important;
+        padding-bottom: 2pt !important;
+    }
+
     .markdown-body h3 {
-        color: #000000 !important;
-        page-break-after: avoid;
+        font-size: 9.5pt !important;
+        margin-top: 8pt !important;
+        margin-bottom: 4pt !important;
     }
 
-    .markdown-body table {
-        page-break-inside: avoid;
-        border: 1px solid #444 !important;
+    /* ==================== PREVENCIÓN DE CORTE EN TABLAS ==================== */
+    .markdown-body table,
+    table {
+        display: table !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        width: 100% !important;
+        margin: 8pt 0 12pt 0 !important;
+        border-collapse: collapse !important;
+        border: 1pt solid #94a3b8 !important;
+        font-size: 8pt !important;
     }
 
-    .markdown-body table th {
-        background-color: #eee !important;
-        color: #000 !important;
-        border-bottom: 2px solid #444 !important;
+    .markdown-body table tr,
+    table tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 
-    .markdown-body table td {
-        border-bottom: 1px solid #ccc !important;
+    .markdown-body table thead,
+    table thead {
+        display: table-header-group !important;
     }
 
-    .mermaid {
-        page-break-inside: avoid;
-        max-width: 380px !important;
-        margin: 1rem auto !important;
-        border: 1px solid #999 !important;
+    .markdown-body table tbody,
+    table tbody {
+        display: table-row-group !important;
+    }
+
+    .markdown-body table th,
+    table th {
+        background-color: #f1f5f9 !important;
+        color: #0f172a !important;
+        font-weight: 700 !important;
+        padding: 4pt 6pt !important;
+        border: 0.75pt solid #94a3b8 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .markdown-body table td,
+    table td {
+        padding: 3.5pt 6pt !important;
+        border: 0.5pt solid #cbd5e1 !important;
+        color: #1e293b !important;
+    }
+
+    /* ==================== PREVENCIÓN DE CORTE EN DIAGRAMAS MERMAID ==================== */
+    .mermaid,
+    div.mermaid,
+    .mermaid-container {
+        display: block !important;
+        text-align: center !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        break-inside: avoid-page !important;
+        max-width: 100% !important;
+        width: auto !important;
+        margin: 10pt auto !important;
+        padding: 6pt !important;
+        border: 0.75pt solid #cbd5e1 !important;
+        border-radius: 6pt !important;
+        background-color: #ffffff !important;
         box-shadow: none !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
 
-    .mermaid svg {
-        max-height: 220px !important;
+    /* Restricción de tamaño EXCLUSIVA para el SVG del diagrama Mermaid */
+    .mermaid svg,
+    div.mermaid svg,
+    .mermaid > svg {
+        display: block !important;
+        margin: 0 auto !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        max-width: 95% !important;
+        max-height: 250pt !important;
+        height: auto !important;
+        width: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Prevenir cortes en citas, bloques de código e imágenes */
+    .markdown-body blockquote,
+    .markdown-body pre,
+    .markdown-body figure {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        background-color: #f8fafc !important;
+        border-left: 3pt solid #004a99 !important;
+        padding: 5pt 8pt !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Control de viudas y huérfanas en texto */
+    .markdown-body p,
+    .markdown-body li {
+        orphans: 3;
+        widows: 3;
+    }
+
+    /* Pie de auditoría en impresión */
+    .informe-ia-divider {
+        border-top: 0.75pt solid #cbd5e1 !important;
+        margin: 8pt 0 4pt 0 !important;
+    }
+
+    .informe-ia-footer {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        font-size: 7pt !important;
+        color: #64748b !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .informe-ia-footer i,
+    .informe-ia-footer svg,
+    .informe-ia-footer .svg-inline--fa {
+        width: 8pt !important;
+        height: 8pt !important;
+        max-width: 8pt !important;
+        max-height: 8pt !important;
+        font-size: 7.5pt !important;
+        margin-right: 2pt !important;
     }
 }

@@ -274,6 +274,11 @@ function obtenerReportesCatalogos(): void
  */
 function reportesIaGenerar(string $modulo, string $intencion, array $filtros, ?string $observacion): array
 {
+    // Aumentar el límite de ejecución PHP para evitar muerte prematura por timeout
+    if (function_exists('set_time_limit')) {
+        @set_time_limit(90);
+    }
+
     $urlRaw = $_ENV['DIRPOLES_IA_URL'] ?? $_SERVER['DIRPOLES_IA_URL'] ?? getenv('DIRPOLES_IA_URL') ?: 'http://127.0.0.1:8000';
     $url = rtrim((string) $urlRaw, '/');
     $clave = (string) ($_ENV['DIRPOLES_IA_API_KEY'] ?? $_SERVER['DIRPOLES_IA_API_KEY'] ?? getenv('DIRPOLES_IA_API_KEY') ?: '');
@@ -329,7 +334,7 @@ function reportesIaGenerar(string $modulo, string $intencion, array $filtros, ?s
         CURLOPT_POST => true,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_CONNECTTIMEOUT => 5,
-        CURLOPT_TIMEOUT => 120,
+        CURLOPT_TIMEOUT => 45,
         CURLOPT_NOPROXY => '*',
 
         CURLOPT_HTTPHEADER => [
