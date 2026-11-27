@@ -70,6 +70,10 @@ function obtenerBinarioMysql(): string {
         return 'mysql';
     }
 
+    $mariadb = trim((string) @shell_exec('which mariadb 2>/dev/null'));
+    if (!empty($mariadb)) {
+        return $mariadb;
+    }
     $salida = trim((string) @shell_exec('which mysql 2>/dev/null'));
     return !empty($salida) ? $salida : 'mysql';
 }
@@ -100,6 +104,7 @@ $seeds = [
     'seed_discapacidad2.sql',
     'seed_trabajo_social2.sql',
     'seed_referencias2.sql',
+    'seed_recientes_medicina_becas.sql',
 ];
 
 $total = count($seeds);
@@ -156,9 +161,9 @@ echo "======================================================================\n";
 
 $consultas = [
     'Beneficiarios'               => 'SELECT COUNT(*) FROM beneficiario',
-    'Citas de Psicología'         => 'SELECT COUNT(*) FROM citas',
-    'Consultas de Psicología'     => 'SELECT COUNT(*) FROM psicologia',
-    'Consultas de Medicina'       => 'SELECT COUNT(*) FROM medicina',
+    'Citas de Psicología'         => 'SELECT COUNT(*) FROM cita',
+    'Consultas de Psicología'     => 'SELECT COUNT(*) FROM consulta_psicologica',
+    'Consultas de Medicina'       => 'SELECT COUNT(*) FROM consulta_medica',
     'Atenciones de Orientación'   => 'SELECT COUNT(*) FROM orientacion',
     'Expedientes de Discapacidad' => 'SELECT COUNT(*) FROM discapacidad',
     'Becas Estudiantiles'         => 'SELECT COUNT(*) FROM becas',
@@ -167,6 +172,10 @@ $consultas = [
     'Atención a Gestantes'        => 'SELECT COUNT(*) FROM gestion_emb',
     'Referencias Registradas'     => 'SELECT COUNT(*) FROM referencias',
     'Trazabilidad Log Referencias'=> 'SELECT COUNT(*) FROM log_referencias',
+    'Consultas Médicas (Hoy 26/11)' => "SELECT COUNT(*) FROM consulta_medica WHERE fecha_creacion = '2026-11-26'",
+    'Becas Registradas (Hoy 26/11)' => "SELECT COUNT(*) FROM becas WHERE fecha_creacion = '2026-11-26'",
+    'Consultas Médicas (18-26 Nov)' => "SELECT COUNT(*) FROM consulta_medica WHERE fecha_creacion BETWEEN '2026-11-18' AND '2026-11-26'",
+    'Becas Registradas (18-26 Nov)' => "SELECT COUNT(*) FROM becas WHERE fecha_creacion BETWEEN '2026-11-18' AND '2026-11-26'",
 ];
 
 printf("%-35s | %10s\n", "Módulo / Concepto", "Total Filas");
@@ -192,4 +201,4 @@ try {
     echo "  (No se pudo obtener la distribución de referencias)\n";
 }
 
-echo "\n[LISTO] Todos los datos sintéticos (2024 - 17/11/2026) están listos para el microservicio de IA.\n";
+echo "\n[LISTO] Todos los datos sintéticos (2024 - 26/11/2026) están listos para el microservicio de IA.\n";

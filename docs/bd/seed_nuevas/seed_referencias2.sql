@@ -36,7 +36,7 @@
 -- 100% IDEMPOTENTE: omite la inserción si ya existe la referencia en la misma fecha.
 -- =====================================================================
 
-SET NAMES utf8mb4;
+SET NAMES utf8mb4 COLLATE utf8mb4_spanish2_ci;
 
 -- =====================================================================
 -- 1. PROCEDIMIENTO TEMPORAL DE CARGA TRANSACCIONAL E IDEMPOTENTE
@@ -64,9 +64,9 @@ BEGIN
     DECLARE v_id_ref INT;
 
     -- Resolución dinámica de IDs
-    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben LIMIT 1;
-    SELECT id_empleado INTO v_id_emp_orig FROM dirpoles_security.empleado WHERE cedula = p_cedula_origen LIMIT 1;
-    SELECT id_empleado INTO v_id_emp_dest FROM dirpoles_security.empleado WHERE cedula = p_cedula_destino LIMIT 1;
+    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_empleado INTO v_id_emp_orig FROM dirpoles_security.empleado WHERE cedula = p_cedula_origen COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_empleado INTO v_id_emp_dest FROM dirpoles_security.empleado WHERE cedula = p_cedula_destino COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     IF v_id_ben IS NOT NULL AND v_id_emp_orig IS NOT NULL AND v_id_emp_dest IS NOT NULL THEN
         -- Comprobación de idempotencia: evitar duplicados exactos en misma fecha

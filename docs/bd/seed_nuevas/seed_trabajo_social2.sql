@@ -30,7 +30,7 @@
 -- 100% IDEMPOTENTE: omite registros si ya existen para el beneficiario y fecha.
 -- =====================================================================
 
-SET NAMES utf8mb4;
+SET NAMES utf8mb4 COLLATE utf8mb4_spanish2_ci;
 
 -- =====================================================================
 -- 1. PROCEDIMIENTOS TEMPORALES TRANSACCIONALES E IDEMPOTENTES
@@ -52,8 +52,8 @@ BEGIN
     DECLARE v_id_ben INT;
     DECLARE v_id_sol INT;
 
-    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts LIMIT 1;
-    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben LIMIT 1;
+    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     IF v_id_ts IS NOT NULL AND v_id_ben IS NOT NULL THEN
         IF NOT EXISTS (
@@ -88,8 +88,8 @@ BEGIN
     DECLARE v_id_ben INT;
     DECLARE v_id_sol INT;
 
-    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts LIMIT 1;
-    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben LIMIT 1;
+    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     IF v_id_ts IS NOT NULL AND v_id_ben IS NOT NULL THEN
         IF NOT EXISTS (
@@ -124,9 +124,9 @@ BEGIN
     DECLARE v_id_det INT;
     DECLARE v_id_sol INT;
 
-    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts LIMIT 1;
-    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben LIMIT 1;
-    SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = p_nombre_patologia LIMIT 1;
+    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = p_nombre_patologia COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     IF v_id_pat IS NULL THEN
         SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = 'Gripe' LIMIT 1;
@@ -170,9 +170,9 @@ BEGIN
     DECLARE v_id_det INT;
     DECLARE v_id_sol INT;
 
-    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts LIMIT 1;
-    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben LIMIT 1;
-    SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = p_nombre_patologia LIMIT 1;
+    SELECT id_empleado INTO v_id_ts FROM dirpoles_security.empleado WHERE cedula = p_cedula_ts COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = p_nombre_patologia COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     IF v_id_pat IS NULL THEN
         SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = 'Sin patología médica' LIMIT 1;

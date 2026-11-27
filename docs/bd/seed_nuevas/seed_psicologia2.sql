@@ -21,7 +21,7 @@
 -- 100% IDEMPOTENTE: omite registros si ya existen para el beneficiario y fecha.
 -- =====================================================================
 
-SET NAMES utf8mb4;
+SET NAMES utf8mb4 COLLATE utf8mb4_spanish2_ci;
 
 -- =====================================================================
 -- 1. ASEGURAR PATOLOGÍAS PSICOLÓGICAS COMUNES EN EL CATÁLOGO
@@ -65,9 +65,9 @@ BEGIN
     DECLARE v_id_det INT;
     DECLARE v_id_sol INT;
 
-    SELECT id_empleado INTO v_id_psic FROM dirpoles_security.empleado WHERE cedula = p_cedula_psic LIMIT 1;
-    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben LIMIT 1;
-    SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = p_nombre_patologia LIMIT 1;
+    SELECT id_empleado INTO v_id_psic FROM dirpoles_security.empleado WHERE cedula = p_cedula_psic COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_beneficiario INTO v_id_ben FROM beneficiario WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
+    SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = p_nombre_patologia COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     IF v_id_pat IS NULL THEN
         SELECT id_patologia INTO v_id_pat FROM patologia WHERE tipo_patologia = 'Psicológica' LIMIT 1;

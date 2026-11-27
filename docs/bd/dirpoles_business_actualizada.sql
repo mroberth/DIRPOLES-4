@@ -1,9 +1,9 @@
 /*M!999999\- enable the sandbox mode */ 
--- MariaDB dump 10.19  Distrib 10.11.14-MariaDB, for debian-linux-gnu (x86_64)
+-- MariaDB dump 10.19-12.3.2-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: dirpoles_business
 -- ------------------------------------------------------
--- Server version	10.11.14-MariaDB-0ubuntu0.24.04.1
+-- Server version	12.3.2-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -14,13 +14,13 @@
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+/*M!100616 SET @OLD_NOTE_VERBOSITY=@@NOTE_VERBOSITY, NOTE_VERBOSITY=0 */;
 
 --
 -- Current Database: `dirpoles_business`
 --
 
-CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dirpoles_business` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish2_ci */;
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `dirpoles_business` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
 
 USE `dirpoles_business`;
 
@@ -50,6 +50,7 @@ CREATE TABLE `asignaciones_rutas` (
 -- Dumping data for table `asignaciones_rutas`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `asignaciones_rutas` WRITE;
 /*!40000 ALTER TABLE `asignaciones_rutas` DISABLE KEYS */;
 INSERT INTO `asignaciones_rutas` VALUES
@@ -60,6 +61,8 @@ INSERT INTO `asignaciones_rutas` VALUES
 (6,4,6,4,'2026-10-05','Activa');
 /*!40000 ALTER TABLE `asignaciones_rutas` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `becas`
@@ -85,6 +88,7 @@ CREATE TABLE `becas` (
 -- Dumping data for table `becas`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `becas` WRITE;
 /*!40000 ALTER TABLE `becas` DISABLE KEYS */;
 INSERT INTO `becas` VALUES
@@ -96,6 +100,8 @@ INSERT INTO `becas` VALUES
 (13,142,'0102443322110099','uploads/trabajo_social/planilla_beca_6.pdf','0102','2026-02-14');
 /*!40000 ALTER TABLE `becas` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `beneficiario`
@@ -125,13 +131,14 @@ CREATE TABLE `beneficiario` (
   KEY `idx_ben_estatus_pnf` (`estatus`,`id_pnf`),
   KEY `idx_ben_fecha` (`fecha_creacion`),
   CONSTRAINT `beneficiario_ibfk_1` FOREIGN KEY (`id_pnf`) REFERENCES `pnf` (`id_pnf`)
-) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=195 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `beneficiario`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `beneficiario` WRITE;
 /*!40000 ALTER TABLE `beneficiario` DISABLE KEYS */;
 INSERT INTO `beneficiario` VALUES
@@ -196,9 +203,83 @@ INSERT INTO `beneficiario` VALUES
 (60,6,'2309-M','Erick Darío','Silva Nieves','V','19904108','1998-05-18','04226969560','erick.silva63@gmail.com','M','Av. 9 con calle 14, Barrio Tamarindo',1,'2026-04-15 04:00:00'),
 (61,4,'2408-J','Erika Jackeline','Vera Cárdenas','V','23913281','1999-02-27','04246983351','erika.vera73@gmail.com','F','Calle 22 con carrera 3, Sector Centro',1,'2026-05-26 04:00:00'),
 (63,3,'2103-B','Ligia','Duran','V','14335760','1988-10-09','04245952471','Duranligia.pnfi@gmail.com','F','Pueblo nuevo',1,'2026-10-09 04:00:00'),
-(66,1,'1101','Otro','Beneficiario','V','30000001','2003-01-01','04144959176','correo.distinto.benef@test.com','F','Lara',1,'2026-10-18 04:00:00');
+(66,1,'1101','Otro','Beneficiario','V','30000001','2003-01-01','04144959176','correo.distinto.benef@test.com','F','Lara',1,'2026-10-18 04:00:00'),
+(68,3,'1101-M','Valeria Sofía','Colmenárez Gil','V','28114201','2004-03-12','04125101122','valeria.colmenarez01@gmail.com','F','Carrera 19 con calle 25, Sector Centro, Barquisimeto',1,'2024-01-15 04:00:00'),
+(69,1,'2201-C','Diego Alejandro','Paredes Riera','V','29215302','2003-07-24','04145112233','diego.paredes02@gmail.com','M','Av. Libertador con calle 33, Urb. Sucre, Barquisimeto',1,'2024-01-28 04:00:00'),
+(70,2,'3102-M','Camila Victoria','Castillo Alvarado','V','30316403','2005-02-18','04245123344','camila.castillo03@gmail.com','F','Urb. El Tostao, calle 12 con Av. 5 de Julio, Barquisimeto',1,'2024-02-10 04:00:00'),
+(71,4,'1401-J','Gabriel José','Montilla Barreto','V','31417504','2006-05-30','04165134455','gabriel.montilla04@gmail.com','M','Calle 8 con carrera 15, Barrio Unión, Barquisimeto',1,'2024-02-22 04:00:00'),
+(72,5,'2501-U','Daniela Beatriz','Medina Carrillo','V','27518605','2002-11-09','04265145566','daniela.medina05@gmail.com','F','Urb. Don Rómulo, Av. 5 de Julio con calle 18, Barquisimeto',1,'2024-03-08 04:00:00'),
+(73,6,'3302-M','Mateo Jesús','Rojas Guédez','V','26619706','2001-09-15','04225156677','mateo.rojas06@yahoo.es','M','Barrio Belén, carrera 17 con calle 52, Barquisimeto',1,'2024-03-25 04:00:00'),
+(74,7,'1601-C','Paula Andrea','Hernández Silva','V','25720807','2000-08-20','04125167788','paula.hernandez07@gmail.com','F','Carrera 22 con calle 30, Sector Obrero, Barquisimeto',1,'2024-04-12 04:00:00'),
+(75,8,'2102-B','Samuel David','Pérez Escalona','V','24821908','1999-04-14','04145178899','samuel.perez08@gmail.com','M','Av. Las Américas, Urb. Buen Pastor, calle 7, Barquisimeto',1,'2024-04-29 04:00:00'),
+(76,9,'2701-U','Lucía Valentina','Gómez Morillo','V','23922019','1998-12-03','04245189900','lucia.gomez09@gmail.com','F','Sector Alto de la Cruz, calle 38 con carrera 9, Barquisimeto',1,'2024-05-14 04:00:00'),
+(77,10,'3401-C','Sebastián José','Torres Sequera','V','29023120','2003-01-25','04165201122','sebastian.torres10@gmail.com','M','Urb. Daniel Camacho, Av. Carabobo con calle 16, Barquisimeto',1,'2024-05-30 04:00:00'),
+(78,11,'2602-B','Isabella María','Navas Valera','V','30124231','2004-10-17','04265212233','isabella.navas11@gmail.com','F','Barrio Tamarindo, carrera 4 con calle 42, Barquisimeto',0,'2024-06-11 04:00:00'),
+(79,12,'3501-C','Alejandro José','Soto Meléndez','V','31225342','2005-06-08','04225223344','alejandro.soto12@yahoo.es','M','Av. Venezuela con calle 21, Urb. 15 de Enero, Barquisimeto',1,'2024-06-26 04:00:00'),
+(80,3,'1202-B','Victoria Elena','Chávez Oropeza','V','28326453','2002-03-30','04125234455','victoria.chavez13@gmail.com','F','Calle 54 con carrera 13, Barquisimeto',1,'2024-07-09 04:00:00'),
+(81,1,'2301-B','Leonardo Daniel','Briceño Falcón','V','27427564','2001-08-11','04145245566','leonardo.briceno14@gmail.com','M','Urb. Santa Rosa, Av. Paramacay con calle 8, Barquisimeto',1,'2024-07-24 04:00:00'),
+(82,2,'1302-M','Mariana Coromoto','Marrero Peraza','V','26528675','2000-05-19','04245256677','mariana.marrero15@gmail.com','F','Barrio San José, calle 28 con carrera 14, Barquisimeto',1,'2024-08-13 04:00:00'),
+(83,4,'2101-M','Ricardo Javier','Vargas Cordero','V','25629786','1999-09-07','04165267788','ricardo.vargas16@hotmail.com','M','Sector Pío Tamayo, calle 23 con carrera 8, Barquisimeto',1,'2024-08-28 04:00:00'),
+(84,5,'1901-U','Natalia Carolina','Salas Aranguren','V','24730897','1998-01-16','04265278899','natalia.salas17@gmail.com','F','Urb. La Carreta, calle 11 con Av. Santiago Rodríguez, Barquisimeto',1,'2024-09-10 04:00:00'),
+(85,6,'2301-M','Mauricio Enrique','Reyes Camacaro','V','29831908','2004-12-05','04225289900','mauricio.reyes18@gmail.com','M','Barrio La Sequita, carrera 20 con calle 31, Barquisimeto',1,'2024-09-27 04:00:00'),
+(86,7,'3301-J','Fabiana del Valle','Quero Linárez','V','30932019','2005-04-22','04125301122','fabiana.quero19@gmail.com','F','Carrera 16 con calle 40, Barrio El Recreo, Barquisimeto',1,'2024-10-15 04:00:00'),
+(87,8,'3201-B','Santiago Andrés','Bermúdez Yépez','V','31033120','2006-02-14','04145312233','santiago.bermudez20@gmail.com','M','Urb. 6 de Marzo, calle 9 con carrera 12, Barquisimeto',1,'2024-10-31 04:00:00'),
+(88,9,'1502-M','Bárbara Teresa','Alvarado Parra','V','28134231','2003-09-03','04245323344','barbara.alvarado21@gmail.com','F','Barrio El Maní, carrera 18 con calle 27, Barquisimeto',1,'2024-11-12 04:00:00'),
+(89,10,'2201-U','Fernando José','Suárez Mendoza','V','27235342','2001-10-29','04165334455','fernando.suarez22@gmail.com','M','Urb. Javier Este, Av. Los Leones con calle 5, Barquisimeto',0,'2024-11-26 04:00:00'),
+(90,11,'3101-C','Adriana Mercedes','Pineda Lameda','V','26336453','2000-07-06','04265345566','adriana.pineda23@gmail.com','F','Calle 14 con carrera 26, Urb. Sucre, Barquisimeto',1,'2024-12-05 04:00:00'),
+(91,12,'2402-U','Guillermo Antonio','Godoy Bastidas','V','25437564','1999-03-18','04225356677','guillermo.godoy24@gmail.com','M','Carrera 7 con calle 34, Sector El Tránsito, Barquisimeto',1,'2024-12-18 04:00:00'),
+(92,3,'2103-M','Verónica Isabel','Lovera Mogollón','V','29538675','2004-06-25','04125367788','veronica.lovera25@gmail.com','F','Av. 20 con calle 45, Sector Centro, Barquisimeto',1,'2025-01-14 04:00:00'),
+(93,1,'3202-C','Andrés Eduardo','Ochoa Terán','V','30639786','2005-08-14','04145378899','andres.ochoa26@gmail.com','M','Calle 32 con carrera 10, Barrio Unión, Barquisimeto',1,'2025-01-27 04:00:00'),
+(94,2,'2105-M','Diana Patricia','Urbina Zambrano','V','31740897','2006-01-31','04245389900','diana.urbina27@gmail.com','F','Urb. El Tostao, calle 9 con carrera 3, Barquisimeto',1,'2025-02-11 04:00:00'),
+(95,4,'3101-J','Javier Ignacio','Lucena Garrido','V','28841908','2003-11-12','04165401122','javier.lucena28@gmail.com','M','Barrio Belén, carrera 15 con calle 48, Barquisimeto',1,'2025-02-24 04:00:00'),
+(96,5,'3103-U','Claudia Virginia','Páez Santeliz','V','27942019','2002-04-04','04265412233','claudia.paez29@gmail.com','F','Av. Libertador con calle 24, Urb. Sucre, Barquisimeto',1,'2025-03-10 04:00:00'),
+(97,6,'1701-U','Héctor Alfonso','Giménez Crespo','V','26043120','2000-12-28','04225423344','hector.gimenez30@yahoo.es','M','Sector Obrero, carrera 21 con calle 14, Barquisimeto',1,'2025-03-26 04:00:00'),
+(98,7,'2201-B','Silvia Raquel','Sánchez Oviedo','V','25144231','1999-07-15','04125434455','silvia.sanchez31@gmail.com','F','Urb. Don Rómulo, carrera 11 con calle 16, Barquisimeto',1,'2025-04-08 04:00:00'),
+(99,8,'1201-B','Ignacio Ramón','Daza Colmenárez','V','29245342','2004-02-09','04145445566','ignacio.daza32@gmail.com','M','Calle 18 con carrera 5, Barrio La Loma, Barquisimeto',1,'2025-04-22 04:00:00'),
+(100,9,'3101-J','Rocío Milagros','Leal Chirinos','V','30346453','2005-09-21','04245456677','rocio.leal33@gmail.com','F','Av. 5 de Julio, Urb. 6 de Marzo, calle 12, Barquisimeto',1,'2025-05-13 04:00:00'),
+(101,10,'1401-C','César Augusto','Aguilar Colina','V','31447564','2006-03-10','04165467788','cesar.aguilar34@gmail.com','M','Sector Alto de la Cruz, calle 44 con carrera 10, Barquisimeto',1,'2025-05-28 04:00:00'),
+(102,11,'1801-B','Elena Cristina','Yépez Carucí','V','28548675','2003-05-17','04265478899','elena.yepez35@gmail.com','F','Urb. Daniel Camacho, carrera 17 con calle 19, Barquisimeto',1,'2025-06-10 04:00:00'),
+(103,12,'1701-U','Álvaro Luis','Barrios Valero','V','27649786','2001-11-23','04225489900','alvaro.barrios36@gmail.com','M','Barrio Tamarindo, carrera 2 con calle 39, Barquisimeto',1,'2025-06-25 04:00:00'),
+(104,3,'3104-B','Irene Coromoto','Carreño Hurtado','V','26750897','2000-10-11','04125501122','irene.carreno37@gmail.com','F','Urb. Santa Rosa, calle 15 con Av. Paramacay, Barquisimeto',1,'2025-07-15 04:00:00'),
+(105,1,'1102-M','Rafael Vicente','Morales Rivero','V','25851908','1999-08-01','04145512233','rafael.morales38@gmail.com','M','Carrera 14 con calle 50, Barrio Belén, Barquisimeto',1,'2025-07-29 04:00:00'),
+(106,2,'3201-M','Aura Marina','Campos Tovar','V','29952019','2004-11-04','04245523344','aura.campos39@gmail.com','F','Av. Las Américas, Urb. Buen Pastor, calle 14, Barquisimeto',1,'2025-08-12 04:00:00'),
+(107,4,'2401-J','Marcos Antonio','Peña Villegas','V','30053120','2005-03-27','04165534455','marcos.pena40@gmail.com','M','Barrio San José, carrera 18 con calle 30, Barquisimeto',0,'2025-08-26 04:00:00'),
+(108,5,'2101-U','Carolina Esther','Mora Antequera','V','31154231','2006-07-19','04265545566','carolina.mora41@gmail.com','F','Sector Pío Tamayo, calle 27 con carrera 6, Barquisimeto',1,'2025-09-09 04:00:00'),
+(109,6,'3401-M','Víctor Manuel','Infante Palencia','V','28255342','2002-12-14','04225556677','victor.infante42@yahoo.es','M','Urb. La Carreta, Av. 14 con calle 8, Barquisimeto',1,'2025-09-23 04:00:00'),
+(110,7,'1702-C','Norma Cecilia','Guanipa Sira','V','27356453','2001-06-29','04125567788','norma.guanipa43@gmail.com','F','Calle 24 con carrera 8, Sector Centro, Barquisimeto',1,'2025-10-14 04:00:00'),
+(111,8,'3101-B','Nelson Enrique','Brito Cañizalez','V','26457564','2000-02-16','04145578899','nelson.brito44@gmail.com','M','Barrio La Sequita, carrera 24 con calle 28, Barquisimeto',1,'2025-10-28 04:00:00'),
+(112,9,'2201-U','Mónica Alejandra','Pernía Sivira','V','25558675','1999-10-05','04245589900','monica.pernia45@gmail.com','F','Urb. El Tostao, Av. 9 con calle 14, Barquisimeto',1,'2025-11-11 04:00:00'),
+(113,10,'2501-C','Gustavo Adolfo','Cuicas Manzano','V','29659786','2004-04-18','04165601122','gustavo.cuicas46@gmail.com','M','Carrera 15 con calle 38, Barrio El Maní, Barquisimeto',1,'2025-11-25 04:00:00'),
+(114,11,'2202-B','Gladys Josefina','Guillén Piña','V','30760897','2005-01-26','04265612233','gladys.guillen47@gmail.com','F','Urb. Javier Este, calle 4 con Av. Los Leones, Barquisimeto',1,'2025-12-09 04:00:00'),
+(115,12,'3101-U','Julio César','Corao Vielma','V','31861908','2006-08-30','04225623344','julio.corao48@gmail.com','M','Av. Libertador con calle 16, Urb. Sucre, Barquisimeto',1,'2025-12-16 04:00:00'),
+(116,3,'4101-M','Ligia Margarita','Heredia Mogollón','V','28962019','2003-03-08','04125634455','ligia.heredia49@gmail.com','F','Carrera 17 con calle 46, Barrio Belén, Barquisimeto',1,'2026-01-13 04:00:00'),
+(117,1,'4201-B','Pedro Vicente','Blanco Mujica','V','27063120','2001-09-22','04145645566','pedro.blanco50@gmail.com','M','Sector Obrero, carrera 23 con calle 11, Barquisimeto',1,'2026-01-27 04:00:00'),
+(118,2,'4101-C','Lourdes Teresa','Fontaines Prado','V','26164231','2000-06-12','04245656677','lourdes.fontaines51@gmail.com','F','Urb. Don Rómulo, calle 21 con Av. 5 de Julio, Barquisimeto',1,'2026-02-10 04:00:00'),
+(119,4,'4401-J','Óscar Enrique','Gil Castrillo','V','25265342','1999-11-25','04165667788','oscar.gil52@gmail.com','M','Calle 10 con carrera 19, Barrio El Maní, Barquisimeto',1,'2026-02-24 04:00:00'),
+(120,5,'4101-U','Rosalba María','Orellana Ramos','V','29366453','2004-07-14','04265678899','rosalba.orellana53@gmail.com','F','Urb. El Tostao, calle 16 con carrera 5, Barquisimeto',1,'2026-03-09 04:00:00'),
+(121,6,'4301-M','Rubén Darío','Coronado Pire','V','30467564','2005-04-02','04225689900','ruben.coronado54@yahoo.es','M','Barrio Tamarindo, carrera 6 con calle 36, Barquisimeto',1,'2026-03-23 04:00:00'),
+(122,7,'4201-C','Carmen Elena','Carcache Gómez','V','31568675','2006-12-01','04125701122','carmen.carcache55@gmail.com','F','Sector Alto de la Cruz, calle 40 con carrera 7, Barquisimeto',1,'2026-04-14 04:00:00'),
+(123,8,'4102-B','Felipe José','Pacheco Nelo','V','28669786','2003-02-17','04145712233','felipe.pacheco56@gmail.com','M','Av. Venezuela con calle 12, Urb. 15 de Enero, Barquisimeto',1,'2026-04-28 04:00:00'),
+(124,9,'4101-U','Beatriz Eugenia','Timaure Vargas','V','27770897','2002-08-30','04245723344','beatriz.timaure57@gmail.com','F','Barrio San José, carrera 21 con calle 32, Barquisimeto',1,'2026-05-12 04:00:00'),
+(125,10,'4401-C','Manuel Salvador','Méndez Sigala','V','26871908','2001-05-15','04165734455','manuel.mendez58@gmail.com','M','Urb. Daniel Camacho, Av. Carabobo con calle 24, Barquisimeto',1,'2026-05-26 04:00:00'),
+(126,11,'4101-B','Raquel Yolanda','Argüelles Otero','V','25972019','2000-03-24','04265745566','raquel.arguelles59@gmail.com','F','Urb. Santa Rosa, calle 10 con Av. Paramacay, Barquisimeto',0,'2026-06-09 04:00:00'),
+(127,12,'4501-U','Tomás Alberto','Ceballos Prieto','V','29073120','2004-10-09','04225756677','tomas.ceballos60@gmail.com','M','Sector Pío Tamayo, calle 29 con carrera 5, Barquisimeto',1,'2026-06-23 04:00:00'),
+(128,3,'1106-M','Elba Coromoto','Riera Aldana','V','30174231','2005-08-04','04125767788','elba.riera61@gmail.com','F','Calle 13 con carrera 51, Barrio Belén, Barquisimeto',1,'2026-07-14 04:00:00'),
+(129,1,'1205-C','José Gregorio','Montes Delgado','V','31275342','2006-04-12','04145778899','jose.montes62@gmail.com','M','Av. Libertador con calle 38, Urb. Sucre, Barquisimeto',1,'2026-07-28 04:00:00'),
+(130,2,'1304-M','Miriam Esther','Zamora Marcano','V','28376453','2003-01-18','04245789900','miriam.zamora63@gmail.com','F','Urb. Don Rómulo, carrera 14 con calle 19, Barquisimeto',1,'2026-08-11 04:00:00'),
+(131,4,'1405-J','Edgar David','Duno Villalobos','V','27477564','2001-09-05','04165801122','edgar.duno64@gmail.com','M','Barrio La Sequita, carrera 22 con calle 26, Barquisimeto',1,'2026-08-25 04:00:00'),
+(132,5,'1904-U','Yolanda Beatriz','Sosa Cordero','V','26578675','2000-06-21','04265812233','yolanda.sosa65@gmail.com','F','Sector Obrero, calle 25 con carrera 17, Barquisimeto',1,'2026-09-08 04:00:00'),
+(133,6,'2305-M','Félix Eduardo','Cisneros Parra','V','25679786','1999-12-10','04225823344','felix.cisneros66@yahoo.es','M','Urb. La Carreta, carrera 18 con calle 11, Barquisimeto',1,'2026-09-22 04:00:00'),
+(134,7,'2403-J','Xiomara del Valle','Mendoza Querales','V','29780897','2004-05-28','04125834455','xiomara.mendoza67@gmail.com','F','Barrio El Maní, calle 29 con carrera 12, Barquisimeto',1,'2026-10-13 04:00:00'),
+(135,8,'1205-B','Hugo Alexander','Carballo Meza','V','30881908','2005-02-15','04145845566','hugo.carballo68@gmail.com','M','Av. Las Américas, Urb. Buen Pastor, calle 18, Barquisimeto',1,'2026-10-27 04:00:00'),
+(136,9,'1504-M','Alicia Josefina','Lozada Barrios','V','31982019','2006-10-03','04245856677','alicia.lozada69@gmail.com','F','Urb. 6 de Marzo, calle 14 con carrera 10, Barquisimeto',1,'2026-11-05 04:00:00'),
+(137,10,'1208-C','Emilio José','Vásquez Nieves','V','28083120','2002-07-20','04165867788','emilio.vasquez70@gmail.com','M','Barrio Tamarindo, carrera 5 con calle 41, Barquisimeto',1,'2026-11-12 04:00:00'),
+(138,11,'3104-C','Milena Coromoto','Nava Montilla','V','27184231','2001-03-16','04265878899','milena.nava71@gmail.com','F','Urb. Daniel Camacho, calle 20 con Av. Carabobo, Barquisimeto',1,'2026-11-16 04:00:00'),
+(139,12,'3404-M','Alonso Rafael','Freitez Castillo','V','26285342','2000-11-28','04225889900','alonso.freitez72@gmail.com','M','Calle 35 con carrera 16, Barrio San José, Barquisimeto',1,'2026-11-17 04:00:00');
 /*!40000 ALTER TABLE `beneficiario` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `cita`
@@ -222,21 +303,48 @@ CREATE TABLE `cita` (
   KEY `idx_cita_estatus` (`estatus`,`fecha`),
   CONSTRAINT `cita_ibfk_1` FOREIGN KEY (`id_beneficiario`) REFERENCES `beneficiario` (`id_beneficiario`),
   CONSTRAINT `cita_ibfk_2` FOREIGN KEY (`estatus`) REFERENCES `estado_cita` (`id_estado`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `cita`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `cita` WRITE;
 /*!40000 ALTER TABLE `cita` DISABLE KEYS */;
 INSERT INTO `cita` VALUES
 (1,'2026-09-21','12:00:00',1,3,3,'2026-09-17'),
 (2,'2026-10-12','09:30:00',2,3,1,'2026-10-07'),
-(3,'2026-10-12','11:00:00',63,3,1,'2026-10-09');
+(3,'2026-10-12','11:00:00',63,3,1,'2026-10-09'),
+(4,'2025-03-24','08:30:00',98,3,5,'2025-03-19'),
+(5,'2026-02-23','11:00:00',119,3,4,'2026-02-18'),
+(6,'2024-07-02','11:30:00',83,3,5,'2024-06-27'),
+(7,'2024-03-13','08:30:00',74,3,5,'2024-03-08'),
+(8,'2025-06-16','09:30:00',104,3,3,'2025-06-11'),
+(9,'2026-05-19','10:30:00',125,3,3,'2026-05-14'),
+(10,'2024-10-08','10:00:00',89,3,4,'2024-10-03'),
+(11,'2025-09-24','08:30:00',110,3,3,'2025-09-19'),
+(12,'2026-08-18','11:30:00',131,3,5,'2026-08-13'),
+(13,'2026-11-09','10:00:00',137,3,2,'2026-11-04'),
+(14,'2024-01-22','09:00:00',68,3,3,'2024-01-18'),
+(15,'2024-05-27','09:30:00',80,3,3,'2024-05-22'),
+(16,'2025-02-17','11:00:00',95,3,4,'2025-02-12'),
+(17,'2026-01-19','09:00:00',116,3,3,'2026-01-14'),
+(18,'2024-04-18','10:30:00',77,3,3,'2024-04-14'),
+(19,'2025-01-20','09:00:00',92,3,3,'2025-01-15'),
+(20,'2025-11-05','10:00:00',113,3,4,'2025-10-31'),
+(21,'2026-10-06','08:30:00',134,3,3,'2026-10-01'),
+(22,'2025-08-07','11:30:00',107,3,5,'2025-08-02'),
+(23,'2026-07-07','09:30:00',128,3,3,'2026-07-02'),
+(24,'2024-08-20','08:30:00',86,3,3,'2024-08-15'),
+(25,'2024-02-14','11:00:00',71,3,4,'2024-02-10'),
+(26,'2025-05-08','10:30:00',101,3,3,'2025-05-03'),
+(27,'2026-04-08','08:30:00',122,3,5,'2026-04-03');
 /*!40000 ALTER TABLE `cita` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `consulta_medica`
@@ -269,6 +377,7 @@ CREATE TABLE `consulta_medica` (
 -- Dumping data for table `consulta_medica`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `consulta_medica` WRITE;
 /*!40000 ALTER TABLE `consulta_medica` DISABLE KEYS */;
 INSERT INTO `consulta_medica` VALUES
@@ -298,6 +407,8 @@ INSERT INTO `consulta_medica` VALUES
 (26,65,69,1.61,53.00,'A+','Dolor en epigastrio secundario a ingesta de café sin alimento.','Gastritis aguda estresora.','Tratamiento sintomático gástrico.','Recomendación de suspender irritantes por 7 días.','2026-10-05');
 /*!40000 ALTER TABLE `consulta_medica` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `consulta_psicologica`
@@ -323,13 +434,14 @@ CREATE TABLE `consulta_psicologica` (
   KEY `id_detalle_patologia` (`id_detalle_patologia`),
   CONSTRAINT `consulta_psicologica_ibfk_1` FOREIGN KEY (`id_detalle_patologia`) REFERENCES `detalle_patologia` (`id_detalle_patologia`),
   CONSTRAINT `consulta_psicologica_ibfk_2` FOREIGN KEY (`id_solicitud_serv`) REFERENCES `solicitud_de_servicio` (`id_solicitud_serv`)
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `consulta_psicologica`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `consulta_psicologica` WRITE;
 /*!40000 ALTER TABLE `consulta_psicologica` DISABLE KEYS */;
 INSERT INTO `consulta_psicologica` VALUES
@@ -356,9 +468,31 @@ INSERT INTO `consulta_psicologica` VALUES
 (35,42,38,'Diagnóstico','Sintomatología ansiosa asociada a la toma de decisiones profesionales de fin de trayecto.','Reestructuración cognitiva, resolución de problemas y focalización en metas inmediatas.','No aplica','No aplica','No aplica','Evolución satisfactoria. Se otorga alta psicológica de la fase aguda.','2026-07-21 14:10:00'),
 (36,43,39,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Cambio vocacional a PNF Agroalimentación por producción sostenible.','Batería psicométrica confirma perfil aptitudinal hacia áreas agrícolas y ambientales.','2026-08-16 20:30:00'),
 (37,44,40,'Diagnóstico','Tensión emocional y sobrecarga percibida ante el inicio de prácticas profesionales institucionales.','Técnicas de gestión del tiempo, comunicación asertiva y contención emocional.','No aplica','No aplica','No aplica','Se mantiene en seguimiento mensual voluntario.','2026-09-08 13:00:00'),
-(38,45,41,'Diagnóstico','Episodio ansioso agudo generado por sobrecarga de compromisos académicos de fin de trayecto.','Psicoterapia breve de apoyo, ejercicios de grounding y planificación semanal.','No aplica','No aplica','No aplica','Paciente se retira tranquilo y fortalecido tras la sesión.','2026-10-04 15:45:00');
+(38,45,41,'Diagnóstico','Episodio ansioso agudo generado por sobrecarga de compromisos académicos de fin de trayecto.','Psicoterapia breve de apoyo, ejercicios de grounding y planificación semanal.','No aplica','No aplica','No aplica','Paciente se retira tranquilo y fortalecido tras la sesión.','2026-10-04 15:45:00'),
+(39,161,85,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Reorientación vocacional hacia PNF Administración por afinidad con finanzas y gestión de costos.','Batería vocacional de Holland aplicada. Muestra perfil emprendedor compatible con el perfil de egreso.','2024-01-22 13:30:00'),
+(40,162,86,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Solicitud de cambio vocacional a PNF Informática por marcado interés en programación web.','Test de aptitudes analíticas arroja percentil 85 en razonamiento lógico formal.','2024-03-04 15:30:00'),
+(41,163,87,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Reorientación a PNF Turismo por afinidad a la gestión del patrimonio y relaciones públicas.','Entrevista vocacional favorable. Estudiante comprende la estructura curricular de la especialidad.','2024-04-22 19:00:00'),
+(42,164,88,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Cambio vocacional a PNF Contaduría Pública por excelente desempeño en cátedras numéricas.','Informe psicotécnico positivo remitido a la comisión de validación de admisiones.','2024-06-11 13:15:00'),
+(43,165,89,'Diagnóstico','Reacción de duelo adaptativo tras el fallecimiento de su progenitora con labilidad emocional transitoria.','Psicoterapia breve de apoyo en proceso de duelo, validación de afectos y contención psicosocial.','No aplica','No aplica','No aplica','Evolución favorable en proceso de elaboración de la pérdida. Mantiene su ritmo de estudio.','2024-07-24 15:30:00'),
+(44,166,90,'Diagnóstico','Estado de ánimo decaído, anhedonia leve y desmotivación en actividades académicas habituales.','Activación conductual, reestructuración cognitiva y fortalecimiento de redes de apoyo entre pares.','No aplica','No aplica','No aplica','Responde satisfactoriamente al plan de tareas graduales.','2024-09-10 14:30:00'),
+(45,167,91,'Retiro temporal','No aplica','No aplica','Traslado forzoso de residencia familiar a otro estado del país por motivos económicos imprevistos.','1 Año Académico','No aplica','Se entrega constancia institucional para tramitar la reserva de cupo reglamentaria.','2024-11-12 18:00:00'),
+(46,168,92,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Reorientación a PNF Higiene y Seguridad Laboral por marcado interés en seguridad industrial.','Batería de intereses profesionales respalda plenamente la afinidad con la nueva especialidad.','2025-02-05 15:00:00'),
+(47,169,93,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Cambio vocacional a PNF Administración por interés en la gestión de organizaciones deportivas.','Entrevista vocacional favorable. Informe de reorientación curricular consignado.','2025-03-24 14:15:00'),
+(48,170,94,'Cambio de carrera','No aplica','No aplica','No aplica','No aplica','Reorientación vocacional hacia PNF Agroalimentación por vocación familiar en el sector agrícola.','Pruebas psicotécnicas ratifican perfil técnico y vocacional acorde a las ciencias agrícolas.','2025-05-13 15:30:00'),
+(49,171,95,'Diagnóstico','Manifestaciones ansiosas somáticas en semanas de exámenes finales de lapso.','Entrenamiento en relajación guiada, hábitos de alimentación saludable y descansos programados.','No aplica','No aplica','No aplica','Se reporta alivio de sintomatología somática tras 3 sesiones de seguimiento.','2025-06-25 14:30:00'),
+(50,172,96,'Diagnóstico','Proceso adaptativo de duelo por ruptura afectiva significativa que interfiere transitoriamente en su concentración.','Contención emocional, psicoeducación afectiva y fomento de actividades recreativas saludables.','No aplica','No aplica','No aplica','Buena capacidad de introspección y compromiso en la superación de la fase aguda.','2025-08-12 15:15:00'),
+(51,173,97,'Diagnóstico','Evaluación psicológica preventiva de rutina por solicitud de beca de honor académico.','Recomendaciones de alto rendimiento mental y equilibrio en la rutina de estudio.','No aplica','No aplica','No aplica','Estudiante con sobresaliente estabilidad psíquica y emocional.','2025-09-23 12:30:00'),
+(52,174,98,'Diagnóstico','Cierre y evaluación final de acompañamiento psicológico del periodo formativo.','Revisión de logros y consolidación de herramientas psicoeducativas incorporadas.','No aplica','No aplica','No aplica','Se otorga el alta psicológica formal con excelente pronóstico de autonomía.','2025-12-09 14:00:00'),
+(53,175,99,'Diagnóstico','Cuadro de ansiedad reactiva por presiones económicas familiares que perturban la concentración académica.','Psicoterapia breve de apoyo, técnicas de grounding y canalización con el área de Trabajo Social.','No aplica','No aplica','No aplica','Se remite a Trabajo Social para evaluación de beneficio socioeconómico institucional.','2026-02-24 18:00:00'),
+(54,176,100,'Diagnóstico','Fatiga extrema por sobrecarga de actividades laborales y preparación de defensas de grado.','Estrategias de higiene del descanso, delegación de responsabilidades y reestructuración de metas.','No aplica','No aplica','No aplica','El beneficiario reduce la jornada externa y reporta franca recuperación del rendimiento.','2026-04-14 17:15:00'),
+(55,177,101,'Diagnóstico','Dificultad marcada para formular preguntas en clase y participar en dinámicas grupales.','Entrenamiento en habilidades sociales asertivas, ensayo conductual y contacto visual progresivo.','No aplica','No aplica','No aplica','Se observan progresos palpables en la soltura comunicacional del estudiante.','2026-05-26 18:45:00'),
+(56,178,102,'Diagnóstico','Tensión muscular e insomnio leve por acumulación de entregas metodológicas del proyecto comunitario.','Entrenamiento en relajación diafragmática profunda y pausas ergonómicas regulares.','No aplica','No aplica','No aplica','Notable mejoría en el patrón de descanso nocturno reportado por el beneficiario.','2026-07-14 17:00:00'),
+(57,179,103,'Diagnóstico','Sintomatología ansiosa moderada derivada de conflictos de convivencia en equipo de proyecto.','Intervención breve orientada a la resolución asertiva de conflictos y comunicación no violenta.','No aplica','No aplica','No aplica','Logro de acuerdos de convivencia en el equipo de proyecto con mediación metodológica.','2026-08-25 18:30:00'),
+(58,180,104,'Diagnóstico','Preocupación constante ante el inicio de las defensas públicas de los proyectos comunitarios.','Ensayo conductual guiado, técnicas de autoinstrucción positiva y modulación vocal.','No aplica','No aplica','No aplica','Beneficiaria adquiere seguridad y dominio de su discurso de presentación.','2026-10-13 17:15:00');
 /*!40000 ALTER TABLE `consulta_psicologica` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
 /*!50003 SET @saved_col_connection = @@collation_connection */ ;
@@ -385,7 +519,8 @@ DELIMITER ;;
             WHERE id_beneficiario = v_id_beneficiario;
         END IF;
     END IF;
-END */;;
+END 
+*/;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -416,6 +551,7 @@ CREATE TABLE `detalle_ficha_equipo` (
 -- Dumping data for table `detalle_ficha_equipo`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `detalle_ficha_equipo` WRITE;
 /*!40000 ALTER TABLE `detalle_ficha_equipo` DISABLE KEYS */;
 INSERT INTO `detalle_ficha_equipo` VALUES
@@ -440,6 +576,8 @@ INSERT INTO `detalle_ficha_equipo` VALUES
 (19,9,19,'Video Beam Epson');
 /*!40000 ALTER TABLE `detalle_ficha_equipo` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `detalle_ficha_mobiliario`
@@ -466,6 +604,7 @@ CREATE TABLE `detalle_ficha_mobiliario` (
 -- Dumping data for table `detalle_ficha_mobiliario`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `detalle_ficha_mobiliario` WRITE;
 /*!40000 ALTER TABLE `detalle_ficha_mobiliario` DISABLE KEYS */;
 INSERT INTO `detalle_ficha_mobiliario` VALUES
@@ -492,6 +631,8 @@ INSERT INTO `detalle_ficha_mobiliario` VALUES
 (21,9,18,1,'Mesa de conferencias');
 /*!40000 ALTER TABLE `detalle_ficha_mobiliario` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `detalle_insumo`
@@ -517,6 +658,7 @@ CREATE TABLE `detalle_insumo` (
 -- Dumping data for table `detalle_insumo`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `detalle_insumo` WRITE;
 /*!40000 ALTER TABLE `detalle_insumo` DISABLE KEYS */;
 INSERT INTO `detalle_insumo` VALUES
@@ -528,6 +670,8 @@ INSERT INTO `detalle_insumo` VALUES
 (7,23,1,'2');
 /*!40000 ALTER TABLE `detalle_insumo` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `detalle_insumo_jornadas`
@@ -553,10 +697,13 @@ CREATE TABLE `detalle_insumo_jornadas` (
 -- Dumping data for table `detalle_insumo_jornadas`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `detalle_insumo_jornadas` WRITE;
 /*!40000 ALTER TABLE `detalle_insumo_jornadas` DISABLE KEYS */;
 /*!40000 ALTER TABLE `detalle_insumo_jornadas` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `detalle_patologia`
@@ -571,13 +718,14 @@ CREATE TABLE `detalle_patologia` (
   PRIMARY KEY (`id_detalle_patologia`),
   KEY `id_patologia` (`id_patologia`),
   CONSTRAINT `detalle_patologia_ibfk_1` FOREIGN KEY (`id_patologia`) REFERENCES `patologia` (`id_patologia`)
-) ENGINE=InnoDB AUTO_INCREMENT=85 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `detalle_patologia`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `detalle_patologia` WRITE;
 /*!40000 ALTER TABLE `detalle_patologia` DISABLE KEYS */;
 INSERT INTO `detalle_patologia` VALUES
@@ -587,6 +735,15 @@ INSERT INTO `detalle_patologia` VALUES
 (19,2),
 (28,2),
 (37,2),
+(85,2),
+(86,2),
+(87,2),
+(88,2),
+(92,2),
+(93,2),
+(94,2),
+(97,2),
+(98,2),
 (17,3),
 (21,3),
 (22,3),
@@ -618,6 +775,9 @@ INSERT INTO `detalle_patologia` VALUES
 (34,6),
 (38,6),
 (41,6),
+(95,6),
+(99,6),
+(103,6),
 (42,10),
 (48,10),
 (53,10),
@@ -642,9 +802,19 @@ INSERT INTO `detalle_patologia` VALUES
 (57,13),
 (75,13),
 (78,13),
-(84,13);
+(84,13),
+(102,15),
+(104,15),
+(90,16),
+(91,17),
+(101,18),
+(89,19),
+(96,19),
+(100,20);
 /*!40000 ALTER TABLE `detalle_patologia` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `discapacidad`
@@ -678,6 +848,7 @@ CREATE TABLE `discapacidad` (
 -- Dumping data for table `discapacidad`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `discapacidad` WRITE;
 /*!40000 ALTER TABLE `discapacidad` DISABLE KEYS */;
 INSERT INTO `discapacidad` VALUES
@@ -707,6 +878,8 @@ INSERT INTO `discapacidad` VALUES
 (25,117,'Física','Monoparesia leve residual de miembro superior derecho.','Disminución discreta de la fuerza de agarre en mano derecha.','Leve','Ejercicios de rehabilitación de fuerza fina.','Independencia funcional total con compensación.','No','Pelota de fisioterapia para articulación.','Diagnóstico reciente registrado en la unidad este mes.','Permitir tiempo adicional en pruebas escritas prolongadas.','CONAPDIS-551029','2026-10-07');
 /*!40000 ALTER TABLE `discapacidad` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `equipos`
@@ -741,6 +914,7 @@ CREATE TABLE `equipos` (
 -- Dumping data for table `equipos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `equipos` WRITE;
 /*!40000 ALTER TABLE `equipos` DISABLE KEYS */;
 INSERT INTO `equipos` VALUES
@@ -765,6 +939,8 @@ INSERT INTO `equipos` VALUES
 (19,2,6,'Epson','PowerLite E20','EPS-VIB-2025-013','Blanco','Bueno','2025-02-01','Proyector 3400 lúmenes HDMI','Video Beam Sala de Conferencias','Activo','2025-02-15 15:15:00');
 /*!40000 ALTER TABLE `equipos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `estado_cita`
@@ -787,6 +963,7 @@ CREATE TABLE `estado_cita` (
 -- Dumping data for table `estado_cita`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `estado_cita` WRITE;
 /*!40000 ALTER TABLE `estado_cita` DISABLE KEYS */;
 INSERT INTO `estado_cita` VALUES
@@ -797,6 +974,8 @@ INSERT INTO `estado_cita` VALUES
 (5,'No asistió','Beneficiario no se presentó',1,'2025-12-14 16:02:38');
 /*!40000 ALTER TABLE `estado_cita` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `eventos_calendario_personal`
@@ -813,19 +992,23 @@ CREATE TABLE `eventos_calendario_personal` (
   `fecha` datetime NOT NULL,
   `fecha_creacion` date NOT NULL,
   PRIMARY KEY (`id_evento`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `eventos_calendario_personal`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `eventos_calendario_personal` WRITE;
 /*!40000 ALTER TABLE `eventos_calendario_personal` DISABLE KEYS */;
 INSERT INTO `eventos_calendario_personal` VALUES
-(1,3,'Prueba','Hola','2026-09-30 15:32:00','2026-09-30');
+(1,3,'Prueba','Hola','2026-09-30 15:32:00','2026-09-30'),
+(2,1,'Hola','hola','2026-10-24 12:30:00','2026-10-23');
 /*!40000 ALTER TABLE `eventos_calendario_personal` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `exoneracion`
@@ -853,6 +1036,7 @@ CREATE TABLE `exoneracion` (
 -- Dumping data for table `exoneracion`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `exoneracion` WRITE;
 /*!40000 ALTER TABLE `exoneracion` DISABLE KEYS */;
 INSERT INTO `exoneracion` VALUES
@@ -864,6 +1048,8 @@ INSERT INTO `exoneracion` VALUES
 (13,148,'Inscripción','No aplica','uploads/trabajo_social/carta_exo_6.pdf',NULL,'No posee','2026-10-04');
 /*!40000 ALTER TABLE `exoneracion` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `fames`
@@ -891,6 +1077,7 @@ CREATE TABLE `fames` (
 -- Dumping data for table `fames`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `fames` WRITE;
 /*!40000 ALTER TABLE `fames` DISABLE KEYS */;
 INSERT INTO `fames` VALUES
@@ -902,6 +1089,8 @@ INSERT INTO `fames` VALUES
 (12,78,78,'Exámenes','No aplica','2026-03-08');
 /*!40000 ALTER TABLE `fames` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `fichas_tecnicas`
@@ -928,6 +1117,7 @@ CREATE TABLE `fichas_tecnicas` (
 -- Dumping data for table `fichas_tecnicas`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `fichas_tecnicas` WRITE;
 /*!40000 ALTER TABLE `fichas_tecnicas` DISABLE KEYS */;
 INSERT INTO `fichas_tecnicas` VALUES
@@ -942,6 +1132,8 @@ INSERT INTO `fichas_tecnicas` VALUES
 (9,'Ficha Técnica - Dirección General DIRPOLES',8,7,'Oficina de Coordinación y Dirección.','2025-02-15',1);
 /*!40000 ALTER TABLE `fichas_tecnicas` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `gestion_emb`
@@ -971,6 +1163,7 @@ CREATE TABLE `gestion_emb` (
 -- Dumping data for table `gestion_emb`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `gestion_emb` WRITE;
 /*!40000 ALTER TABLE `gestion_emb` DISABLE KEYS */;
 INSERT INTO `gestion_emb` VALUES
@@ -982,6 +1175,8 @@ INSERT INTO `gestion_emb` VALUES
 (6,84,84,18,1092830192,1984019283,'En Proceso','2026-10-06');
 /*!40000 ALTER TABLE `gestion_emb` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `historial_inventario`
@@ -1015,12 +1210,15 @@ CREATE TABLE `historial_inventario` (
 -- Dumping data for table `historial_inventario`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `historial_inventario` WRITE;
 /*!40000 ALTER TABLE `historial_inventario` DISABLE KEYS */;
 INSERT INTO `historial_inventario` VALUES
 (2,12,'mobiliario',2,'asignacion',NULL,NULL,6,'Alta e inventariado de Escritorio receptor','2025-01-15 08:30:00');
 /*!40000 ALTER TABLE `historial_inventario` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `horario`
@@ -1036,20 +1234,26 @@ CREATE TABLE `horario` (
   `hora_inicio` time NOT NULL,
   `hora_fin` time NOT NULL,
   PRIMARY KEY (`id_horario`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `horario`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `horario` WRITE;
 /*!40000 ALTER TABLE `horario` DISABLE KEYS */;
 INSERT INTO `horario` VALUES
 (1,3,'Lunes','08:00:00','13:00:00'),
-(2,3,'Martes','08:00:00','14:00:00');
+(2,3,'Martes','08:00:00','14:00:00'),
+(3,3,'Miércoles','08:00:00','14:00:00'),
+(4,3,'Jueves','08:00:00','14:00:00'),
+(5,3,'Viernes','08:00:00','13:00:00');
 /*!40000 ALTER TABLE `horario` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `insumos`
@@ -1080,6 +1284,7 @@ CREATE TABLE `insumos` (
 -- Dumping data for table `insumos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `insumos` WRITE;
 /*!40000 ALTER TABLE `insumos` DISABLE KEYS */;
 INSERT INTO `insumos` VALUES
@@ -1096,6 +1301,8 @@ INSERT INTO `insumos` VALUES
 (12,1,'Tachiforte 500mg','Nada','Medicamento','2027-01-13','2026-10-12',0,'Agotado');
 /*!40000 ALTER TABLE `insumos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `inventario_medico`
@@ -1122,6 +1329,7 @@ CREATE TABLE `inventario_medico` (
 -- Dumping data for table `inventario_medico`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `inventario_medico` WRITE;
 /*!40000 ALTER TABLE `inventario_medico` DISABLE KEYS */;
 INSERT INTO `inventario_medico` VALUES
@@ -1151,6 +1359,8 @@ INSERT INTO `inventario_medico` VALUES
 (25,12,1,'2026-10-12 21:25:35','Registro',0,'Nuevo registro');
 /*!40000 ALTER TABLE `inventario_medico` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `inventario_mob`
@@ -1177,10 +1387,13 @@ CREATE TABLE `inventario_mob` (
 -- Dumping data for table `inventario_mob`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `inventario_mob` WRITE;
 /*!40000 ALTER TABLE `inventario_mob` DISABLE KEYS */;
 /*!40000 ALTER TABLE `inventario_mob` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `inventario_repuestos`
@@ -1200,13 +1413,14 @@ CREATE TABLE `inventario_repuestos` (
   PRIMARY KEY (`id_inventario`),
   KEY `id_repuesto` (`id_repuesto`),
   CONSTRAINT `inventario_repuestos_ibfk_1` FOREIGN KEY (`id_repuesto`) REFERENCES `repuestos_vehiculos` (`id_repuesto`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `inventario_repuestos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `inventario_repuestos` WRITE;
 /*!40000 ALTER TABLE `inventario_repuestos` DISABLE KEYS */;
 INSERT INTO `inventario_repuestos` VALUES
@@ -1220,9 +1434,12 @@ INSERT INTO `inventario_repuestos` VALUES
 (11,5,4,'3','Entrada','Compra a proveedor','2025-02-15 12:45:00'),
 (12,6,4,'0','Registro','Alta inicial de repuesto','2025-03-01 13:00:00'),
 (13,2,4,'2','Salida','Uso en mantenimiento rutinario','2026-10-02 14:00:00'),
-(14,5,4,'1','Salida','Uso en mantenimiento rutinario','2026-10-02 14:05:00');
+(14,5,4,'1','Salida','Uso en mantenimiento rutinario','2026-10-02 14:05:00'),
+(15,6,1,'10','Entrada','Compra','2026-11-01 18:30:19');
 /*!40000 ALTER TABLE `inventario_repuestos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `jornada_beneficiarios`
@@ -1256,6 +1473,7 @@ CREATE TABLE `jornada_beneficiarios` (
 -- Dumping data for table `jornada_beneficiarios`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `jornada_beneficiarios` WRITE;
 /*!40000 ALTER TABLE `jornada_beneficiarios` DISABLE KEYS */;
 INSERT INTO `jornada_beneficiarios` VALUES
@@ -1301,6 +1519,8 @@ INSERT INTO `jornada_beneficiarios` VALUES
 (42,'V','26546361','Stephanie Beatriz','Lugo','1997-08-14','Femenino','Estudiante','04145309900','stephanie.lugo@gmail.com','Urb. la Rosaleda Calle 1',9,'2026-10-07 13:00:00','Atendido');
 /*!40000 ALTER TABLE `jornada_beneficiarios` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `jornada_diagnosticos`
@@ -1327,6 +1547,7 @@ CREATE TABLE `jornada_diagnosticos` (
 -- Dumping data for table `jornada_diagnosticos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `jornada_diagnosticos` WRITE;
 /*!40000 ALTER TABLE `jornada_diagnosticos` DISABLE KEYS */;
 INSERT INTO `jornada_diagnosticos` VALUES
@@ -1372,6 +1593,8 @@ INSERT INTO `jornada_diagnosticos` VALUES
 (41,42,8,'Screening de estrés académico moderado.','Talleres de técnicas de relajación e higiene del sueño.','Remitida a consulta de Psicología UPTAEB.','2026-10-07 13:10:00');
 /*!40000 ALTER TABLE `jornada_diagnosticos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `jornada_insumos`
@@ -1398,6 +1621,7 @@ CREATE TABLE `jornada_insumos` (
 -- Dumping data for table `jornada_insumos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `jornada_insumos` WRITE;
 /*!40000 ALTER TABLE `jornada_insumos` DISABLE KEYS */;
 INSERT INTO `jornada_insumos` VALUES
@@ -1423,6 +1647,8 @@ INSERT INTO `jornada_insumos` VALUES
 (21,40,7,1,'Insumo utilizado en jornada médica');
 /*!40000 ALTER TABLE `jornada_insumos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `jornadas_medicas`
@@ -1450,6 +1676,7 @@ CREATE TABLE `jornadas_medicas` (
 -- Dumping data for table `jornadas_medicas`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `jornadas_medicas` WRITE;
 /*!40000 ALTER TABLE `jornadas_medicas` DISABLE KEYS */;
 INSERT INTO `jornadas_medicas` VALUES
@@ -1463,6 +1690,8 @@ INSERT INTO `jornadas_medicas` VALUES
 (9,'Jornada de Salud Mental, Manejo del Estrés y Screening Médico','Salud Mental y Bienestar',30,'2026-10-28 08:00:00','2026-10-28 15:00:00','Sala de Usos Múltiples - Biblioteca Central','Jornada de promoción de salud mental, detección precoz de ansiedad/depresión y triage médico.','Activa','2026-10-05 11:00:00');
 /*!40000 ALTER TABLE `jornadas_medicas` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `log_referencias`
@@ -1489,6 +1718,7 @@ CREATE TABLE `log_referencias` (
 -- Dumping data for table `log_referencias`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `log_referencias` WRITE;
 /*!40000 ALTER TABLE `log_referencias` DISABLE KEYS */;
 INSERT INTO `log_referencias` VALUES
@@ -1510,6 +1740,8 @@ INSERT INTO `log_referencias` VALUES
 (31,32,'Pendiente','Rechazada',10,'2026-03-13 14:00:00','Se orienta al estudiante hacia los programas de becas socioeconómicas disponibles.');
 /*!40000 ALTER TABLE `log_referencias` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `mantenimiento_vehiculos`
@@ -1534,12 +1766,15 @@ CREATE TABLE `mantenimiento_vehiculos` (
 -- Dumping data for table `mantenimiento_vehiculos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `mantenimiento_vehiculos` WRITE;
 /*!40000 ALTER TABLE `mantenimiento_vehiculos` DISABLE KEYS */;
 INSERT INTO `mantenimiento_vehiculos` VALUES
 (2,5,'Correctivo','2026-10-02','Reemplazo de filtro de aceite por saturación y sustitución de correa de alternador agrietada.');
 /*!40000 ALTER TABLE `mantenimiento_vehiculos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `mobiliario`
@@ -1574,6 +1809,7 @@ CREATE TABLE `mobiliario` (
 -- Dumping data for table `mobiliario`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `mobiliario` WRITE;
 /*!40000 ALTER TABLE `mobiliario` DISABLE KEYS */;
 INSERT INTO `mobiliario` VALUES
@@ -1596,6 +1832,8 @@ INSERT INTO `mobiliario` VALUES
 (18,10,6,1,'Bueno','Activo','2025-02-15 15:15:00','MueblesLara','ML-CONF','Caoba Oscuro','2025-02-01','Mesa de reuniones Sala de Conferencia','Capacidad 10 puestos');
 /*!40000 ALTER TABLE `mobiliario` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `orientacion`
@@ -1615,13 +1853,14 @@ CREATE TABLE `orientacion` (
   PRIMARY KEY (`id_orientacion`),
   KEY `id_solicitud_serv` (`id_solicitud_serv`),
   CONSTRAINT `orientacion_ibfk_1` FOREIGN KEY (`id_solicitud_serv`) REFERENCES `solicitud_de_servicio` (`id_solicitud_serv`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `orientacion`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `orientacion` WRITE;
 /*!40000 ALTER TABLE `orientacion` DISABLE KEYS */;
 INSERT INTO `orientacion` VALUES
@@ -1648,9 +1887,31 @@ INSERT INTO `orientacion` VALUES
 (22,90,'Orientación sobre canales institucionales de atención al estudiante.','Desconocimiento del catálogo de servicios transversales disponibles en la UPTAEB.','Se entrega tríptico informativo de los servicios de la institución.','Informar sobre las unidades de Psicología, Medicina, Trabajo Social y Biblioteca.','2026-07-20'),
 (23,91,'Asesoría para la formulación de objetivos de investigación.','Redacción ambigua en los objetivos específicos del proyecto comunitario.','Objetivos corregidos y alineados con la metodología.','Utilizar la taxonomía de Bloom para seleccionar verbos en infinitivo medibles.','2026-08-25'),
 (24,92,'Orientación preventiva sobre deserción estudiantil.','Dudas sobre continuar la carrera debido a desmotivación temporal.','Estudiante decide continuar matriculado con acompañamiento quincenal.','Reevaluar los logros alcanzados y definir metas a corto plazo.','2026-09-18'),
-(25,93,'Evaluación de cierre de acompañamiento pedagógico.','Sesión final para verificar el logro de las metas académicas del trayecto.','Cierre de caso por cumplimiento satisfactorio de los objetivos planteados.','Mantener las metodologías de estudio consolidadas durante las sesiones.','2026-10-06');
+(25,93,'Evaluación de cierre de acompañamiento pedagógico.','Sesión final para verificar el logro de las metas académicas del trayecto.','Cierre de caso por cumplimiento satisfactorio de los objetivos planteados.','Mantener las metodologías de estudio consolidadas durante las sesiones.','2026-10-06'),
+(26,181,'Orientación sobre hábitos de estudio y rendimiento académico en ciencias administrativas.','La estudiante manifiesta vacíos metodológicos en la organización de su tiempo libre y estudio independiente para materias cuantitativas.','Muestra excelente disposición para adoptar nuevas técnicas de lectura analítica y resolución de casos.','Crear una rutina de estudio fija de 2 horas diarias, emplear la técnica Pomodoro y elaborar mapas conceptuales.','2024-01-24'),
+(27,182,'Acompañamiento en la adaptación al entorno académico universitario.','Estudiante de nuevo ingreso reporta desorientación sobre la dinámica de bloques horarios y trámites académicos institucionales.','Se hace entrega formal de la guía de procedimientos al estudiante y el reglamento disciplinario.','Asistir a las jornadas de inducción estudiantil e incorporarse al programa de tutorías entre pares en Higiene y Seguridad Laboral.','2024-03-06'),
+(28,183,'Orientación en la toma de decisiones sobre carga horaria y créditos académicos.','Evaluación de cantidad de unidades curriculares inscritas frente a responsabilidades laborales vespertinas.','Trámite canalizado satisfactoriamente con la coordinación del PNF y control de estudios.','Solicitar ajuste de sección para evitar solapamientos con su jornada laboral en biblioteca o archivo.','2024-04-25'),
+(29,184,'Asesoría pedagógica en metodologías de investigación aplicada a la logística.','Dudas conceptuales en la delimitación del problema y alcance territorial en el proyecto de cadenas de distribución.','Muestra comprensión adecuada de la ruta metodológica y variables de estudio.','Consultar bibliografía recomendada en el centro de documentación y coordinar asesoría técnica con el docente metodólogo.','2024-06-13'),
+(30,185,'Orientación en la resolución de conflictos interpersonales en equipo de proyecto.','Desacuerdos entre los integrantes del grupo de desarrollo sobre el cronograma y división de entregables.','El equipo logró consensuar compromisos claros y firmar acuerdos de convivencia técnica.','Establecer acta de acuerdos internos de trabajo, definir responsables por módulo y aplicar metodología ágil.','2024-07-24'),
+(31,186,'Acompañamiento en el cumplimiento del servicio comunitario universitario.','Dudas sobre la contabilización de las 120 horas lectivas y llenado de bitácoras de campo en prevención de riesgos.','Proceso de vinculación comunitaria en marcha sin contratiempos administrativos.','Registrar actividades semanalmente en la bitácora física y solicitar la firma del vocero del consejo comunal.','2024-09-12'),
+(32,187,'Orientación en técnicas de resolución de exámenes analíticos y catalogación.','Reporta bloqueo mental al enfrentarse a pruebas escritas con límite estricto de tiempo.','La estudiante pondrá en práctica las recomendaciones en las evaluaciones finales del trimestre.','Aplicar lecturas iniciales globales de la prueba, responder primero las preguntas de mayor dominio y dosificar minutos.','2024-11-07'),
+(33,188,'Asesoría para la formulación de objetivos de investigación en distribución y logística.','Redacción ambigua en los objetivos específicos del proyecto sociointegrador comunitario.','Objetivos corregidos y alineados con la metodología del Programa Nacional de Formación.','Utilizar la taxonomía de Bloom para seleccionar verbos en infinitivo medibles y orientados al diagnóstico.','2025-01-30'),
+(34,189,'Estrategias de organización en programación y desarrollo web en informática.','Estudiante manifiesta sobrecarga de entregables en desarrollo de software y bases de datos relacionales.','Excelente receptividad; implementa tablero de organización semanal con metas diarias medibles.','Aplicar metodologías ágiles personales (tableros Kanban) para priorizar tareas y evitar postergaciones.','2025-03-13'),
+(35,190,'Asesoría para la conformación de brigadas de emergencia en higiene laboral.','Dudas en el diseño de planes de contingencia comunitarios para su proyecto de prevención de incendios.','Enlace institucional gestionado oportunamente para la validación del protocolo de seguridad.','Coordinar enlace con el cuerpo de bomberos universitarios y aplicar normas COVENIN correspondientes.','2025-04-24'),
+(36,191,'Orientación en digitalización y preservación de documentos históricos.','Dudas metodológicas sobre normas archivísticas internacionales aplicables a fondos documentales locales.','Se entrega esquema conceptual y guía de buenas prácticas en archivología digital.','Consultar la norma ISAD(G) y los manuales del Archivo General de la Nación disponibles en repositorio.','2025-06-12'),
+(37,192,'Orientación en optimización de rutas de transporte de carga y almacenes.','Modelado de rutas de distribución para el proyecto sociointegrador de abastecimiento local.','Comprensión satisfactoria de los modelos de optimización de transporte y logística.','Utilizar diagramas de flujo de procesos logísticos y aplicar el método de ruta crítica (CPM).','2025-07-23'),
+(38,193,'Asesoría en preparación para pasantías en soporte técnico y redes.','Orientación sobre expectativas de desempeño laboral en centros de cómputo del sector público.','Estudiante bien preparada técnicamente; se refuerzan destrezas de comunicación con usuarios no técnicos.','Reforzar conceptos de configuración de enrutadores, cableado estructurado y ética profesional informática.','2025-09-24'),
+(39,194,'Orientación pedagógica sobre diseño de mapas de riesgo laboral.','Dudas en la simbología estandarizada y codificación de colores para planos de evacuación.','Planos corregidos conforme a los estándares de higiene y seguridad laboral vigentes.','Basarse estrictamente en la norma venezolana COVENIN 187 para colores y señales de seguridad.','2025-11-26'),
+(40,195,'Orientación sobre conservación preventiva en archivos comunales y familiares.','Planificación de jornadas de capacitación a voceros de consejos comunales sobre resguardo de documentos.','Estudiante demuestra madurez metodológica en la divulgación de saberes archivísticos.','Estructurar talleres prácticos de limpieza mecánica, control de humedad relativa y almacenamiento libre de ácido.','2026-02-12'),
+(41,196,'Asesoría en control de inventarios mediante software libre institucional.','Integración de herramientas informáticas en la gestión de almacenes comunales de distribución.','El estudiante logra automatizar el kardex de prueba con fórmulas dinámicas.','Emplear hojas de cálculo avanzadas y bases de datos relacionales abiertas para registro de entradas y salidas.','2026-03-25'),
+(42,197,'Orientación en ciberseguridad básica y protección de datos en sistemas académicos.','Implementación de medidas de seguridad y cifrado en el proyecto de software comunitario.','Excelente criterio de seguridad informática defensiva demostrado por la estudiante.','Investigar directrices de OWASP Top 10, hash seguro de contraseñas y validación estricta de formularios.','2026-05-14'),
+(43,198,'Asesoría en ergonomía en puestos de trabajo con pantallas de visualización de datos.','Evaluación ergonómica mediante el método ROSA en oficinas administrativas de la universidad.','Informe ergonómico preliminar muy completo y con recomendaciones viables de bajo costo.','Realizar mediciones de altura de planos de trabajo, distancia visual a monitores y ángulos de apoyo lumbar.','2026-06-24'),
+(44,199,'Orientación en catalogación de recursos digitales y metadatos en bibliotecas virtuales.','Implementación de esquemas de metadatos Dublin Core para repositorios institucionales de acceso abierto.','Dominio técnico notable de la taxonomía documental y recuperación de información digital.','Estudiar los 15 elementos básicos de Dublin Core y realizar pruebas piloto de catalogación con tesis de grado.','2026-08-13'),
+(45,200,'Asesoría en logística de distribución de insumos médicos para centros de salud comunitaria.','Simulación de rutas críticas de entrega de medicamentos en dispensarios parroquiales de Barquisimeto.','Se logró optimizar el tiempo de respuesta logístico en la propuesta teórica del proyecto.','Integrar el análisis geográfico de distancias con la frecuencia de reposición de stock esencial.','2026-10-15');
 /*!40000 ALTER TABLE `orientacion` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `patologia`
@@ -1665,13 +1926,14 @@ CREATE TABLE `patologia` (
   `tipo_patologia` varchar(100) NOT NULL,
   `fecha_creacion` date NOT NULL,
   PRIMARY KEY (`id_patologia`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `patologia`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `patologia` WRITE;
 /*!40000 ALTER TABLE `patologia` DISABLE KEYS */;
 INSERT INTO `patologia` VALUES
@@ -1684,9 +1946,25 @@ INSERT INTO `patologia` VALUES
 (10,'Cefalea tensional','Médica','2025-01-10'),
 (11,'Gastritis aguda','Médica','2025-01-10'),
 (12,'Faringoamigdalitis','Médica','2025-01-10'),
-(13,'Asma bronquial','Médica','2025-01-10');
+(13,'Asma bronquial','Médica','2025-01-10'),
+(14,'Dolor intestinal','Medica','2026-10-31'),
+(15,'Estrés académico','Psicológica','2024-01-10'),
+(16,'Depresión leve','Psicológica','2024-01-10'),
+(17,'Trastorno de adaptación','Psicológica','2024-01-10'),
+(18,'Fobia social / Ansiedad social','Psicológica','2024-01-10'),
+(19,'Duelo no complicado','Psicológica','2024-01-10'),
+(20,'Agotamiento emocional / Burnout','Psicológica','2024-01-10'),
+(22,'Hipertensión arterial leve','Médica','2024-01-10'),
+(23,'Lumbalgia mecánica','Médica','2024-01-10'),
+(24,'Dermatitis por contacto','Médica','2024-01-10'),
+(25,'Infección urinaria no complicada','Médica','2024-01-10'),
+(26,'Rinitis alérgica','Médica','2024-01-10'),
+(27,'Esguince de tobillo leve','Médica','2024-01-10'),
+(28,'Gastroenteritis aguda viral','Médica','2024-01-10');
 /*!40000 ALTER TABLE `patologia` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `pnf`
@@ -1708,6 +1986,7 @@ CREATE TABLE `pnf` (
 -- Dumping data for table `pnf`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `pnf` WRITE;
 /*!40000 ALTER TABLE `pnf` DISABLE KEYS */;
 INSERT INTO `pnf` VALUES
@@ -1726,6 +2005,8 @@ INSERT INTO `pnf` VALUES
 (13,'PNF Sistemas informáticos',0,'2026-02-02');
 /*!40000 ALTER TABLE `pnf` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `presentacion_insumo`
@@ -1746,6 +2027,7 @@ CREATE TABLE `presentacion_insumo` (
 -- Dumping data for table `presentacion_insumo`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `presentacion_insumo` WRITE;
 /*!40000 ALTER TABLE `presentacion_insumo` DISABLE KEYS */;
 INSERT INTO `presentacion_insumo` VALUES
@@ -1757,6 +2039,8 @@ INSERT INTO `presentacion_insumo` VALUES
 (6,'Gaseosas','2026-02-02');
 /*!40000 ALTER TABLE `presentacion_insumo` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `proveedores`
@@ -1784,6 +2068,7 @@ CREATE TABLE `proveedores` (
 -- Dumping data for table `proveedores`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `proveedores` WRITE;
 /*!40000 ALTER TABLE `proveedores` DISABLE KEYS */;
 INSERT INTO `proveedores` VALUES
@@ -1792,6 +2077,8 @@ INSERT INTO `proveedores` VALUES
 (3,'J','J-40123987-5','Autopartes y Mantenimiento Barquisimeto, F.P.','0251-2334455','contacto@autobarquisimeto.com','Av. Venezuela con Calle 29','Activo','2025-01-15 14:00:00');
 /*!40000 ALTER TABLE `proveedores` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `referencias`
@@ -1825,6 +2112,7 @@ CREATE TABLE `referencias` (
 -- Dumping data for table `referencias`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `referencias` WRITE;
 /*!40000 ALTER TABLE `referencias` DISABLE KEYS */;
 INSERT INTO `referencias` VALUES
@@ -1854,6 +2142,8 @@ INSERT INTO `referencias` VALUES
 (40,5,9,4,8,2,'2026-10-06 18:00:00','Valoración médica de control para beneficiario de programa FAMES.','Pendiente','Verificación de evolución clínica previa a la entrega de reembolso quirúrgico.');
 /*!40000 ALTER TABLE `referencias` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `repuestos_mantenimiento`
@@ -1879,6 +2169,7 @@ CREATE TABLE `repuestos_mantenimiento` (
 -- Dumping data for table `repuestos_mantenimiento`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `repuestos_mantenimiento` WRITE;
 /*!40000 ALTER TABLE `repuestos_mantenimiento` DISABLE KEYS */;
 INSERT INTO `repuestos_mantenimiento` VALUES
@@ -1886,6 +2177,8 @@ INSERT INTO `repuestos_mantenimiento` VALUES
 (3,2,5,'1');
 /*!40000 ALTER TABLE `repuestos_mantenimiento` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `repuestos_vehiculos`
@@ -1912,6 +2205,7 @@ CREATE TABLE `repuestos_vehiculos` (
 -- Dumping data for table `repuestos_vehiculos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `repuestos_vehiculos` WRITE;
 /*!40000 ALTER TABLE `repuestos_vehiculos` DISABLE KEYS */;
 INSERT INTO `repuestos_vehiculos` VALUES
@@ -1919,9 +2213,11 @@ INSERT INTO `repuestos_vehiculos` VALUES
 (3,'Filtro de Combustible Yutong','Filtro primario de trampa de agua',3,2,'2025-02-01','Disponible'),
 (4,'Liga de Freno DOT4 1L','Envase de 1 litro de fluido de frenos',8,3,'2025-02-10','Disponible'),
 (5,'Correa de Alternador Encava','Correa acanalada para motor ISUZU/Encava',2,3,'2025-02-15','Disponible'),
-(6,'Batería 800Ah 12V Heavy Duty','Batería de alto amperaje para autobús',0,3,'2025-03-01','Agotado');
+(6,'Batería 800Ah 12V Heavy Duty','Batería de alto amperaje para autobús',10,3,'2025-03-01','Disponible');
 /*!40000 ALTER TABLE `repuestos_vehiculos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `rutas`
@@ -1949,6 +2245,7 @@ CREATE TABLE `rutas` (
 -- Dumping data for table `rutas`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `rutas` WRITE;
 /*!40000 ALTER TABLE `rutas` DISABLE KEYS */;
 INSERT INTO `rutas` VALUES
@@ -1958,6 +2255,8 @@ INSERT INTO `rutas` VALUES
 (5,'Ruta 4 - Quíbor / Traslado Especial','UPTAEB - Carretera Lara-Zulia - Entrada Quíbor','Extraurbana','06:00:00','08:00:00','Sede UPTAEB','Plaza Bolívar de Quíbor','Inactiva','2025-02-01 14:00:00');
 /*!40000 ALTER TABLE `rutas` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `servicio`
@@ -1979,6 +2278,7 @@ CREATE TABLE `servicio` (
 -- Dumping data for table `servicio`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `servicio` WRITE;
 /*!40000 ALTER TABLE `servicio` DISABLE KEYS */;
 INSERT INTO `servicio` VALUES
@@ -1994,6 +2294,8 @@ INSERT INTO `servicio` VALUES
 (10,'Mantenimiento',0,'2026-02-02');
 /*!40000 ALTER TABLE `servicio` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `solicitud_de_servicio`
@@ -2012,13 +2314,14 @@ CREATE TABLE `solicitud_de_servicio` (
   KEY `id_servicios` (`id_servicios`),
   CONSTRAINT `solicitud_de_servicio_ibfk_1` FOREIGN KEY (`id_beneficiario`) REFERENCES `beneficiario` (`id_beneficiario`),
   CONSTRAINT `solicitud_de_servicio_ibfk_2` FOREIGN KEY (`id_servicios`) REFERENCES `servicio` (`id_servicios`)
-) ENGINE=InnoDB AUTO_INCREMENT=161 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish2_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table `solicitud_de_servicio`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `solicitud_de_servicio` WRITE;
 /*!40000 ALTER TABLE `solicitud_de_servicio` DISABLE KEYS */;
 INSERT INTO `solicitud_de_servicio` VALUES
@@ -2142,9 +2445,51 @@ INSERT INTO `solicitud_de_servicio` VALUES
 (157,4,7,9),
 (158,4,9,10),
 (159,4,11,10),
-(160,4,13,10);
+(160,4,13,10),
+(161,1,68,3),
+(162,1,71,3),
+(163,1,74,3),
+(164,1,77,3),
+(165,1,80,3),
+(166,1,83,3),
+(167,1,89,3),
+(168,1,93,3),
+(169,1,96,3),
+(170,1,99,3),
+(171,1,102,3),
+(172,1,105,3),
+(173,1,109,3),
+(174,1,112,3),
+(175,1,118,3),
+(176,1,121,3),
+(177,1,124,3),
+(178,1,127,3),
+(179,1,130,3),
+(180,1,134,3),
+(181,3,68,2),
+(182,3,71,2),
+(183,3,74,2),
+(184,3,77,2),
+(185,3,80,2),
+(186,3,83,2),
+(187,3,86,2),
+(188,3,89,2),
+(189,3,92,2),
+(190,3,95,2),
+(191,3,98,2),
+(192,3,101,2),
+(193,3,104,2),
+(194,3,107,2),
+(195,3,110,2),
+(196,3,113,2),
+(197,3,116,2),
+(198,3,119,2),
+(199,3,122,2),
+(200,3,125,2);
 /*!40000 ALTER TABLE `solicitud_de_servicio` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `tipo_equipo`
@@ -2167,6 +2512,7 @@ CREATE TABLE `tipo_equipo` (
 -- Dumping data for table `tipo_equipo`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `tipo_equipo` WRITE;
 /*!40000 ALTER TABLE `tipo_equipo` DISABLE KEYS */;
 INSERT INTO `tipo_equipo` VALUES
@@ -2181,6 +2527,8 @@ INSERT INTO `tipo_equipo` VALUES
 (11,'Sistema de Audio Amplificado','Altavoz amplificado para sala de conferencias',1,'2025-01-10');
 /*!40000 ALTER TABLE `tipo_equipo` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `tipo_mobiliario`
@@ -2203,6 +2551,7 @@ CREATE TABLE `tipo_mobiliario` (
 -- Dumping data for table `tipo_mobiliario`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `tipo_mobiliario` WRITE;
 /*!40000 ALTER TABLE `tipo_mobiliario` DISABLE KEYS */;
 INSERT INTO `tipo_mobiliario` VALUES
@@ -2217,6 +2566,8 @@ INSERT INTO `tipo_mobiliario` VALUES
 (11,'Silla de Ruedas Institucional','Silla de ruedas plegable para asistencia',1,'2025-01-10');
 /*!40000 ALTER TABLE `tipo_mobiliario` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Table structure for table `vehiculos`
@@ -2241,6 +2592,7 @@ CREATE TABLE `vehiculos` (
 -- Dumping data for table `vehiculos`
 --
 
+SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, @@AUTOCOMMIT=0;
 LOCK TABLES `vehiculos` WRITE;
 /*!40000 ALTER TABLE `vehiculos` DISABLE KEYS */;
 INSERT INTO `vehiculos` VALUES
@@ -2251,6 +2603,8 @@ INSERT INTO `vehiculos` VALUES
 (7,'A05IJ6K','Toyota Corolla','Automóvil','2025-02-01','Inactivo');
 /*!40000 ALTER TABLE `vehiculos` ENABLE KEYS */;
 UNLOCK TABLES;
+COMMIT;
+SET AUTOCOMMIT=@OLD_AUTOCOMMIT;
 
 --
 -- Temporary table structure for view `vw_beneficiarios_completos`
@@ -2261,26 +2615,30 @@ DROP TABLE IF EXISTS `vw_beneficiarios_completos`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8mb4;
 /*!50001 CREATE VIEW `vw_beneficiarios_completos` AS SELECT
- 1 AS `id_beneficiario`,
-  1 AS `nombres`,
-  1 AS `apellidos`,
-  1 AS `nombre_completo`,
-  1 AS `tipo_cedula`,
-  1 AS `cedula`,
-  1 AS `cedula_completa`,
-  1 AS `identificacion_formateada`,
-  1 AS `fecha_nac`,
-  1 AS `telefono`,
-  1 AS `correo`,
-  1 AS `genero`,
-  1 AS `genero_texto`,
-  1 AS `direccion`,
-  1 AS `seccion`,
-  1 AS `estatus`,
-  1 AS `fecha_creacion`,
-  1 AS `id_pnf`,
-  1 AS `nombre_pnf` */;
+ NULL AS `id_beneficiario`,
+ NULL AS `nombres`,
+ NULL AS `apellidos`,
+ NULL AS `nombre_completo`,
+ NULL AS `tipo_cedula`,
+ NULL AS `cedula`,
+ NULL AS `cedula_completa`,
+ NULL AS `identificacion_formateada`,
+ NULL AS `fecha_nac`,
+ NULL AS `telefono`,
+ NULL AS `correo`,
+ NULL AS `genero`,
+ NULL AS `genero_texto`,
+ NULL AS `direccion`,
+ NULL AS `seccion`,
+ NULL AS `estatus`,
+ NULL AS `fecha_creacion`,
+ NULL AS `id_pnf`,
+ NULL AS `nombre_pnf` */;
 SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping routines for database 'dirpoles_business'
+--
 
 --
 -- Current Database: `dirpoles_business`
@@ -2313,6 +2671,6 @@ USE `dirpoles_business`;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+/*M!100616 SET NOTE_VERBOSITY=@OLD_NOTE_VERBOSITY */;
 
--- Dump completed on 2026-10-20 15:16:37
+-- Dump completed on 2026-11-27  0:35:59

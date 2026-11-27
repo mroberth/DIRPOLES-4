@@ -24,7 +24,7 @@
 -- 100% IDEMPOTENTE: omite registros si ya existen para el beneficiario y fecha.
 -- =====================================================================
 
-SET NAMES utf8mb4;
+SET NAMES utf8mb4 COLLATE utf8mb4_spanish2_ci;
 
 -- =====================================================================
 -- 1. PROCEDIMIENTO TEMPORAL DE CARGA TRANSACCIONAL E IDEMPOTENTE
@@ -48,12 +48,12 @@ BEGIN
     -- 1. Resolver orientador
     SELECT id_empleado INTO v_id_ori
     FROM dirpoles_security.empleado
-    WHERE cedula = p_cedula_ori LIMIT 1;
+    WHERE cedula = p_cedula_ori COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     -- 2. Resolver beneficiario
     SELECT id_beneficiario INTO v_id_ben
     FROM beneficiario
-    WHERE cedula = p_cedula_ben LIMIT 1;
+    WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     -- Idempotencia: Verificar que orientador y beneficiario existan, y que no exista orientación previa en esa fecha
     IF v_id_ori IS NOT NULL AND v_id_ben IS NOT NULL THEN

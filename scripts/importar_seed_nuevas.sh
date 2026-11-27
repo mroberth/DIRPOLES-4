@@ -28,10 +28,14 @@ echo -e "${CYAN}================================================================
 echo -e "${CYAN}   DIRPOLES-4 — IMPORTADOR AUTOMATIZADO DE SEEDS SINTÉTICOS (TANDA 2)  ${NC}"
 echo -e "${CYAN}======================================================================${NC}\n"
 
-# 1. Verificar comando mysql
-if ! command -v mysql >/dev/null 2>&1; then
-    echo -e "${ROJO}[ERROR] El cliente 'mysql' no está instalado o no se encuentra en el PATH.${NC}" >&2
-    echo -e "        Instálalo con: sudo apt install mariadb-client (en Linux) o agrega MySQL al PATH." >&2
+# 1. Detectar cliente mariadb o mysql
+if command -v mariadb >/dev/null 2>&1; then
+    CLI_BIN="mariadb"
+elif command -v mysql >/dev/null 2>&1; then
+    CLI_BIN="mysql"
+else
+    echo -e "${ROJO}[ERROR] No se encontró el cliente 'mariadb' ni 'mysql' en el PATH.${NC}" >&2
+    echo -e "        Instálalo con: sudo dnf install mariadb (en Fedora) o equivalente." >&2
     exit 1
 fi
 
@@ -57,8 +61,8 @@ else
     echo -e "${AMARILLO}[AVISO] Archivo .env no encontrado. Usando valores por defecto (host=$DB_HOST, user=$DB_USER, db=$DB_NAME).${NC}"
 fi
 
-# Parámetros de conexión a MySQL
-MYSQL_CMD=(mysql --default-character-set=utf8mb4 -h "$DB_HOST" -u "$DB_USER")
+# Parámetros de conexión a MariaDB / MySQL
+MYSQL_CMD=("$CLI_BIN" --default-character-set=utf8mb4 -h "$DB_HOST" -u "$DB_USER")
 if [[ -n "$DB_PASS" ]]; then
     MYSQL_CMD+=("-p$DB_PASS")
 else
@@ -88,6 +92,7 @@ SEEDS=(
     "seed_discapacidad2.sql"
     "seed_trabajo_social2.sql"
     "seed_referencias2.sql"
+    "seed_recientes_medicina_becas.sql"
 )
 
 TOTAL_SEEDS=${#SEEDS[@]}
@@ -132,11 +137,11 @@ echo -e "${CYAN}================================================================
 "${MYSQL_CMD[@]}" "$DB_NAME" -t << 'SQL'
 SELECT 'Beneficiarios Totales' AS Concepto, COUNT(*) AS Total FROM beneficiario
 UNION ALL
-SELECT 'Citas de Psicología', COUNT(*) FROM citas
+SELECT 'Citas de Psicología', COUNT(*) FROM cita
 UNION ALL
-SELECT 'Consultas de Psicología', COUNT(*) FROM psicologia
+SELECT 'Consultas de Psicología', COUNT(*) FROM consulta_psicologica
 UNION ALL
-SELECT 'Consultas de Medicina', COUNT(*) FROM medicina
+SELECT 'Consultas de Medicina', COUNT(*) FROM consulta_medica
 UNION ALL
 SELECT 'Atenciones de Orientación', COUNT(*) FROM orientacion
 UNION ALL
@@ -152,10 +157,18 @@ SELECT 'Atención a Gestantes', COUNT(*) FROM gestion_emb
 UNION ALL
 SELECT 'Referencias Inter-departamentales', COUNT(*) FROM referencias
 UNION ALL
-SELECT 'Trazabilidad en Log Referencias', COUNT(*) FROM log_referencias;
+SELECT 'Trazabilidad en Log Referencias', COUNT(*) FROM log_referencias
+UNION ALL
+SELECT 'Consultas Médicas (Hoy 26/11)', COUNT(*) FROM consulta_medica WHERE fecha_creacion = '2026-11-26'
+UNION ALL
+SELECT 'Becas Registradas (Hoy 26/11)', COUNT(*) FROM becas WHERE fecha_creacion = '2026-11-26'
+UNION ALL
+SELECT 'Consultas Médicas (Última Semana: 18-26 Nov)', COUNT(*) FROM consulta_medica WHERE fecha_creacion BETWEEN '2026-11-18' AND '2026-11-26'
+UNION ALL
+SELECT 'Becas Registradas (Última Semana: 18-26 Nov)', COUNT(*) FROM becas WHERE fecha_creacion BETWEEN '2026-11-18' AND '2026-11-26';
 SQL
 
 echo -e "\n${CYAN}Distribución de Referencias por Estado:${NC}"
 "${MYSQL_CMD[@]}" "$DB_NAME" -t -e "SELECT estado AS Estado, COUNT(*) AS Total FROM referencias GROUP BY estado;"
 
-echo -e "\n${VERDE}Todo listo. El entorno de datos sintéticos (2024 - 17/11/2026) está activo y verificado.${NC}"
+echo -e "\n${VERDE}Todo listo. El entorno de datos sintéticos (2024 - 26/11/2026) está activo y verificado.${NC}"

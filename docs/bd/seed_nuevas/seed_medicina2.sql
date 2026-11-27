@@ -39,7 +39,7 @@
 -- 100% IDEMPOTENTE: omite registros si ya existen para el beneficiario y fecha.
 -- =====================================================================
 
-SET NAMES utf8mb4;
+SET NAMES utf8mb4 COLLATE utf8mb4_spanish2_ci;
 
 -- =====================================================================
 -- 1. ASEGURAR PATOLOGÍAS MÉDICAS COMUNES EN EL CATÁLOGO
@@ -100,17 +100,17 @@ BEGIN
     -- 1. Resolver médico
     SELECT id_empleado INTO v_id_med
     FROM dirpoles_security.empleado
-    WHERE cedula = p_cedula_med LIMIT 1;
+    WHERE cedula = p_cedula_med COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     -- 2. Resolver beneficiario
     SELECT id_beneficiario INTO v_id_ben
     FROM beneficiario
-    WHERE cedula = p_cedula_ben LIMIT 1;
+    WHERE cedula = p_cedula_ben COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     -- 3. Resolver patología
     SELECT id_patologia INTO v_id_pat
     FROM patologia
-    WHERE nombre_patologia = p_nombre_patologia LIMIT 1;
+    WHERE nombre_patologia = p_nombre_patologia COLLATE utf8mb4_spanish2_ci LIMIT 1;
 
     IF v_id_pat IS NULL THEN
         SELECT id_patologia INTO v_id_pat FROM patologia WHERE nombre_patologia = 'Sin patología médica' LIMIT 1;
@@ -147,7 +147,7 @@ BEGIN
             IF p_nombre_insumo1 IS NOT NULL AND p_cant_insumo1 IS NOT NULL THEN
                 SELECT id_insumo INTO v_id_ins1
                 FROM insumos
-                WHERE nombre_insumo LIKE CONCAT('%', p_nombre_insumo1, '%') LIMIT 1;
+                WHERE nombre_insumo LIKE CONCAT('%', p_nombre_insumo1 COLLATE utf8mb4_spanish2_ci, '%') LIMIT 1;
 
                 IF v_id_ins1 IS NOT NULL THEN
                     INSERT INTO detalle_insumo (id_consulta_med, id_insumo, cantidad_usada)
@@ -159,7 +159,7 @@ BEGIN
             IF p_nombre_insumo2 IS NOT NULL AND p_cant_insumo2 IS NOT NULL THEN
                 SELECT id_insumo INTO v_id_ins2
                 FROM insumos
-                WHERE nombre_insumo LIKE CONCAT('%', p_nombre_insumo2, '%') LIMIT 1;
+                WHERE nombre_insumo LIKE CONCAT('%', p_nombre_insumo2 COLLATE utf8mb4_spanish2_ci, '%') LIMIT 1;
 
                 IF v_id_ins2 IS NOT NULL THEN
                     INSERT INTO detalle_insumo (id_consulta_med, id_insumo, cantidad_usada)
